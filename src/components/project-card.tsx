@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Download, Github } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 interface ProjectCardProps {
   title: string
@@ -31,9 +32,11 @@ export function ProjectCard({
     <Card className="group overflow-hidden transition-all hover:shadow-lg">
       {image && (
         <div className="aspect-video overflow-hidden bg-muted">
-          <img
+          <Image
             src={image}
             alt={title}
+            width={400}
+            height={225}
             className="h-full w-full object-cover transition-all group-hover:scale-105"
           />
         </div>

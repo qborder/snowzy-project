@@ -3,10 +3,8 @@
 import Link from "next/link"
 import { Github, Youtube, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useTheme } from "next-themes"
 
 export function Navigation() {
-  const { theme, setTheme } = useTheme()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
