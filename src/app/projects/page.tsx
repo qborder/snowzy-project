@@ -351,7 +351,7 @@ export default function ProjectsPage() {
             
             <h3 className="text-2xl font-semibold mb-3">No projects found</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              We couldn't find any projects matching your criteria. Try adjusting your search terms or clearing some filters.
+              We couldn&apos;t find any projects matching your criteria. Try adjusting your search terms or clearing some filters.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
