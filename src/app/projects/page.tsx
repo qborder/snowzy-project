@@ -298,38 +298,44 @@ export default function ProjectsPage() {
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
             className={layout === "list" 
               ? "space-y-4" 
-              : "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              : "grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
             }
           >
-            {filtered.map((project, index) => (
-              <motion.div
-                key={`${project.title}-${index}`}
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0, 
-                  scale: 1,
-                  transition: {
-                    delay: index * 0.02,
-                    duration: 0.3,
-                    ease: [0.2, 0.8, 0.2, 1]
-                  }
-                }}
-                layout
-                className={layout === "list" ? "w-full" : ""}
-              >
-                <ProjectCard
-                  title={project.title}
-                  description={project.description}
-                  category={project.category}
-                  downloadUrl={project.downloadUrl}
-                  githubUrl={project.githubUrl}
-                  demoUrl={project.demoUrl}
-                  tags={project.tags}
-                  reduce={layout === "list"}
-                />
-              </motion.div>
-            ))}
+            {filtered.map((project, index) => {
+              const originalIndex = projects.indexOf(project)
+              return (
+                <motion.div
+                  key={`${project.title}-${index}`}
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1,
+                    transition: {
+                      delay: index * 0.02,
+                      duration: 0.3,
+                      ease: [0.2, 0.8, 0.2, 1]
+                    }
+                  }}
+                  layout
+                  className={layout === "list" ? "w-full" : ""}
+                >
+                  <ProjectCard
+                    title={project.title}
+                    description={project.description}
+                    category={project.category}
+                    downloadUrl={project.downloadUrl}
+                    githubUrl={project.githubUrl}
+                    demoUrl={project.demoUrl}
+                    youtubeUrl={(project as any).youtubeUrl}
+                    image={(project as any).image}
+                    tags={project.tags}
+                    reduce={layout === "list"}
+                    projectIndex={originalIndex}
+                  />
+                </motion.div>
+              )
+            })}
           </motion.div>
         </AnimatePresence>
 
