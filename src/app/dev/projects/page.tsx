@@ -6,6 +6,8 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Brush } from "lucide-react"
@@ -459,20 +461,38 @@ export default function DevProjectsPage() {
                         <div>
                           <label className="text-sm font-medium mb-2 block">Background Gradient</label>
                           <div className="space-y-2">
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-4 gap-2">
                               {[
                                 "bg-gradient-to-br from-blue-500 to-purple-600",
                                 "bg-gradient-to-br from-green-400 to-blue-500",
                                 "bg-gradient-to-br from-pink-500 to-rose-500",
                                 "bg-gradient-to-br from-purple-500 to-pink-500",
                                 "bg-gradient-to-br from-yellow-400 to-orange-500",
-                                "bg-gradient-to-br from-cyan-500 to-blue-500"
+                                "bg-gradient-to-br from-cyan-500 to-blue-500",
+                                "bg-gradient-to-br from-red-500 to-pink-500",
+                                "bg-gradient-to-br from-indigo-500 to-purple-500",
+                                "bg-gradient-to-br from-emerald-400 to-cyan-400",
+                                "bg-gradient-to-br from-orange-400 to-red-500",
+                                "bg-gradient-to-br from-teal-400 to-blue-500",
+                                "bg-gradient-to-br from-violet-500 to-purple-500",
+                                "bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600",
+                                "bg-gradient-to-r from-green-300 via-blue-500 to-purple-600",
+                                "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400",
+                                "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200",
+                                "bg-gradient-to-tr from-slate-900 via-purple-900 to-slate-900",
+                                "bg-gradient-to-tr from-gray-900 via-gray-600 to-gray-900",
+                                "bg-gradient-to-bl from-pink-200 via-purple-400 to-indigo-200",
+                                "bg-gradient-to-bl from-green-200 via-green-400 to-purple-700",
+                                "bg-gradient-to-tl from-red-400 via-gray-300 to-blue-500",
+                                "bg-gradient-to-tl from-amber-200 via-violet-600 to-sky-900",
+                                "bg-gradient-to-b from-violet-200 to-pink-200",
+                                "bg-gradient-to-b from-blue-200 to-cyan-200"
                               ].map(gradient => (
                                 <button
                                   key={gradient}
                                   type="button"
                                   onClick={() => setCardGradient(gradient)}
-                                  className={`h-16 rounded-lg ${gradient} ${cardGradient === gradient ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
+                                  className={`h-12 rounded-lg ${gradient} ${cardGradient === gradient ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''} hover:scale-105 transition-transform`}
                                 />
                               ))}
                             </div>
@@ -480,6 +500,10 @@ export default function DevProjectsPage() {
                               value={cardGradient}
                               onChange={e => setCardGradient(e.target.value)}
                               placeholder="Custom gradient class (e.g., bg-gradient-to-r from-red-500 to-blue-500)"
+                            />
+                            <GradientPicker 
+                              value={cardGradient}
+                              onChange={setCardGradient}
                             />
                           </div>
                         </div>

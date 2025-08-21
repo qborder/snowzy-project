@@ -23,6 +23,40 @@ export const metadata: Metadata = {
   keywords: ["Roblox", "Development", "Tutorials", "Projects", "Programming", "Web Development"],
   authors: [{ name: "Snowzy" }],
   creator: "Snowzy",
+  metadataBase: new URL('https://snowzy.dev'),
+  openGraph: {
+    title: "Snowzy - Projects & Tutorials",
+    description: "Discover cutting-edge tutorials and download project files for Roblox development, web applications, and modern programming.",
+    url: 'https://snowzy.dev',
+    siteName: 'Snowzy',
+    images: [
+      {
+        url: '/embed-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'Snowzy - Projects & Tutorials',
+      }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Snowzy - Projects & Tutorials",
+    description: "Discover cutting-edge tutorials and download project files for Roblox development, web applications, and modern programming.",
+    images: ['/embed-banner.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
