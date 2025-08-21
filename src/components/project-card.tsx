@@ -31,7 +31,8 @@ export function ProjectCard({
   image,
   reduce
 }: ProjectCardProps) {
-  const isReduced = reduce ?? useReducedMotion()
+  const prefersReduced = useReducedMotion()
+  const isReduced = reduce !== undefined ? reduce : prefersReduced
   return (
     <motion.div
       initial={isReduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
