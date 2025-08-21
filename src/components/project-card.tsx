@@ -17,7 +17,6 @@ interface ProjectCardProps {
   demoUrl?: string
   tags: string[]
   image?: string
-  reduce?: boolean
 }
 
 export function ProjectCard({
@@ -28,23 +27,21 @@ export function ProjectCard({
   githubUrl,
   demoUrl,
   tags,
-  image,
-  reduce
+  image
 }: ProjectCardProps) {
-  const prefersReduced = useReducedMotion()
-  const isReduced = reduce !== undefined ? reduce : prefersReduced
+  const reduce = useReducedMotion()
   return (
     <motion.div
-      initial={isReduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
-      whileInView={isReduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
-      whileHover={isReduced ? undefined : { 
+      whileHover={reduce ? undefined : { 
         y: -8, 
         rotateX: 2,
         scale: 1.02,
         transition: { duration: 0.3, ease: "easeOut" }
       }}
-      transition={{ duration: isReduced ? 0.2 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+      transition={{ duration: reduce ? 0.2 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
       className="[perspective:1000px] group"
     >
       <Card className="group/card overflow-hidden border-white/10 bg-background/60 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] hover:border-white/20 hover:bg-background/80 relative">
@@ -52,7 +49,7 @@ export function ProjectCard({
         <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(600px_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.06),transparent_40%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         {image && (
           <div className="relative aspect-video overflow-hidden bg-muted">
-            <motion.div initial={{ scale: 1 }} whileHover={isReduced ? undefined : { scale: 1.03 }} transition={{ duration: isReduced ? 0.2 : 0.3 }}>
+            <motion.div initial={{ scale: 1 }} whileHover={reduce ? undefined : { scale: 1.03 }} transition={{ duration: reduce ? 0.2 : 0.3 }}>
               <Image
                 src={image}
                 alt={title}
@@ -111,4 +108,3 @@ export function ProjectCard({
     </motion.div>
   )
 }
-

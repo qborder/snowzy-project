@@ -6,7 +6,7 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Search, Grid3X3, LayoutList, Sparkles, Code, Gamepad2, Filter, Clock, X } from "lucide-react"
+import { Search, Grid3X3, LayoutList, Sparkles, Code, Gamepad2, Filter, Download, Clock, X, Grid2X2, List } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import projectsData from "@/data/projects.json"
 
@@ -21,7 +21,11 @@ export default function ProjectsPage() {
   const router = useRouter()
   const pathname = usePathname()
 
-  
+  const categories = useMemo(() => {
+    const set = new Set<string>(["all"]) 
+    projects.forEach(p => set.add(p.category))
+    return Array.from(set)
+  }, [])
 
   const baseForCounts = useMemo(() => {
     return projects.filter(p => {
@@ -87,7 +91,9 @@ export default function ProjectsPage() {
     setSelectedTags([])
   }
 
-  
+  const gridClass = layout === "list"
+    ? "mx-auto grid justify-center gap-4 md:max-w-[70rem] grid-cols-1"
+    : "mx-auto grid justify-center gap-5 sm:grid-cols-2 md:max-w-[90rem] md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 
   return (
     <div className="min-h-screen">
