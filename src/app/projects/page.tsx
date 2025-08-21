@@ -6,7 +6,7 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Search, Grid3X3, LayoutList, Sparkles, Code, Gamepad2, Filter, Download, Clock, X, Grid2X2, List } from "lucide-react"
+import { Search, Grid3X3, LayoutList, Sparkles, Code, Gamepad2, Filter, Clock, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import projectsData from "@/data/projects.json"
 
