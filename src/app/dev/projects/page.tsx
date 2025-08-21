@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react"
-import { notFound } from "next/navigation"
+import { notFound, useRouter, useSearchParams } from "next/navigation"
 import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Brush } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
+import { ProjectEditor } from "@/components/project-editor"
 
 const DEFAULT_TEMPLATES = {
   roblox: {
@@ -63,8 +64,16 @@ type CustomTemplate = {
   cardColor?: string
 }
 
-export default function DevProjectCreatorPage() {
-  if (process.env.NODE_ENV === "production") return notFound()
+export default function DevProjectsPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = searchParams.get('tab')
+    return tab === 'editor' ? 'editor' : tab === 'edit' ? 'edit' : 'creator'
+  })
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
+  const [editingProject, setEditingProject] = useState<any>(null)
+  
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [category, setCategory] = useState("")
@@ -74,17 +83,40 @@ export default function DevProjectCreatorPage() {
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [image, setImage] = useState("")
   const [tags, setTags] = useState<string[]>([])
-  const [tagInput, setTagInput] = useState("")
   const [saving, setSaving] = useState(false)
-  const [result, setResult] = useState<string | null>(null)
-  const [dragActive, setDragActive] = useState(false)
-  const [customTemplates, setCustomTemplates] = useState<Record<string, CustomTemplate>>({})
-  const [templateName, setTemplateName] = useState("")
-  const [showTemplateDialog, setShowTemplateDialog] = useState(false)
+  const [result, setResult] = useState("")
   const [cardGradient, setCardGradient] = useState("")
   const [cardColor, setCardColor] = useState("")
   const [useCustomStyle, setUseCustomStyle] = useState(false)
+  const [customTemplates, setCustomTemplates] = useState<Record<string, CustomTemplate>>({})
+  const [templateName, setTemplateName] = useState("")
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false)
+  const [tagInput, setTagInput] = useState("")
+  const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  function handleTabChange(value: string) {
+    setActiveTab(value)
+    const url = new URL(window.location.href)
+    if (value === 'editor') {
+      url.searchParams.set('tab', 'editor')
+    } else if (value === 'edit') {
+      url.searchParams.set('tab', 'edit')
+    } else {
+      url.searchParams.delete('tab')
+    }
+    router.replace(url.pathname + url.search, { scroll: false })
+  }
+
+  function startEditingProject(projectId: string, project: any) {
+    setEditingProjectId(projectId)
+    setEditingProject(project)
+    setActiveTab('edit')
+    const url = new URL(window.location.href)
+    url.searchParams.set('tab', 'edit')
+    url.searchParams.set('id', projectId)
+    router.replace(url.pathname + url.search, { scroll: false })
+  }
 
   useEffect(() => {
     const saved = localStorage.getItem('customTemplates')
@@ -133,7 +165,7 @@ export default function DevProjectCreatorPage() {
     const imageFile = files.find(file => file.type.startsWith('image/'))
     if (imageFile) {
       const reader = new FileReader()
-      reader.onload = () => setImage(reader.result as string)
+      reader.onload = () => setImage(reader.result as string || "")
       reader.readAsDataURL(imageFile)
     }
   }
@@ -142,7 +174,7 @@ export default function DevProjectCreatorPage() {
     const file = e.target.files?.[0]
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader()
-      reader.onload = () => setImage(reader.result as string)
+      reader.onload = () => setImage(reader.result as string || "")
       reader.readAsDataURL(file)
     }
   }
@@ -191,13 +223,22 @@ export default function DevProjectCreatorPage() {
   return (
     <div className="container mx-auto max-w-7xl py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Project Creator Studio</h1>
-        <p className="text-muted-foreground">Create and manage your project portfolio with ease</p>
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Project Management Studio</h1>
+        <p className="text-muted-foreground">Create, edit, and manage your project portfolio</p>
       </div>
       
-      <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="basic" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsTrigger value="creator">Project Creator</TabsTrigger>
+          <TabsTrigger value="editor">Project Editor</TabsTrigger>
+          <TabsTrigger value="edit">Edit Project</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="creator" className="space-y-6">
+      
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <Tabs defaultValue="basic" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic</TabsTrigger>
               <TabsTrigger value="links">Links</TabsTrigger>
@@ -631,35 +672,168 @@ export default function DevProjectCreatorPage() {
                   </Button>
                 </div>
               </div>
-            </form>
-          </Tabs>
+              </form>
+            </Tabs>
+          </div>
+          
+          <div className="lg:col-span-1">
+            <Card className="sticky top-8">
+              <CardHeader>
+                <CardTitle>Live Preview</CardTitle>
+                <CardDescription>See how your project card will look</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProjectCard
+                  title={title || "Your Project Title"}
+                  description={description || "Your project description will appear here. Make it compelling to attract viewers!"}
+                  category={category || "Category"}
+                  downloadUrl={downloadUrl || undefined}
+                  githubUrl={githubUrl || undefined}
+                  demoUrl={demoUrl || undefined}
+                  youtubeUrl={youtubeUrl || undefined}
+                  image={image || undefined}
+                  tags={tags.length ? tags : ["Sample", "Tags"]}
+                  reduce
+                  cardGradient={useCustomStyle ? cardGradient : undefined}
+                  cardColor={useCustomStyle ? cardColor : undefined}
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
+        </TabsContent>
         
-        <div className="lg:col-span-1">
-          <Card className="sticky top-8">
-            <CardHeader>
-              <CardTitle>Live Preview</CardTitle>
-              <CardDescription>See how your project card will look</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProjectCard
-                title={title || "Your Project Title"}
-                description={description || "Your project description will appear here. Make it compelling to attract viewers!"}
-                category={category || "Category"}
-                downloadUrl={downloadUrl || undefined}
-                githubUrl={githubUrl || undefined}
-                demoUrl={demoUrl || undefined}
-                youtubeUrl={youtubeUrl || undefined}
-                image={image || undefined}
-                tags={tags.length ? tags : ["Sample", "Tags"]}
-                reduce
-                cardGradient={useCustomStyle ? cardGradient : undefined}
-                cardColor={useCustomStyle ? cardColor : undefined}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        <TabsContent value="editor" className="space-y-6">
+          <ProjectEditor onEditProject={startEditingProject} />
+        </TabsContent>
+        
+        <TabsContent value="edit" className="space-y-6">
+          {editingProject ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Edit Project</CardTitle>
+                <CardDescription>Make changes to your project details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Title</label>
+                    <EnhancedInput
+                      value={editingProject.title}
+                      onChange={e => setEditingProject({...editingProject, title: e.target.value})}
+                      placeholder="Project title"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Category</label>
+                    <EnhancedInput
+                      value={editingProject.category}
+                      onChange={e => setEditingProject({...editingProject, category: e.target.value})}
+                      placeholder="Project category"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Description</label>
+                  <textarea
+                    value={editingProject.description}
+                    onChange={e => setEditingProject({...editingProject, description: e.target.value})}
+                    placeholder="Project description"
+                    className="w-full min-h-[100px] px-3 py-2 rounded-md border bg-background text-sm resize-none"
+                  />
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Download URL</label>
+                    <EnhancedInput
+                      value={editingProject.downloadUrl || ""}
+                      onChange={e => setEditingProject({...editingProject, downloadUrl: e.target.value})}
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">GitHub URL</label>
+                    <EnhancedInput
+                      value={editingProject.githubUrl || ""}
+                      onChange={e => setEditingProject({...editingProject, githubUrl: e.target.value})}
+                      placeholder="https://github.com/..."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Demo URL</label>
+                    <EnhancedInput
+                      value={editingProject.demoUrl || ""}
+                      onChange={e => setEditingProject({...editingProject, demoUrl: e.target.value})}
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">YouTube URL</label>
+                    <EnhancedInput
+                      value={editingProject.youtubeUrl || ""}
+                      onChange={e => setEditingProject({...editingProject, youtubeUrl: e.target.value})}
+                      placeholder="https://youtube.com/..."
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tags (comma separated)</label>
+                  <EnhancedInput
+                    value={editingProject.tags?.join(", ") || ""}
+                    onChange={e => setEditingProject({...editingProject, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean)})}
+                    placeholder="tag1, tag2, tag3"
+                  />
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setActiveTab('editor')}>
+                    Cancel
+                  </Button>
+                  <Button onClick={async () => {
+                    try {
+                      const response = await fetch('/api/projects')
+                      const projects = await response.json()
+                      const projectIndex = projects.findIndex((p: any, index: number) => index.toString() === editingProjectId)
+                      if (projectIndex !== -1) {
+                        projects[projectIndex] = editingProject
+                        const updateResponse = await fetch('/api/projects', {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(projects)
+                        })
+                        if (updateResponse.ok) {
+                          setActiveTab('editor')
+                          setEditingProject(null)
+                          setEditingProjectId(null)
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error updating project:', error)
+                    }
+                  }}>
+                    Save Changes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12">
+                <p className="text-muted-foreground mb-4">No project selected for editing</p>
+                <Button onClick={() => setActiveTab('editor')}>
+                  Go to Project Editor
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

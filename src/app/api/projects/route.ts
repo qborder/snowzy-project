@@ -52,3 +52,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err?.message || "Write failed" }, { status: 500 })
   }
 }
+
+export async function PUT(req: Request) {
+  if (process.env.NODE_ENV !== "development") {
+    return NextResponse.json({ error: "Not allowed" }, { status: 403 })
+  }
+
+  let body: any
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+  }
+
+  if (!Array.isArray(body)) {
+    return NextResponse.json({ error: "Expected array of projects" }, { status: 400 })
+  }
+
+  const filePath = path.join(process.cwd(), "src", "data", "projects.json")
+
+  try {
+    const pretty = JSON.stringify(body, null, 2) + "\n"
+    await fs.writeFile(filePath, pretty, "utf8")
+    return NextResponse.json({ ok: true })
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Write failed" }, { status: 500 })
+  }
+}

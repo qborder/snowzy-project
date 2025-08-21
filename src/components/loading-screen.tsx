@@ -5,17 +5,32 @@ import { useState, useEffect } from 'react'
 
 export default function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval)
+          return 100
+        }
+        return prev + Math.random() * 15
+      })
+    }, 200)
+
     const handleLoad = () => {
-      setTimeout(() => setIsLoading(false), 800)
+      setProgress(100)
+      setTimeout(() => setIsLoading(false), 1000)
     }
 
     if (document.readyState === 'complete') {
       handleLoad()
     } else {
       window.addEventListener('load', handleLoad)
-      return () => window.removeEventListener('load', handleLoad)
+      return () => {
+        window.removeEventListener('load', handleLoad)
+        clearInterval(progressInterval)
+      }
     }
   }, [])
 
@@ -24,59 +39,98 @@ export default function LoadingScreen() {
       {isLoading && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background"
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-background via-background/95 to-background/90 backdrop-blur-sm"
         >
           <div className="relative">
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+              transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
               className="relative mb-8"
             >
-              <div className="relative h-24 w-24 mx-auto">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-primary/5 animate-pulse" />
+              <div className="relative h-32 w-32 mx-auto">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    opacity: [0.3, 0.6, 0.3]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/30 via-primary/10 to-transparent"
+                />
+                
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-2 rounded-full border-2 border-transparent bg-gradient-to-r from-primary to-transparent bg-clip-border"
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-3 rounded-full"
                   style={{
-                    backgroundOrigin: 'border-box',
-                    backgroundClip: 'border-box, padding-box',
+                    background: `conic-gradient(from 0deg, transparent, hsl(var(--primary)), transparent)`,
                   }}
                 />
+                
                 <motion.div
                   animate={{ rotate: -360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-4 rounded-full border border-primary/30"
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-6 rounded-full border-2 border-primary/20 border-t-primary/60"
+                />
+                
+                <motion.div
+                  animate={{ 
+                    scale: [0.8, 1.2, 0.8],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-10 rounded-full bg-gradient-to-br from-primary/40 to-primary/10"
                 />
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-center"
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-center space-y-4"
             >
-              <h2 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Snowzy
-              </h2>
-              <motion.p
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="text-sm text-muted-foreground"
+              <motion.h2
+                animate={{ 
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/70 to-primary bg-[length:200%_100%] bg-clip-text text-transparent"
               >
-                Loading projects...
+                Snowzy
+              </motion.h2>
+              
+              <motion.p
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="text-base text-muted-foreground font-medium"
+              >
+                Initializing workspace...
               </motion.p>
+
+              <div className="w-64 mx-auto space-y-2">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Loading</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <div className="h-1 bg-muted/30 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-primary/60 via-primary to-primary/80 rounded-full"
+                  />
+                </div>
+              </div>
             </motion.div>
 
             <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.4, duration: 1.5, ease: [0.2, 0.8, 0.2, 1] }}
-              className="mt-6 h-0.5 w-48 bg-gradient-to-r from-transparent via-primary to-transparent origin-center"
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: 1, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 1.8, ease: [0.2, 0.8, 0.2, 1] }}
+              className="mt-8 h-px w-80 bg-gradient-to-r from-transparent via-primary/50 to-transparent origin-center"
             />
           </div>
         </motion.div>

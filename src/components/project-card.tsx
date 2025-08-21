@@ -7,7 +7,7 @@ import { ExternalLink, Download, Github, Youtube, BookOpen } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 
 interface ProjectCardProps {
   title: string
@@ -55,7 +55,27 @@ export function ProjectCard({
       })()
     : undefined
   const [imgOk, setImgOk] = useState(true)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const cardRef = useRef<HTMLDivElement>(null)
   const isValidSrc = (s?: string) => !!s && (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/"))
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!cardRef.current) return
+      const rect = cardRef.current.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      setMousePosition({ x, y })
+      cardRef.current.style.setProperty('--mouse-x', `${x}px`)
+      cardRef.current.style.setProperty('--mouse-y', `${y}px`)
+    }
+
+    const card = cardRef.current
+    if (card) {
+      card.addEventListener('mousemove', handleMouseMove)
+      return () => card.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
   const rawCover = image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : undefined)
   const cover = isValidSrc(rawCover) && imgOk ? rawCover : undefined
   const useNextImage = (() => {
@@ -70,6 +90,7 @@ export function ProjectCard({
   })()
   return (
     <motion.div
+      ref={cardRef}
       initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
       whileInView={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
@@ -88,8 +109,9 @@ export function ProjectCard({
           : 'bg-background/60 hover:bg-background/80'
       }`}>
         <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(600px_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.06),transparent_40%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/10 group-hover:ring-white/20 transition" />
+        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),rgba(255,255,255,0.08)_30%,transparent_70%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(200px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.1),transparent_50%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/10 group-hover:ring-white/30 transition-all duration-300" />
         {cover && (
           <div className="relative aspect-video overflow-hidden bg-muted">
             <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.03 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.3 }}>
@@ -112,6 +134,7 @@ export function ProjectCard({
               )}
             </motion.div>
             <div className="pointer-events-none absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(300px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.1),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
           </div>
         )}
@@ -122,7 +145,9 @@ export function ProjectCard({
         )}
         <CardHeader className={reduce ? "pt-4 pb-2" : undefined}>
           <div className="flex items-start justify-between mb-2">
-            <Badge variant="secondary" className="text-xs">{category}</Badge>
+            <Badge variant="secondary" className={`text-xs ${
+              cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
+            }`}>{category}</Badge>
             <div className="flex gap-1">
               {githubUrl && (
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors" asChild>
@@ -147,8 +172,12 @@ export function ProjectCard({
               )}
             </div>
           </div>
-          <CardTitle className={reduce ? "text-lg line-clamp-1" : "line-clamp-2"}>{title}</CardTitle>
-          <CardDescription className={reduce ? "line-clamp-2" : "line-clamp-3"}>{description}</CardDescription>
+          <CardTitle className={`${reduce ? "text-lg line-clamp-1" : "line-clamp-2"} ${
+            cardGradient || cardColor ? 'text-white' : ''
+          }`}>{title}</CardTitle>
+          <CardDescription className={`${reduce ? "line-clamp-2" : "line-clamp-3"} ${
+            cardGradient || cardColor ? 'text-white/90' : ''
+          }`}>{description}</CardDescription>
         </CardHeader>
         <CardContent className={reduce ? "space-y-3 pt-0 px-4 pb-4" : "space-y-4 px-6 pb-6"}>
           <div className="flex flex-wrap gap-1">
@@ -159,12 +188,16 @@ export function ProjectCard({
               return (
                 <>
                   {shown.map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-xs transition-transform group-hover:translate-y-[-1px]">
+                    <Badge key={index} variant="outline" className={`text-xs transition-transform group-hover:translate-y-[-1px] ${
+                      cardGradient || cardColor ? 'bg-black/20 text-white border-white/30' : ''
+                    }`}>
                       {tag}
                     </Badge>
                   ))}
                   {extra > 0 && (
-                    <Badge variant="secondary" className="text-[10px] px-2">+{extra}</Badge>
+                    <Badge variant="secondary" className={`text-[10px] px-2 ${
+                      cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
+                    }`}>+{extra}</Badge>
                   )}
                 </>
               )

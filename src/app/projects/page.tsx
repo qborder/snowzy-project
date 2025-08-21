@@ -56,7 +56,7 @@ export default function ProjectsPage() {
   }, [q, category, selectedTags])
 
   useEffect(() => {
-    const spQ = searchParams.get("q") || ""
+    const spQ = searchParams.get("q") || searchParams.get("search") || ""
     const spCat = (searchParams.get("cat") as string | null) || "all"
     const spTags = searchParams.get("tags") || ""
     const rawLayout = (searchParams.get("layout") as string | null)
@@ -69,7 +69,7 @@ export default function ProjectsPage() {
     setSelectedTags(spTags ? spTags.split(",").filter(Boolean) : [])
     setLayout(spLayout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [searchParams])
 
   useEffect(() => {
     const params = new URLSearchParams()
