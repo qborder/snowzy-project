@@ -73,7 +73,7 @@ export default function DevProjectsPage() {
     return tab === 'editor' ? 'editor' : tab === 'edit' ? 'edit' : 'creator'
   })
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
-  const [editingProject, setEditingProject] = useState<any>(null)
+  const [editingProject, setEditingProject] = useState<Record<string, unknown> | null>(null)
   
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -91,7 +91,6 @@ export default function DevProjectsPage() {
   const [useCustomStyle, setUseCustomStyle] = useState(false)
   const [customTemplates, setCustomTemplates] = useState<Record<string, CustomTemplate>>({})
   const [templateName, setTemplateName] = useState("")
-  const [showTemplateDialog, setShowTemplateDialog] = useState(false)
   const [tagInput, setTagInput] = useState("")
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -109,8 +108,8 @@ export default function DevProjectsPage() {
     router.replace(url.pathname + url.search, { scroll: false })
   }
 
-  function startEditingProject(projectId: string, project: Record<string, any>) {
-    const handleEditProject = (project: Record<string, any>) => {
+  function startEditingProject(projectId: string, project: Record<string, unknown>) {
+    const handleEditProject = (project: Record<string, unknown>) => {
       setEditingProject(project)
       setActiveTab('edit')
       const url = new URL(window.location.href)
@@ -744,7 +743,7 @@ export default function DevProjectsPage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Title</label>
                     <EnhancedInput
-                      value={editingProject.title}
+                      value={editingProject?.title as string || ""}
                       onChange={e => setEditingProject({...editingProject, title: e.target.value})}
                       placeholder="Project title"
                     />
@@ -752,7 +751,7 @@ export default function DevProjectsPage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Category</label>
                     <EnhancedInput
-                      value={editingProject.category}
+                      value={editingProject?.category as string || ""}
                       onChange={e => setEditingProject({...editingProject, category: e.target.value})}
                       placeholder="Project category"
                     />
@@ -762,7 +761,7 @@ export default function DevProjectsPage() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Description</label>
                   <textarea
-                    value={editingProject.description}
+                    value={editingProject?.description as string || ""}
                     onChange={e => setEditingProject({...editingProject, description: e.target.value})}
                     placeholder="Project description"
                     className="w-full min-h-[100px] px-3 py-2 rounded-md border bg-background text-sm resize-none"
@@ -773,7 +772,7 @@ export default function DevProjectsPage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Download URL</label>
                     <EnhancedInput
-                      value={editingProject.downloadUrl || ""}
+                      value={editingProject?.downloadUrl as string || ""}
                       onChange={e => setEditingProject({...editingProject, downloadUrl: e.target.value})}
                       placeholder="https://..."
                     />
@@ -781,7 +780,7 @@ export default function DevProjectsPage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">GitHub URL</label>
                     <EnhancedInput
-                      value={editingProject.githubUrl || ""}
+                      value={editingProject?.githubUrl as string || ""}
                       onChange={e => setEditingProject({...editingProject, githubUrl: e.target.value})}
                       placeholder="https://github.com/..."
                     />
@@ -792,7 +791,7 @@ export default function DevProjectsPage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Demo URL</label>
                     <EnhancedInput
-                      value={editingProject.demoUrl || ""}
+                      value={editingProject?.demoUrl as string || ""}
                       onChange={e => setEditingProject({...editingProject, demoUrl: e.target.value})}
                       placeholder="https://..."
                     />
@@ -800,7 +799,7 @@ export default function DevProjectsPage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">YouTube URL</label>
                     <EnhancedInput
-                      value={editingProject.youtubeUrl || ""}
+                      value={editingProject?.youtubeUrl as string || ""}
                       onChange={e => setEditingProject({...editingProject, youtubeUrl: e.target.value})}
                       placeholder="https://youtube.com/..."
                     />
@@ -810,7 +809,7 @@ export default function DevProjectsPage() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Tags (comma separated)</label>
                   <EnhancedInput
-                    value={editingProject.tags?.join(", ") || ""}
+                    value={(editingProject?.tags as string[])?.join(", ") || ""}
                     onChange={e => setEditingProject({...editingProject, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean)})}
                     placeholder="tag1, tag2, tag3"
                   />
@@ -824,7 +823,7 @@ export default function DevProjectsPage() {
                     try {
                       const response = await fetch('/api/projects')
                       const projects = await response.json()
-                      const projectIndex = projects.findIndex((p: any, index: number) => index.toString() === editingProjectId)
+                      const projectIndex = projects.findIndex((p: Record<string, unknown>, index: number) => index.toString() === editingProjectId)
                       if (projectIndex !== -1) {
                         projects[projectIndex] = editingProject
                         const updateResponse = await fetch('/api/projects', {
