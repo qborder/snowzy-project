@@ -56,6 +56,21 @@ const SUGGESTED_TAGS = [
   "UI/UX", "Design", "Figma", "Responsive", "Accessibility", "SEO"
 ]
 
+type Project = {
+  title: string
+  description: string
+  category: string
+  downloadUrl?: string
+  githubUrl?: string
+  demoUrl?: string
+  youtubeUrl?: string
+  image?: string
+  tags: string[]
+  createdAt?: string
+  cardGradient?: string
+  cardColor?: string
+}
+
 type CustomTemplate = {
   title: string
   description: string
@@ -73,7 +88,7 @@ export default function DevProjectsPage() {
     return tab === 'editor' ? 'editor' : tab === 'edit' ? 'edit' : 'creator'
   })
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
-  const [editingProject, setEditingProject] = useState<Record<string, unknown> | null>(null)
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
   
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -108,8 +123,8 @@ export default function DevProjectsPage() {
     router.replace(url.pathname + url.search, { scroll: false })
   }
 
-  function startEditingProject(projectId: string, project: Record<string, unknown>) {
-    const handleEditProject = (project: Record<string, unknown>) => {
+  function startEditingProject(projectId: string, project: Project) {
+    const handleEditProject = (project: Project) => {
       setEditingProject(project)
       setActiveTab('edit')
       const url = new URL(window.location.href)
@@ -194,7 +209,7 @@ export default function DevProjectsPage() {
     e.preventDefault()
     setSaving(true)
     setResult("")
-    const body: Record<string, any> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags }
+    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
@@ -215,8 +230,9 @@ export default function DevProjectsPage() {
       setYoutubeUrl("")
       setImage("")
       setTags([])
-    } catch (err: any) {
-      setResult(err?.message || "error")
+    } catch (err: unknown) {
+      const error = err as Error
+      setResult(error.message || "error")
     } finally {
       setSaving(false)
     }

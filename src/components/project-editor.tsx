@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Edit, Search, Filter, MoreHorizontal, Eye, Download, Github, ExternalLink, Grid, List } from "lucide-react"
+import { Edit, Search, Eye, Download, ExternalLink, Grid, List, Trash2, Github } from "lucide-react"
 import Link from "next/link"
 
 type Project = {
@@ -25,8 +25,8 @@ type Project = {
 }
 
 type ProjectEditorProps = {
-  onEditProject?: (projectId: string, project: any) => void
-  handleEditProject?: (project: Record<string, any>) => void
+  onEditProject?: (projectId: string, project: Project) => void
+  handleEditProject?: (project: Project) => void
 }
 
 export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEditorProps = {}) {
@@ -103,14 +103,18 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
     if (!editForm || editingProject === null) return
 
     try {
+      const projectToUpdate = filteredProjects[editingProject]
       const projectIndex = projects.findIndex(p => 
-        p.title === filteredProjects[editingProject].title &&
-        p.description === filteredProjects[editingProject].description
+        p.title === projectToUpdate.title &&
+        p.description === projectToUpdate.description
       )
       
-      if (projectIndex === -1) return
+      if (projectIndex === -1) {
+        console.error("Project to edit not found in the main list.")
+        return
+      }
 
-      const updatedProjects = projects.filter((_, i) => !selectedProjects.has(i))
+      const updatedProjects = [...projects]
       updatedProjects[projectIndex] = editForm
       
       const response = await fetch('/api/projects', {
@@ -137,12 +141,8 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
     if (!confirmed) return
 
     try {
-      const indicesToDelete = Array.from(selectedProjects).sort((a, b) => b - a)
-      let updatedProjects = [...projects]
-      
-      for (const index of indicesToDelete) {
-        updatedProjects.splice(index, 1)
-      }
+      const projectsToDelete = new Set(Array.from(selectedProjects).map(index => filteredProjects[index]))
+      const updatedProjects = projects.filter(p => !projectsToDelete.has(p))
       
       const response = await fetch('/api/projects', {
         method: 'PUT',

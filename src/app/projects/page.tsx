@@ -6,11 +6,24 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Search, Filter } from "lucide-react"
+import { Search, Filter, Grid3x3, LayoutList, Clock, Sparkles, Gamepad2, Code, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import projectsData from "@/data/projects.json"
 
-const projects = projectsData
+type Project = {
+  title: string
+  description: string
+  category: string
+  downloadUrl?: string
+  githubUrl?: string
+  demoUrl?: string
+  youtubeUrl?: string
+  image?: string
+  tags: string[]
+  createdAt?: string
+}
+
+const projects: Project[] = projectsData
 
 export default function ProjectsPage() {
   const [q, setQ] = useState("")
@@ -161,7 +174,7 @@ export default function ProjectsPage() {
                         onClick={() => setLayout("gallery")}
                         className="h-8 px-3"
                       >
-                        <Grid3X3 className="h-3 w-3 mr-1" />
+                        <Grid3x3 className="h-3 w-3 mr-1" />
                         Grid
                       </Button>
                       <Button
@@ -327,8 +340,8 @@ export default function ProjectsPage() {
                     downloadUrl={project.downloadUrl}
                     githubUrl={project.githubUrl}
                     demoUrl={project.demoUrl}
-                    youtubeUrl={(project as any).youtubeUrl}
-                    image={(project as any).image}
+                    youtubeUrl={project.youtubeUrl}
+                    image={project.image}
                     tags={project.tags}
                     reduce={layout === "list"}
                     projectIndex={originalIndex}
@@ -366,7 +379,7 @@ export default function ProjectsPage() {
                 Clear all filters
               </Button>
               <Button onClick={() => setLayout("gallery")} variant="outline">
-                <Grid3X3 className="h-4 w-4 mr-2" />
+                <Grid3x3 className="h-4 w-4 mr-2" />
                 Switch to grid
               </Button>
             </div>
