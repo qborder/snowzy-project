@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Download, Github } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { motion, useReducedMotion } from "framer-motion"
 
 interface ProjectCardProps {
   title: string
@@ -28,59 +29,71 @@ export function ProjectCard({
   tags,
   image
 }: ProjectCardProps) {
+  const reduce = useReducedMotion()
   return (
-    <Card className="group overflow-hidden transition-all hover:shadow-lg">
-      {image && (
-        <div className="aspect-video overflow-hidden bg-muted">
-          <Image
-            src={image}
-            alt={title}
-            width={400}
-            height={225}
-            className="h-full w-full object-cover transition-all group-hover:scale-105"
-          />
-        </div>
-      )}
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <Badge variant="secondary">{category}</Badge>
-          <div className="flex space-x-1">
-            {githubUrl && (
-              <Button variant="ghost" size="icon" asChild>
-                <Link href={githubUrl} target="_blank">
-                  <Github className="h-4 w-4" />
-                </Link>
-              </Button>
-            )}
-            {demoUrl && (
-              <Button variant="ghost" size="icon" asChild>
-                <Link href={demoUrl} target="_blank">
-                  <ExternalLink className="h-4 w-4" />
-                </Link>
-              </Button>
-            )}
+    <motion.div
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      whileHover={reduce ? undefined : { y: -4 }}
+      transition={{ duration: reduce ? 0.2 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+      className="[perspective:1000px]"
+    >
+      <Card className="group overflow-hidden border-white/10 bg-background/60 backdrop-blur-md transition-shadow hover:shadow-lg">
+        {image && (
+          <div className="aspect-video overflow-hidden bg-muted">
+            <motion.div initial={{ scale: 1 }} whileHover={reduce ? undefined : { scale: 1.03 }} transition={{ duration: reduce ? 0.2 : 0.3 }}>
+              <Image
+                src={image}
+                alt={title}
+                width={400}
+                height={225}
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
           </div>
-        </div>
-        <CardTitle className="line-clamp-2">{title}</CardTitle>
-        <CardDescription className="line-clamp-3">{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-1">
-          {tags.map((tag, index) => (
-            <Badge key={index} variant="outline" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        {downloadUrl && (
-          <Button className="w-full" asChild>
-            <Link href={downloadUrl} target="_blank">
-              <Download className="mr-2 h-4 w-4" />
-              Download Project
-            </Link>
-          </Button>
         )}
-      </CardContent>
-    </Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <Badge variant="secondary">{category}</Badge>
+            <div className="flex space-x-1">
+              {githubUrl && (
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={githubUrl} target="_blank">
+                    <Github className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+              {demoUrl && (
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={demoUrl} target="_blank">
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
+          <CardTitle className="line-clamp-2">{title}</CardTitle>
+          <CardDescription className="line-clamp-3">{description}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-1">
+            {tags.map((tag, index) => (
+              <Badge key={index} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          {downloadUrl && (
+            <Button className="w-full" asChild>
+              <Link href={downloadUrl} target="_blank">
+                <Download className="mr-2 h-4 w-4" />
+                Download Project
+              </Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }

@@ -35,13 +35,13 @@ export default function Home() {
       <HeroSection />
       <FeaturesSection />
       
-      <section className="container space-y-6 py-8 md:py-12 lg:py-24">
+      <section className="space-y-6 py-8 md:py-12 lg:py-24">
         <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
           <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-            Featured Projects
+            Featured projects
           </h2>
           <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-            Check out some of my latest projects and tutorials.
+            A quick look at what I’ve been building lately — with code you can use.
           </p>
         </div>
         <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
