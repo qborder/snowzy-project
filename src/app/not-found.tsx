@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Home, Search, ArrowLeft, Sparkles } from "lucide-react"
+import { Home, ArrowLeft, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function NotFound() {
@@ -37,7 +37,7 @@ export default function NotFound() {
             </CardTitle>
             
             <CardDescription className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
-              The page you're looking for doesn't exist or has been moved. Don't worry, it happens to the best of us.
+              The page you&apos;re looking for doesn&apos;t exist or has been moved. Don&apos;t worry, it happens to the best of us.
             </CardDescription>
           </CardHeader>
           
