@@ -9,8 +9,9 @@ export async function GET() {
     const data = await fs.readFile(filePath, "utf8")
     const projects = JSON.parse(data)
     return NextResponse.json(projects)
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Failed to read projects" }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to read projects"
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields: title, description, category, tags[]" }, { status: 400 })
   }
 
-  const project: Record<string, any> = { title, description, category, tags }
+  const project: Record<string, unknown> = { title, description, category, tags }
   if (downloadUrl) project.downloadUrl = downloadUrl
   if (githubUrl) project.githubUrl = githubUrl
   if (demoUrl) project.demoUrl = demoUrl
@@ -48,8 +49,9 @@ export async function POST(request: Request) {
     const pretty = JSON.stringify(arr, null, 2) + "\n"
     await fs.writeFile(filePath, pretty, "utf8")
     return NextResponse.json({ ok: true })
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Write failed" }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Write failed"
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -75,7 +77,8 @@ export async function PUT(request: Request) {
     const pretty = JSON.stringify(body, null, 2) + "\n"
     await fs.writeFile(filePath, pretty, "utf8")
     return NextResponse.json({ ok: true })
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Write failed" }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Write failed"
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
