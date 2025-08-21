@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Navigation } from "@/components/navigation";
+import { Inter, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
+import Navigation from '@/components/navigation'
+import MouseSpotlight from '@/components/mouse-spotlight'
+import PageTransition from '@/components/page-transition'
+import LoadingScreen from '@/components/loading-screen'
 
 const interSans = Inter({
   variable: "--font-inter",
@@ -29,25 +32,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${interSans.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${interSans.variable} ${geistMono.variable} font-sans antialiased overflow-x-hidden`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange
         >
-          <div className="relative flex min-h-screen flex-col">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(1200px_800px_at_20%_-10%,hsl(var(--primary)/0.10),transparent_60%),radial-gradient(1000px_700px_at_90%_10%,hsl(var(--primary)/0.06),transparent_55%)]"
-            />
-            <Navigation />
-            <main className="flex-1">
-              <div className="container mx-auto px-4">
+          <LoadingScreen />
+          <MouseSpotlight />
+          <PageTransition>
+            <div className="relative min-h-screen overflow-visible">
+              <Navigation />
+              <main>
                 {children}
-              </div>
-            </main>
-          </div>
+              </main>
+            </div>
+          </PageTransition>
         </ThemeProvider>
       </body>
     </html>

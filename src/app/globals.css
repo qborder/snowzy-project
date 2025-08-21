@@ -106,18 +106,18 @@
   --card-foreground: oklch(0.18 0.006 255);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.006 255);
-  --primary: oklch(0.5 0.08 255);
+  --primary: oklch(0.62 0.16 255);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.96 0.02 225);
   --secondary-foreground: oklch(0.25 0.01 250);
   --muted: oklch(0.97 0.01 225);
   --muted-foreground: oklch(0.52 0.02 240);
-  --accent: oklch(0.95 0.02 245);
+  --accent: oklch(0.96 0.03 250);
   --accent-foreground: oklch(0.25 0.01 250);
   --destructive: oklch(0.6 0.2 27);
   --border: oklch(0.9 0.01 235);
   --input: oklch(0.9 0.01 235);
-  --ring: oklch(0.58 0.08 255);
+  --ring: oklch(0.66 0.16 255);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,18 +140,18 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.19 0.01 250);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.6 0.08 255);
+  --primary: oklch(0.7 0.17 255);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.25 0.01 250);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.25 0.01 250);
   --muted-foreground: oklch(0.7 0.03 220);
-  --accent: oklch(0.25 0.01 250);
+  --accent: oklch(0.28 0.02 250);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.7 0.2 22);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.6 0.08 255);
+  --ring: oklch(0.7 0.17 255);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -176,5 +176,7 @@
   }
   .font-heading {
     font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
   }
 }

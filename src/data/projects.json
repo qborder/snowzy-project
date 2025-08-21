@@ -1,0 +1,53 @@
+[
+  {
+    "title": "Advanced Roblox Admin System",
+    "description": "Complete admin system with GUI, commands, and user management for Roblox games. Includes ban/kick, teleport, and moderation tools.",
+    "category": "Roblox",
+    "downloadUrl": "https://github.com/snowzy/roblox-admin",
+    "githubUrl": "https://github.com/snowzy/roblox-admin",
+    "tags": ["Lua", "GUI", "Admin", "Commands", "Moderation"]
+  },
+  {
+    "title": "Modern Dashboard Template",
+    "description": "Responsive dashboard built with Next.js, TypeScript, and Tailwind CSS. Perfect for admin panels and data visualization.",
+    "category": "Web Development",
+    "downloadUrl": "https://github.com/snowzy/dashboard-template",
+    "githubUrl": "https://github.com/snowzy/dashboard-template",
+    "demoUrl": "https://dashboard-demo.vercel.app",
+    "tags": ["Next.js", "TypeScript", "Dashboard", "React", "Tailwind"]
+  },
+  {
+    "title": "Roblox RPG Combat System",
+    "description": "Complete RPG combat system with skills, levels, special abilities, and damage calculations for immersive gameplay.",
+    "category": "Roblox",
+    "downloadUrl": "https://github.com/snowzy/rpg-combat",
+    "githubUrl": "https://github.com/snowzy/rpg-combat",
+    "tags": ["RPG", "Combat", "Skills", "Levels", "Gameplay"]
+  },
+  {
+    "title": "React E-commerce Store",
+    "description": "Full-featured e-commerce application with cart, payments, and user authentication using modern React patterns.",
+    "category": "Web Development",
+    "downloadUrl": "https://github.com/snowzy/react-ecommerce",
+    "githubUrl": "https://github.com/snowzy/react-ecommerce",
+    "demoUrl": "https://store-demo.vercel.app",
+    "tags": ["React", "E-commerce", "Authentication", "Payments"]
+  },
+  {
+    "title": "Roblox Chat System",
+    "description": "Advanced chat system with channels, private messages, moderation, and custom commands for Roblox games.",
+    "category": "Roblox",
+    "downloadUrl": "https://github.com/snowzy/roblox-chat",
+    "githubUrl": "https://github.com/snowzy/roblox-chat",
+    "tags": ["Chat", "Messaging", "Moderation", "Commands"]
+  },
+  {
+    "title": "Vue.js Portfolio Template",
+    "description": "Modern portfolio template built with Vue 3, featuring smooth animations and responsive design.",
+    "category": "Web Development",
+    "downloadUrl": "https://github.com/snowzy/vue-portfolio",
+    "githubUrl": "https://github.com/snowzy/vue-portfolio",
+    "demoUrl": "https://portfolio-demo.vercel.app",
+    "tags": ["Vue.js", "Portfolio", "Animations", "Responsive"]
+  }
+]
