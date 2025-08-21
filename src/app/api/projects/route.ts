@@ -14,14 +14,14 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Not allowed" }, { status: 403 })
   }
 
-  let body: any
+  let body
   try {
-    body = await req.json()
+    body = await request.json()
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing required fields: title, description, category, tags[]" }, { status: 400 })
   }
 
-  const project: any = { title, description, category, tags }
+  const project: Record<string, any> = { title, description, category, tags }
   if (downloadUrl) project.downloadUrl = downloadUrl
   if (githubUrl) project.githubUrl = githubUrl
   if (demoUrl) project.demoUrl = demoUrl
@@ -53,14 +53,14 @@ export async function POST(req: Request) {
   }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(request: Request) {
   if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Not allowed" }, { status: 403 })
   }
 
-  let body: any
+  let body
   try {
-    body = await req.json()
+    body = await request.json()
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }

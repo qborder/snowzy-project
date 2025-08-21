@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ColorPicker } from "@/components/ui/color-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, RotateCcw } from "lucide-react"
+import { Palette } from "lucide-react"
 
 interface GradientPickerProps {
   value?: string
@@ -25,15 +25,6 @@ const GRADIENT_DIRECTIONS = [
   { value: "to-bl", label: "Top Right to Bottom Left" }
 ]
 
-const COLOR_STOPS = [
-  { name: "red", colors: ["#fef2f2", "#fee2e2", "#fecaca", "#fca5a5", "#f87171", "#ef4444", "#dc2626", "#b91c1c", "#991b1b", "#7f1d1d"] },
-  { name: "orange", colors: ["#fff7ed", "#ffedd5", "#fed7aa", "#fdba74", "#fb923c", "#f97316", "#ea580c", "#c2410c", "#9a3412", "#7c2d12"] },
-  { name: "yellow", colors: ["#fefce8", "#fef3c7", "#fde68a", "#fcd34d", "#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e", "#78350f"] },
-  { name: "green", colors: ["#f0fdf4", "#dcfce7", "#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d", "#166534", "#14532d"] },
-  { name: "blue", colors: ["#eff6ff", "#dbeafe", "#bfdbfe", "#93c5fd", "#60a5fa", "#3b82f6", "#2563eb", "#1d4ed8", "#1e40af", "#1e3a8a"] },
-  { name: "purple", colors: ["#faf5ff", "#f3e8ff", "#e9d5ff", "#d8b4fe", "#c084fc", "#a855f7", "#9333ea", "#7c3aed", "#6d28d9", "#5b21b6"] },
-  { name: "pink", colors: ["#fdf2f8", "#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6", "#ec4899", "#db2777", "#be185d", "#9d174d", "#831843"] }
-]
 
 export function GradientPicker({ value = "", onChange, className }: GradientPickerProps) {
   const [isOpen, setIsOpen] = useState(false)

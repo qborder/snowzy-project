@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Palette, Plus, X } from "lucide-react"
+import { X } from "lucide-react"
 
 interface ColorPickerProps {
   value?: string

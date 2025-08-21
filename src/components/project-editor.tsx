@@ -26,9 +26,10 @@ type Project = {
 
 type ProjectEditorProps = {
   onEditProject?: (projectId: string, project: any) => void
+  handleEditProject?: (project: Record<string, any>) => void
 }
 
-export function ProjectEditor({ onEditProject }: ProjectEditorProps = {}) {
+export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEditorProps = {}) {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedProjects, setSelectedProjects] = useState<Set<number>>(new Set())
@@ -109,7 +110,7 @@ export function ProjectEditor({ onEditProject }: ProjectEditorProps = {}) {
       
       if (projectIndex === -1) return
 
-      const updatedProjects = [...projects]
+      const updatedProjects = projects.filter((_, i) => !selectedProjects.has(i))
       updatedProjects[projectIndex] = editForm
       
       const response = await fetch('/api/projects', {

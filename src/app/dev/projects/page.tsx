@@ -1,16 +1,15 @@
 "use client"
 
-import { useState, useMemo, useRef, useEffect } from "react"
-import { notFound, useRouter, useSearchParams } from "next/navigation"
+import { useState, useRef, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Brush } from "lucide-react"
+import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 
@@ -110,14 +109,16 @@ export default function DevProjectsPage() {
     router.replace(url.pathname + url.search, { scroll: false })
   }
 
-  function startEditingProject(projectId: string, project: any) {
-    setEditingProjectId(projectId)
-    setEditingProject(project)
-    setActiveTab('edit')
-    const url = new URL(window.location.href)
-    url.searchParams.set('tab', 'edit')
-    url.searchParams.set('id', projectId)
-    router.replace(url.pathname + url.search, { scroll: false })
+  function startEditingProject(projectId: string, project: Record<string, any>) {
+    const handleEditProject = (project: Record<string, any>) => {
+      setEditingProject(project)
+      setActiveTab('edit')
+      const url = new URL(window.location.href)
+      url.searchParams.set('tab', 'edit')
+      url.searchParams.set('id', projectId)
+      router.replace(url.pathname + url.search, { scroll: false })
+    }
+    handleEditProject(project)
   }
 
   useEffect(() => {
@@ -193,8 +194,8 @@ export default function DevProjectsPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
-    setResult(null)
-    const body: any = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags }
+    setResult("")
+    const body: Record<string, any> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
