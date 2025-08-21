@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import fs from "fs/promises"
 import path from "path"
+import { generateProjectId } from "@/lib/project-utils"
 
 export async function GET() {
   const filePath = path.join(process.cwd(), "src", "data", "projects.json")
@@ -32,7 +33,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields: title, description, category, tags[]" }, { status: 400 })
   }
 
-  const project: Record<string, unknown> = { title, description, category, tags }
+  const project: Record<string, unknown> = { 
+    id: generateProjectId(),
+    title, 
+    description, 
+    category, 
+    tags,
+    createdAt: new Date().toISOString()
+  }
   if (downloadUrl) project.downloadUrl = downloadUrl
   if (githubUrl) project.githubUrl = githubUrl
   if (demoUrl) project.demoUrl = demoUrl

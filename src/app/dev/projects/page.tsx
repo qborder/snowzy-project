@@ -57,6 +57,7 @@ const SUGGESTED_TAGS = [
 ]
 
 type Project = {
+  id?: string
   title: string
   description: string
   category: string
@@ -734,6 +735,7 @@ export default function DevProjectsPage() {
                   image={image || undefined}
                   tags={tags.length ? tags : ["Sample", "Tags"]}
                   reduce
+                  projectId="12345"
                   cardGradient={useCustomStyle ? cardGradient : undefined}
                   cardColor={useCustomStyle ? cardColor : undefined}
                 />

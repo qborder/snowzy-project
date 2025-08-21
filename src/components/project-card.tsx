@@ -8,6 +8,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
+import { generateSlug } from "@/lib/project-utils"
 
 interface ProjectCardProps {
   title: string
@@ -21,6 +22,7 @@ interface ProjectCardProps {
   image?: string
   reduce?: boolean
   projectIndex?: number
+  projectId?: string
   cardGradient?: string
   cardColor?: string
 }
@@ -37,6 +39,7 @@ export function ProjectCard({
   image,
   reduce,
   projectIndex,
+  projectId,
   cardGradient,
   cardColor
 }: ProjectCardProps) {
@@ -203,31 +206,30 @@ export function ProjectCard({
               )
             })()}
           </div>
-          {(() => {
-            const viewHref = projectIndex !== undefined ? `/projects/${projectIndex}` : (demoUrl || githubUrl || downloadUrl)
-            const learnHref = youtubeUrl || githubUrl
-            if (!viewHref && !learnHref) return null
-            return (
-              <div className="flex gap-3">
-                {viewHref && (
-                  <Button className="flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200" asChild>
-                    <Link href={viewHref} target={projectIndex !== undefined ? "_self" : "_blank"}>
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      View
-                    </Link>
-                  </Button>
-                )}
-                {learnHref && (
-                  <Button variant="outline" className="flex-1 h-11 font-medium border-white/20 hover:border-white/30 hover:bg-white/5 transition-all duration-200" asChild>
-                    <Link href={learnHref} target="_blank">
-                      {youtubeUrl ? <Youtube className="mr-2 h-4 w-4" /> : <BookOpen className="mr-2 h-4 w-4" />}
-                      Learn
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            )
-          })()}
+          <div className="flex gap-3">
+            {(() => {
+              const viewHref = projectId ? `/projects/${projectId}/${generateSlug(title)}` : (demoUrl || githubUrl || downloadUrl)
+              return viewHref ? (
+                <Button className="flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200" asChild>
+                  <Link href={viewHref} target={projectId ? "_self" : "_blank"}>
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    View
+                  </Link>
+                </Button>
+              ) : null
+            })()}
+            {(() => {
+              const learnHref = youtubeUrl || githubUrl
+              return learnHref ? (
+                <Button variant="outline" className="flex-1 h-11 font-medium border-white/20 hover:border-white/30 hover:bg-white/5 transition-all duration-200" asChild>
+                  <Link href={learnHref} target="_blank">
+                    {youtubeUrl ? <Youtube className="mr-2 h-4 w-4" /> : <BookOpen className="mr-2 h-4 w-4" />}
+                    Learn
+                  </Link>
+                </Button>
+              ) : null
+            })()}
+          </div>
         </CardContent>
       </Card>
     </motion.div>

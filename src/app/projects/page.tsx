@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import projectsData from "@/data/projects.json"
 
 type Project = {
+  id?: string
   title: string
   description: string
   category: string
@@ -119,7 +120,7 @@ export default function ProjectsPage() {
           transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
           className="container mx-auto"
         >
-          <div className="mx-auto max-w-4xl text-center mb-8">
+          <div className="mx-auto max-w-4xl text-center mb-4">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -147,7 +148,7 @@ export default function ProjectsPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-16"
+            className="mb-4"
           >
             <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-background/40 backdrop-blur-2xl p-6">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
@@ -301,7 +302,7 @@ export default function ProjectsPage() {
         </motion.div>
       </div>
 
-      <div className="container mx-auto pb-16 pt-8">
+      <div className="container mx-auto pb-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={`${layout}-${q}-${category}-${selectedTags.join(',')}`}
@@ -315,10 +316,9 @@ export default function ProjectsPage() {
             }
           >
             {filtered.map((project, index) => {
-              const originalIndex = projects.indexOf(project)
               return (
                 <motion.div
-                  key={`${project.title}-${index}`}
+                  key={`${project.id || project.title}-${index}`}
                   initial={{ opacity: 0, y: 30, scale: 0.9 }}
                   animate={{ 
                     opacity: 1, 
@@ -344,7 +344,7 @@ export default function ProjectsPage() {
                     image={project.image}
                     tags={project.tags}
                     reduce={layout === "list"}
-                    projectIndex={originalIndex}
+                    projectId={project.id}
                   />
                 </motion.div>
               )
@@ -359,7 +359,7 @@ export default function ProjectsPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mx-auto max-w-lg text-center py-16"
           >
-            <div className="relative mb-8">
+            <div className="relative mb-4">
               <div className="mx-auto h-24 w-24 rounded-full bg-muted/20 flex items-center justify-center">
                 <Search className="h-12 w-12 text-muted-foreground/50" />
               </div>

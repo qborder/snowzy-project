@@ -12,6 +12,7 @@ import { Edit, Search, Eye, Download, ExternalLink, Grid, List, Trash2, Github }
 import Link from "next/link"
 
 type Project = {
+  id?: string
   title: string
   description: string
   category: string
@@ -32,10 +33,10 @@ type ProjectEditorProps = {
 export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEditorProps = {}) {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedProjects, setSelectedProjects] = useState<Set<number>>(new Set())
+  const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
-  const [editingProject, setEditingProject] = useState<number | null>(null)
+  const [editingProject, setEditingProject] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<"list" | "grid">("list")
   const [editForm, setEditForm] = useState<Project | null>(null)
 
@@ -66,12 +67,12 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
 
   const categories = Array.from(new Set(projects.map(p => p.category)))
 
-  function toggleProjectSelection(index: number) {
+  function toggleProjectSelection(projectId: string) {
     const newSelected = new Set(selectedProjects)
-    if (newSelected.has(index)) {
-      newSelected.delete(index)
+    if (newSelected.has(projectId)) {
+      newSelected.delete(projectId)
     } else {
-      newSelected.add(index)
+      newSelected.add(projectId)
     }
     setSelectedProjects(newSelected)
   }
@@ -80,17 +81,18 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
     if (selectedProjects.size === filteredProjects.length) {
       setSelectedProjects(new Set())
     } else {
-      setSelectedProjects(new Set(filteredProjects.map((_, index) => index)))
+      setSelectedProjects(new Set(filteredProjects.map(project => project.id).filter(Boolean) as string[]))
     }
   }
 
-  function startEditing(index: number) {
-    const project = filteredProjects[index]
+  function startEditing(projectId: string) {
+    const project = projects.find(p => p.id === projectId)
+    if (!project) return
     if (onEditProject) {
-      onEditProject(index.toString(), project)
+      onEditProject(projectId, project)
     } else {
       setEditForm({ ...project })
-      setEditingProject(index)
+      setEditingProject(projectId)
     }
   }
 
@@ -103,11 +105,7 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
     if (!editForm || editingProject === null) return
 
     try {
-      const projectToUpdate = filteredProjects[editingProject]
-      const projectIndex = projects.findIndex(p => 
-        p.title === projectToUpdate.title &&
-        p.description === projectToUpdate.description
-      )
+      const projectIndex = projects.findIndex(p => p.id === editingProject)
       
       if (projectIndex === -1) {
         console.error("Project to edit not found in the main list.")
@@ -141,8 +139,8 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
     if (!confirmed) return
 
     try {
-      const projectsToDelete = new Set(Array.from(selectedProjects).map(index => filteredProjects[index]))
-      const updatedProjects = projects.filter(p => !projectsToDelete.has(p))
+      const projectIdsToDelete = Array.from(selectedProjects)
+      const updatedProjects = projects.filter(p => !projectIdsToDelete.includes(p.id || ""))
       
       const response = await fetch('/api/projects', {
         method: 'PUT',
@@ -277,12 +275,12 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
               {viewMode === "list" ? (
                 <div className="grid gap-4">
                   {filteredProjects.map((project, index) => (
-                    <Card key={index} className="relative">
+                    <Card key={project.id || index} className="relative">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
                           <Checkbox
-                            checked={selectedProjects.has(index)}
-                            onCheckedChange={() => toggleProjectSelection(index)}
+                            checked={selectedProjects.has(project.id || "")}
+                            onCheckedChange={() => toggleProjectSelection(project.id || "")}
                           />
                           
                           <div className="flex-1 min-w-0">
@@ -343,7 +341,7 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => startEditing(index)}
+                                  onClick={() => startEditing(project.id || "")}
                                 >
                                   <Edit className="h-4 w-4 mr-1" />
                                   Edit
@@ -353,7 +351,7 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
                                   size="sm"
                                   asChild
                                 >
-                                  <Link href={`/projects/${index}`}>
+                                  <Link href={project.id ? `/projects/${project.id}/${project.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}` : "#"}>
                                     <Eye className="h-4 w-4 mr-1" />
                                     View
                                   </Link>
@@ -369,12 +367,12 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredProjects.map((project, index) => (
-                    <Card key={index} className="relative group hover:shadow-lg transition-shadow">
+                    <Card key={project.id || index} className="relative group hover:shadow-lg transition-shadow">
                       <CardContent className="p-4">
                         <div className="absolute top-3 left-3 z-10">
                           <Checkbox
-                            checked={selectedProjects.has(index)}
-                            onCheckedChange={() => toggleProjectSelection(index)}
+                            checked={selectedProjects.has(project.id || "")}
+                            onCheckedChange={() => toggleProjectSelection(project.id || "")}
                             className="bg-background/80 backdrop-blur-sm"
                           />
                         </div>
@@ -437,7 +435,7 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => startEditing(index)}
+                                onClick={() => startEditing(project.id || "")}
                               >
                                 <Edit className="h-3 w-3" />
                               </Button>
@@ -446,7 +444,7 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
                                 size="sm"
                                 asChild
                               >
-                                <Link href={`/projects/${index}`}>
+                                <Link href={project.id ? `/projects/${project.id}/${project.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}` : "#"}>
                                   <Eye className="h-3 w-3" />
                                 </Link>
                               </Button>
