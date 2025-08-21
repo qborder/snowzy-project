@@ -21,11 +21,7 @@ export default function ProjectsPage() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const categories = useMemo(() => {
-    const set = new Set<string>(["all"]) 
-    projects.forEach(p => set.add(p.category))
-    return Array.from(set)
-  }, [])
+  
 
   const baseForCounts = useMemo(() => {
     return projects.filter(p => {
@@ -91,9 +87,7 @@ export default function ProjectsPage() {
     setSelectedTags([])
   }
 
-  const gridClass = layout === "list"
-    ? "mx-auto grid justify-center gap-4 md:max-w-[70rem] grid-cols-1"
-    : "mx-auto grid justify-center gap-5 sm:grid-cols-2 md:max-w-[90rem] md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+  
 
   return (
     <div className="min-h-screen">
