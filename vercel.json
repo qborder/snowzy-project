@@ -4,7 +4,6 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
   "outputDirectory": ".next",
-  "regions": ["iad1"],
   "headers": [
     {
       "source": "/(.*)",
