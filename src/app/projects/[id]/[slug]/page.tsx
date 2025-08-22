@@ -194,7 +194,7 @@ export default function ProjectViewPage() {
                 <Link href={project.demoUrl} target="_blank">
                   <Button className="w-full justify-start" variant="default">
                     <ExternalLink className="h-4 w-4 mr-2" />
-                    Live Demo
+                    Live Demo!
                   </Button>
                 </Link>
               )}
