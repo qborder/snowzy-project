@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { put } from "@vercel/blob"
+import { generateCustomUrl, storeFileMapping } from "@/lib/file-storage"
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +16,13 @@ export async function POST(request: Request) {
       access: "public",
       addRandomSuffix: true
     })
-    return NextResponse.json(blob)
+    const customId = generateCustomUrl(filename)
+    const customUrl = storeFileMapping(customId, blob.url, filename)
+    const baseUrl = new URL(request.url).origin
+    return NextResponse.json({
+      ...blob,
+      url: `${baseUrl}${customUrl}`
+    })
   } catch (e) {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
