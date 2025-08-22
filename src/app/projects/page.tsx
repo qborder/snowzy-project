@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Search, Filter, Grid3x3, LayoutList, Clock, Sparkles, Gamepad2, Code, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import projectsData from "@/data/projects.json"
 
 type Project = {
   id?: string
@@ -22,11 +21,13 @@ type Project = {
   image?: string
   tags: string[]
   createdAt?: string
+  cardGradient?: string
+  cardColor?: string
 }
 
-const projects: Project[] = projectsData
-
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
   const [q, setQ] = useState("")
   const [category, setCategory] = useState<string | "all">("all")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -35,11 +36,28 @@ export default function ProjectsPage() {
   const router = useRouter()
   const pathname = usePathname()
 
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const res = await fetch('/api/projects')
+        if (!res.ok) throw new Error('Failed to fetch projects')
+        const data = await res.json()
+        setProjects(Array.isArray(data) ? data : [])
+      } catch (error) {
+        console.error('Error fetching projects:', error)
+        setProjects([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProjects()
+  }, [])
+
   const categories = useMemo(() => {
     const set = new Set<string>(["all"]) 
     projects.forEach(p => set.add(p.category))
     return Array.from(set)
-  }, [])
+  }, [projects])
 
   const baseForCounts = useMemo(() => {
     return projects.filter(p => {
@@ -108,6 +126,32 @@ export default function ProjectsPage() {
   const gridClass = layout === "list"
     ? "mx-auto grid justify-center gap-4 md:max-w-[70rem] grid-cols-1"
     : "mx-auto grid justify-center gap-5 sm:grid-cols-2 md:max-w-[90rem] md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <div className="relative pt-16 pb-8 md:pt-24 md:pb-12">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(600px_400px_at_50%_0%,hsl(var(--primary)/0.08),transparent_70%)]" />
+          <div className="container mx-auto">
+            <div className="mx-auto max-w-4xl text-center mb-4">
+              <div className="h-16 bg-background/40 rounded-2xl animate-pulse mb-6" />
+              <div className="h-8 bg-background/40 rounded-xl animate-pulse mx-auto max-w-2xl" />
+            </div>
+            <div className="mb-6">
+              <div className="h-32 bg-background/40 rounded-2xl animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto pb-16">
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-64 bg-background/40 rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">
