@@ -57,7 +57,6 @@ export function MarkdownEditor({ value, onChange, placeholder = "Enter markdown 
               height={height}
               preview="edit"
               hideToolbar={false}
-              visibleDragBar={false}
               textareaProps={{
                 placeholder,
                 style: {
