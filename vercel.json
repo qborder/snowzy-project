@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm build --turbo",
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
   "outputDirectory": ".next",
