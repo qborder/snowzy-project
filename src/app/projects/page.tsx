@@ -85,7 +85,7 @@ export default function ProjectsPage() {
       const matchTags = selectedTags.length === 0 || selectedTags.every(t => p.tags.includes(t))
       return matchQ && matchCat && matchTags
     })
-  }, [q, category, selectedTags])
+  }, [projects, q, category, selectedTags])
 
   useEffect(() => {
     const spQ = searchParams.get("q") || searchParams.get("search") || ""
