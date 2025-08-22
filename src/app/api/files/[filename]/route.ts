@@ -20,6 +20,3 @@ export async function GET(
   }
 }
 
-export function addFileMapping(filename: string, blobUrl: string) {
-  FILE_MAP[filename] = blobUrl
-}
