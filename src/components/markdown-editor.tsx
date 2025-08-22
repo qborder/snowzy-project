@@ -30,7 +30,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Enter markdown 
             <FileText className="h-5 w-5" />
             Project Page Content
           </CardTitle>
-          <Tabs value={mode} onValueChange={(v) => setMode(v as any)} className="w-auto">
+          <Tabs value={mode} onValueChange={(v) => setMode(v as "edit" | "preview" | "raw")} className="w-auto">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="edit" className="flex items-center gap-1">
                 <Edit className="h-3 w-3" />
