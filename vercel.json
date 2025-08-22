@@ -2,8 +2,14 @@
   "framework": "nextjs",
   "buildCommand": "pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
   "outputDirectory": ".next",
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "memory": 512
+    }
+  },
+  "regions": ["iad1"],
   "headers": [
     {
       "source": "/(.*)",

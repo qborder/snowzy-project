@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.68.3",

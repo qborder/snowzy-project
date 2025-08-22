@@ -1,0 +1,37 @@
+# Development files
+*.log
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache and temp files
+.next/cache
+.turbo
+node_modules/.cache
+*.tsbuildinfo
+
+# Source maps (optional - remove if you need them for debugging)
+**/*.map
+
+# Test files
+__tests__
+**/*.test.*
+**/*.spec.*
+
+# Documentation
+README.md
+docs/
+*.md
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Unnecessary config files for production
+.eslintrc*
+jest.config.*
+.prettierrc*
