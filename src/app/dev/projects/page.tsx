@@ -110,6 +110,8 @@ export default function DevProjectsPage() {
   const [tagInput, setTagInput] = useState("")
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const downloadFileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -197,6 +199,30 @@ export default function DevProjectsPage() {
     }
   }
 
+  async function handleDownloadFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      setUploading(true)
+      setResult("")
+      const form = new FormData()
+      form.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: form })
+      const data = await res.json()
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Upload failed")
+      }
+      setDownloadUrl(data.url)
+      setResult("File uploaded successfully")
+    } catch (err: unknown) {
+      const error = err as Error
+      setResult(error.message || "Upload error")
+    } finally {
+      setUploading(false)
+      if (downloadFileInputRef.current) downloadFileInputRef.current.value = ""
+    }
+  }
+
   function handleDragOver(e: React.DragEvent) {
     e.preventDefault()
     setDragActive(true)
@@ -206,10 +232,25 @@ export default function DevProjectsPage() {
     setDragActive(false)
   }
 
+  function getMissingRequired() {
+    const missing: string[] = []
+    if (!title.trim()) missing.push("title")
+    if (!description.trim()) missing.push("description")
+    if (!category.trim()) missing.push("category")
+    if (tags.length === 0) missing.push("tags[]")
+    return missing
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     setResult("")
+    const missing = getMissingRequired()
+    if (missing.length) {
+      setSaving(false)
+      setResult(`Missing required fields: ${missing.join(", ")}`)
+      return
+    }
     const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
@@ -369,7 +410,13 @@ export default function DevProjectsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-2 block">Download Link</label>
-                      <EnhancedInput value={downloadUrl} onChange={e => setDownloadUrl(e.target.value)} placeholder="https://releases.com/download" />
+                      <div className="flex gap-2">
+                        <EnhancedInput value={downloadUrl} onChange={e => setDownloadUrl(e.target.value)} placeholder="https://releases.com/download" className="flex-1" />
+                        <input ref={downloadFileInputRef} type="file" onChange={handleDownloadFileSelect} className="hidden" />
+                        <Button type="button" variant="outline" onClick={() => downloadFileInputRef.current?.click()} disabled={uploading}>
+                          {uploading ? "Uploading..." : "Upload File"}
+                        </Button>
+                      </div>
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-2 block">YouTube Demo</label>
@@ -496,8 +543,12 @@ export default function DevProjectsPage() {
                                 "bg-gradient-to-r from-green-300 via-blue-500 to-purple-600",
                                 "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400",
                                 "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200",
-                                "bg-gradient-to-tr from-slate-900 via-purple-900 to-slate-900",
-                                "bg-gradient-to-tr from-gray-900 via-gray-600 to-gray-900",
+                                "bg-gradient-to-tr from-black via-zinc-900 to-black",
+                                "bg-gradient-to-tr from-zinc-900 via-neutral-800 to-black",
+                                "bg-gradient-to-tr from-slate-900 via-gray-800 to-neutral-900",
+                                "bg-gradient-to-b from-gray-900 via-zinc-800 to-slate-900",
+                                "bg-gradient-to-br from-neutral-900 via-neutral-800 to-black",
+                                "bg-gradient-to-r from-black via-gray-900 to-black",
                                 "bg-gradient-to-bl from-pink-200 via-purple-400 to-indigo-200",
                                 "bg-gradient-to-bl from-green-200 via-green-400 to-purple-700",
                                 "bg-gradient-to-tl from-red-400 via-gray-300 to-blue-500",
@@ -538,10 +589,16 @@ export default function DevProjectsPage() {
                                 "bg-yellow-500",
                                 "bg-cyan-500",
                                 "bg-orange-500",
-                                "bg-slate-700",
-                                "bg-zinc-700",
-                                "bg-neutral-700",
-                                "bg-stone-700"
+                                "bg-black",
+                                "bg-neutral-900",
+                                "bg-zinc-900",
+                                "bg-slate-900",
+                                "bg-gray-900",
+                                "bg-stone-900",
+                                "bg-neutral-800",
+                                "bg-zinc-800",
+                                "bg-slate-800",
+                                "bg-gray-800"
                               ].map(color => (
                                 <button
                                   key={color}
@@ -708,7 +765,7 @@ export default function DevProjectsPage() {
                     setCardColor("")
                     setUseCustomStyle(false)
                   }}>Clear All</Button>
-                  <Button type="submit" disabled={saving || !title.trim()} className="min-w-[120px]">
+                  <Button type="submit" disabled={saving || getMissingRequired().length > 0} className="min-w-[120px]">
                     {saving ? "Saving..." : "Save Project"}
                   </Button>
                 </div>

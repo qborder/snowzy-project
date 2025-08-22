@@ -148,32 +148,32 @@ export default function ProjectsPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-4"
+            className="mb-6"
           >
-            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-background/40 backdrop-blur-2xl p-6">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/40 backdrop-blur-2xl p-4">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
               
-              <div className="relative space-y-4">
-                <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+              <div className="relative space-y-3">
+                <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <EnhancedInput
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder="Search projects, technologies..."
-                        className="pl-11 h-11 bg-background/60 border-white/20"
+                        className="pl-10 h-10 bg-background/60 border-white/20"
                       />
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 p-1 bg-background/60 border border-white/20 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 p-1 bg-background/60 border border-white/20 rounded-lg">
                       <Button
                         variant={layout === "gallery" ? "default" : "ghost"}
                         size="sm"
                         onClick={() => setLayout("gallery")}
-                        className="h-8 px-3"
+                        className="h-7 px-2 text-xs"
                       >
                         <Grid3x3 className="h-3 w-3 mr-1" />
                         Grid
@@ -182,7 +182,7 @@ export default function ProjectsPage() {
                         variant={layout === "list" ? "default" : "ghost"}
                         size="sm"
                         onClick={() => setLayout("list")}
-                        className="h-8 px-3"
+                        className="h-7 px-2 text-xs"
                       >
                         <LayoutList className="h-3 w-3 mr-1" />
                         List
@@ -191,14 +191,14 @@ export default function ProjectsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm text-muted-foreground">
                       {filtered.length} project{filtered.length !== 1 ? 's' : ''} found
                     </span>
                     {(q || category !== "all" || selectedTags.length > 0) && (
-                      <Badge variant="secondary" className="h-6">
-                        <Filter className="h-3 w-3 mr-1" />
+                      <Badge variant="secondary" className="h-5 text-xs">
+                        <Filter className="h-2 w-2 mr-1" />
                         Filtered
                       </Badge>
                     )}
@@ -206,42 +206,42 @@ export default function ProjectsPage() {
                   
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Sort by:</span>
-                    <Button variant="ghost" size="sm" className="h-7 text-xs">
-                      <Clock className="h-3 w-3 mr-1" />
+                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">
+                      <Clock className="h-2 w-2 mr-1" />
                       Latest
                     </Button>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">Categories:</span>
-                    <div className="flex gap-2">
+                    <span className="text-xs font-medium text-muted-foreground">Categories:</span>
+                    <div className="flex gap-1">
                       <Button
                         variant={category === "all" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCategory("all")}
-                        className="h-8"
+                        className="h-7 px-2 text-xs"
                       >
-                        <Sparkles className="h-3 w-3 mr-2" />
+                        <Sparkles className="h-2 w-2 mr-1" />
                         All
                       </Button>
                       <Button
                         variant={category === "Roblox" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCategory("Roblox")}
-                        className="h-8"
+                        className="h-7 px-2 text-xs"
                       >
-                        <Gamepad2 className="h-3 w-3 mr-2" />
+                        <Gamepad2 className="h-2 w-2 mr-1" />
                         Roblox
                       </Button>
                       <Button
                         variant={category === "Web Development" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCategory("Web Development")}
-                        className="h-8"
+                        className="h-7 px-2 text-xs"
                       >
-                        <Code className="h-3 w-3 mr-2" />
+                        <Code className="h-2 w-2 mr-1" />
                         Web Dev
                       </Button>
                     </div>
@@ -252,7 +252,7 @@ export default function ProjectsPage() {
                       variant="outline"
                       size="sm"
                       onClick={clearFilters}
-                      className="h-8"
+                      className="h-7 px-2 text-xs"
                     >
                       Clear all
                     </Button>
@@ -268,11 +268,11 @@ export default function ProjectsPage() {
                       transition={{ duration: 0.3, ease: "easeOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="pt-4 border-t border-white/10">
-                        <span className="text-sm font-medium text-muted-foreground mb-3 block">
+                      <div className="pt-3 border-t border-white/10">
+                        <span className="text-xs font-medium text-muted-foreground mb-2 block">
                           Technologies ({allTags.length}):
                         </span>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-1">
                           {allTags.map(([tag, count]) => (
                             <motion.div
                               key={tag}
@@ -281,11 +281,11 @@ export default function ProjectsPage() {
                             >
                               <Badge
                                 variant={selectedTags.includes(tag) ? "default" : "secondary"}
-                                className="cursor-pointer px-3 py-1 hover:bg-primary/10 transition-colors"
+                                className="cursor-pointer px-2 py-0.5 text-xs hover:bg-primary/10 transition-colors"
                                 onClick={() => toggleTag(tag)}
                               >
                                 {tag}
-                                <span className="ml-2 opacity-60">
+                                <span className="ml-1 opacity-60">
                                   {count}
                                 </span>
                               </Badge>
