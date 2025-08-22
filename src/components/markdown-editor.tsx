@@ -12,6 +12,11 @@ const MDEditor = dynamic(
   { ssr: false }
 )
 
+const MarkdownPreview = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default.Markdown),
+  { ssr: false }
+)
+
 interface MarkdownEditorProps {
   value: string
   onChange: (value: string) => void
@@ -107,7 +112,7 @@ export function MarkdownViewer({ content }: { content: string }) {
 
   return (
     <div data-color-mode="auto">
-      <MDEditor.Markdown 
+      <MarkdownPreview 
         source={content} 
         style={{ 
           backgroundColor: "transparent",
