@@ -5,7 +5,7 @@ type FileMapping = {
   uploadedAt: string
 }
 
-let fileStore: Record<string, FileMapping> = {}
+const fileStore: Record<string, FileMapping> = {}
 
 export function generateCustomUrl(filename: string): string {
   const timestamp = Date.now().toString(36)

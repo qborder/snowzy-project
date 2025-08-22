@@ -15,7 +15,7 @@ export async function GET(
     }
     
     return NextResponse.redirect(blobUrl)
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 })
   }
 }

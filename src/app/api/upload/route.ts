@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       ...blob,
       url: `${baseUrl}${customUrl}`
     })
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }
