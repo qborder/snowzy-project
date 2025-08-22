@@ -77,7 +77,6 @@ export function MarkdownEditor({ value, onChange, placeholder = "Enter markdown 
               height={height}
               preview="preview"
               hideToolbar
-              visibleDragBar={false}
             />
           </div>
         )}
