@@ -17,9 +17,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (process.env.NODE_ENV !== "development") {
-    return NextResponse.json({ error: "Not allowed" }, { status: 403 })
-  }
+  //if (process.env.NODE_ENV !== "development") {
+    //return NextResponse.json({ error: "Not allowed" }, { status: 403 })
+  //}
 
   let body
   try {
