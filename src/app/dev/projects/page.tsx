@@ -205,9 +205,10 @@ export default function DevProjectsPage() {
     try {
       setUploading(true)
       setResult("")
-      const form = new FormData()
-      form.append("file", file)
-      const res = await fetch("/api/upload", { method: "POST", body: form })
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
+        method: "POST", 
+        body: file 
+      })
       const data = await res.json()
       if (!res.ok || !data?.url) {
         throw new Error(data?.error || "Upload failed")
