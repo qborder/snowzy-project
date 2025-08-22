@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag } from "lucide-react"
+import { MarkdownViewer } from "@/components/markdown-editor"
 
 type Project = {
   id?: string
@@ -20,6 +21,7 @@ type Project = {
   image?: string
   tags?: string[]
   createdAt?: string
+  content?: string
 }
 
 export default function ProjectViewPage() {
@@ -166,6 +168,17 @@ export default function ProjectViewPage() {
               </p>
             </CardContent>
           </Card>
+
+          {project.content && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Documentation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MarkdownViewer content={project.content} />
+              </CardContent>
+            </Card>
+          )}
 
           {project.image && embedUrl && (
             <Card>

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  const { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, cardGradient, cardColor } = body || {}
+  const { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, cardGradient, cardColor, content } = body || {}
   if (!title || !description || !category || !Array.isArray(tags)) {
     return NextResponse.json({ error: "Missing required fields: title, description, category, tags[]" }, { status: 400 })
   }
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
   if (image) project.image = image
   if (cardGradient) project.cardGradient = cardGradient
   if (cardColor) project.cardColor = cardColor
+  if (content) project.content = content
 
   try {
     const projects = (await kv.get('projects') as Record<string, unknown>[]) || []

@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
+import { MarkdownEditor } from "@/components/markdown-editor"
 
 const DEFAULT_TEMPLATES = {
   roblox: {
@@ -70,6 +71,7 @@ type Project = {
   createdAt?: string
   cardGradient?: string
   cardColor?: string
+  content?: string
 }
 
 type CustomTemplate = {
@@ -100,6 +102,7 @@ export default function DevProjectsPage() {
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [image, setImage] = useState("")
   const [tags, setTags] = useState<string[]>([])
+  const [content, setContent] = useState("")
   const [saving, setSaving] = useState(false)
   const [result, setResult] = useState("")
   const [cardGradient, setCardGradient] = useState("")
@@ -252,7 +255,7 @@ export default function DevProjectsPage() {
       setResult(`Missing required fields: ${missing.join(", ")}`)
       return
     }
-    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags }
+    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, content }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
@@ -273,6 +276,7 @@ export default function DevProjectsPage() {
       setYoutubeUrl("")
       setImage("")
       setTags([])
+      setContent("")
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "error")
@@ -300,10 +304,11 @@ export default function DevProjectsPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="basic">Basic</TabsTrigger>
               <TabsTrigger value="links">Links</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="content">Page</TabsTrigger>
               <TabsTrigger value="style">Style</TabsTrigger>
               <TabsTrigger value="templates">Templates</TabsTrigger>
             </TabsList>
@@ -498,6 +503,36 @@ export default function DevProjectsPage() {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+              
+              <TabsContent value="content" className="space-y-6">
+                <MarkdownEditor
+                  value={content}
+                  onChange={setContent}
+                  placeholder="# Project Documentation
+
+## Overview
+Describe your project in detail...
+
+## Features
+- Feature 1
+- Feature 2
+- Feature 3
+
+## Installation
+```bash
+# Add installation instructions
+```
+
+## Usage
+```javascript
+// Add code examples
+```
+
+## Contributing
+Instructions for contributors..."
+                  height={500}
+                />
               </TabsContent>
               
               <TabsContent value="style" className="space-y-6">
