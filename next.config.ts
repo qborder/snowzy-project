@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'framer-motion', '@fluentui/react-components', '@fluentui/react-icons'],
+    webpackBuildWorker: true,
+    optimizeCss: true,
   },
   turbopack: {
     rules: {
@@ -14,6 +16,25 @@ const nextConfig: NextConfig = {
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    styledComponents: true,
+  },
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      config.devtool = false;
+    }
+    
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    };
+    
+    return config;
   },
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -33,6 +54,8 @@ const nextConfig: NextConfig = {
       fullUrl: false,
     },
   },
+  swcMinify: true,
+  productionBrowserSourceMaps: false,
   modularizeImports: {
     '@radix-ui/react-icons': {
       transform: '@radix-ui/react-icons/{{member}}',
