@@ -1,36 +1,71 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+
+const loadingStates = [
+  'Initializing workspace...',
+  'Loading components...',
+  'Almost ready...'
+]
 
 export default function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true)
   const [progress, setProgress] = useState(0)
+  const [currentStateIndex, setCurrentStateIndex] = useState(0)
+  const [isExiting, setIsExiting] = useState(false)
+
+  const smoothProgress = useCallback((targetProgress: number, speed = 0.5) => {
+    const increment = Math.max(1, (targetProgress - progress) * speed)
+    return Math.min(targetProgress, progress + increment)
+  }, [progress])
 
   useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval)
-          return 100
-        }
-        return prev + Math.random() * 15
-      })
-    }, 200)
+    let progressInterval: NodeJS.Timeout
+    let stateInterval: NodeJS.Timeout
+    let timeoutId: NodeJS.Timeout
+
+    const startLoading = () => {
+      progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(progressInterval)
+            return prev
+          }
+          const increment = Math.random() * 12 + 3
+          return Math.min(95, prev + increment)
+        })
+      }, 200)
+
+      stateInterval = setInterval(() => {
+        setCurrentStateIndex(prev => (prev + 1) % loadingStates.length)
+      }, 600)
+    }
 
     const handleLoad = () => {
       setProgress(100)
-      setTimeout(() => setIsLoading(false), 1000)
+      setCurrentStateIndex(loadingStates.length - 1)
+      clearInterval(progressInterval)
+      clearInterval(stateInterval)
+      
+      timeoutId = setTimeout(() => {
+        setIsExiting(true)
+        setTimeout(() => setIsLoading(false), 400)
+      }, 400)
     }
 
     if (document.readyState === 'complete') {
       handleLoad()
     } else {
+      startLoading()
       window.addEventListener('load', handleLoad)
-      return () => {
-        window.removeEventListener('load', handleLoad)
-        clearInterval(progressInterval)
-      }
+    }
+
+    return () => {
+      clearInterval(progressInterval)
+      clearInterval(stateInterval)
+      clearTimeout(timeoutId)
+      window.removeEventListener('load', handleLoad)
     }
   }, [])
 
@@ -39,10 +74,17 @@ export default function LoadingScreen() {
       {isLoading && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          exit={{ 
+            opacity: 0, 
+            scale: 0.95
+          }}
+          transition={{ 
+            duration: 0.8, 
+            ease: [0.4, 0, 0.2, 1]
+          }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-background via-background/95 to-background/90 backdrop-blur-sm"
         >
+
           <div className="relative">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -103,11 +145,13 @@ export default function LoadingScreen() {
               </motion.h2>
               
               <motion.p
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                key={currentStateIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
                 className="text-base text-muted-foreground font-medium"
               >
-                Initializing workspace...
+                {loadingStates[currentStateIndex]}
               </motion.p>
 
               <div className="w-64 mx-auto space-y-2">
