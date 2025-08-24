@@ -149,7 +149,7 @@ export default function ProjectViewPage() {
 
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-purple-500/5 to-primary/5 rounded-3xl blur-3xl -z-10"></div>
-          <div className="bg-gradient-to-br from-background/90 via-background/95 to-background/90 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-background/90 via-background/95 to-background/90 backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-500/20 to-transparent rounded-full blur-xl"></div>
             
@@ -205,21 +205,21 @@ export default function ProjectViewPage() {
                     <Button 
                       onClick={handleDownload}
                       disabled={isDownloading}
-                      className="bg-gradient-to-r from-green-600 via-green-500 to-green-400 hover:from-green-500 hover:via-green-400 hover:to-green-300 border-0 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 text-lg font-bold"
-                      size="lg"
+                      className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 hover:from-slate-600/90 hover:via-slate-500/90 hover:to-slate-600/90 border border-slate-500/30 hover:border-slate-400/50 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] text-white group/btn rounded-xl disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 font-medium backdrop-blur-sm"
+                      size="default"
                     >
-                      <div className="mr-4 group-hover/btn:scale-110 transition-transform">
+                      <div className="mr-3 group-hover/btn:scale-105 transition-transform">
                         {isDownloading ? (
-                          <div className="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full" />
+                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
                         ) : (
-                          <Download className="h-6 w-6" />
+                          <Download className="h-4 w-4" />
                         )}
                       </div>
                       <div className="flex flex-col items-start">
-                        <span className="text-xl">
+                        <span className="text-sm font-semibold">
                           {isDownloading ? 'Downloading...' : 'Download Project'}
                         </span>
-                        <span className="text-sm opacity-90 font-normal">
+                        <span className="text-xs opacity-80 font-normal">
                           {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
                         </span>
                       </div>
