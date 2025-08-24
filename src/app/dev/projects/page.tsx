@@ -341,7 +341,7 @@ export default function DevProjectsPage() {
                     <div className="h-3 w-3 bg-primary rounded-full animate-pulse"></div>
                     <div>
                       <p className="font-semibold text-primary">Editing Project: {editingProject.title}</p>
-                      <p className="text-sm text-muted-foreground">Make your changes and click "Update Project" to save</p>
+                      <p className="text-sm text-muted-foreground">Make your changes and click &quot;Update Project&quot; to save</p>
                     </div>
                   </div>
                   <Button 
