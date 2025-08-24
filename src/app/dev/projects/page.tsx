@@ -273,7 +273,7 @@ export default function DevProjectsPage() {
       if (editingProject && editingProjectId) {
         const response = await fetch('/api/projects')
         const projects = await response.json()
-        const projectIndex = projects.findIndex((p: Record<string, unknown>, index: number) => index.toString() === editingProjectId)
+        const projectIndex = projects.findIndex((p: Record<string, unknown>) => p.id === editingProjectId)
         if (projectIndex !== -1) {
           projects[projectIndex] = { ...projects[projectIndex], ...body }
           const updateResponse = await fetch('/api/projects', {
@@ -286,6 +286,8 @@ export default function DevProjectsPage() {
             throw new Error(t || "Update failed")
           }
           setResult("Project updated successfully!")
+        } else {
+          throw new Error("Project not found for update")
         }
       } else {
         const res = await fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
