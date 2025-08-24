@@ -2,7 +2,7 @@
   {
     "id": "55487",
     "title": "How to Make an Announcement System in Roblox Studio (Grow A Garden)",
-    "description": "lmao",
+    "description": "A complete announcement system for your Roblox game",
     "category": "Roblox Studio",
     "tags": [
       "System",
@@ -10,7 +10,12 @@
       "Template",
       "Asset"
     ],
-    "createdAt": "2025-08-22T03:19:37.539Z"
+    "createdAt": "2025-08-22T03:19:37.539Z",
+    "downloadUrl": "https://example.com/test-download.zip",
+    "demoUrl": "https://demo.example.com/announcement-system",
+    "githubUrl": "https://github.com/example/roblox-announcement-system",
+    "youtubeUrl": "https://youtube.com/watch?v=example123",
+    "content": "# Roblox Announcement System\n\nThis is a **comprehensive announcement system** for Roblox games that allows administrators to broadcast messages to all players in real-time.\n\n## Features\n\n- ✅ Real-time announcements\n- ✅ Admin-only controls\n- ✅ Customizable styling\n- ✅ Sound effects support\n- ✅ Multiple announcement types\n\n## Video Tutorial\n\nWatch this tutorial to learn how to implement the system:\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\n\n## Installation\n\n1. Download the system files\n2. Import into Roblox Studio\n3. Configure the settings\n4. Test with your admin commands\n\n## Code Example\n\n```lua\nlocal AnnouncementService = require(script.AnnouncementService)\n\n-- Send announcement to all players\nAnnouncementService:SendAnnouncement({\n    title = \"Server Update\",\n    message = \"New features have been added!\",\n    type = \"info\",\n    duration = 10\n})\n```\n\n*Perfect for any Roblox game requiring player communication!*"
   },
   {
     "id": "49270",
