@@ -199,6 +199,33 @@ export default function ProjectViewPage() {
                 <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap max-w-4xl font-light">
                   {project.description}
                 </p>
+                
+                {project.downloadUrl && (
+                  <div className="mt-6">
+                    <Button 
+                      onClick={handleDownload}
+                      disabled={isDownloading}
+                      className="bg-gradient-to-r from-green-600 via-green-500 to-green-400 hover:from-green-500 hover:via-green-400 hover:to-green-300 border-0 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 text-lg font-bold"
+                      size="lg"
+                    >
+                      <div className="mr-4 group-hover/btn:scale-110 transition-transform">
+                        {isDownloading ? (
+                          <div className="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full" />
+                        ) : (
+                          <Download className="h-6 w-6" />
+                        )}
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <span className="text-xl">
+                          {isDownloading ? 'Downloading...' : 'Download Project'}
+                        </span>
+                        <span className="text-sm opacity-90 font-normal">
+                          {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
+                        </span>
+                      </div>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -403,30 +430,6 @@ export default function ProjectViewPage() {
                         </div>
                       </Button>
                     </Link>
-                  )}
-                  {project.downloadUrl && (
-                    <Button 
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className="w-full justify-start h-16 bg-gradient-to-r from-green-600 via-green-500 to-green-400 hover:from-green-500 hover:via-green-400 hover:to-green-300 border-0 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-                      size="lg"
-                    >
-                      <div className="p-2 bg-white/20 rounded-xl mr-4 group-hover/btn:bg-white/30 transition-colors">
-                        {isDownloading ? (
-                          <div className="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full" />
-                        ) : (
-                          <Download className="h-6 w-6" />
-                        )}
-                      </div>
-                      <div className="flex flex-col items-start">
-                        <span className="font-bold text-lg">
-                          {isDownloading ? 'Downloading...' : 'Download Project'}
-                        </span>
-                        <span className="text-sm opacity-90 font-light">
-                          {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
-                        </span>
-                      </div>
-                    </Button>
                   )}
                   {project.githubUrl && (
                     <Link href={project.githubUrl} target="_blank">
