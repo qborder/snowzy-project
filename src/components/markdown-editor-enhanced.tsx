@@ -315,20 +315,20 @@ export function MarkdownEditorEnhanced({
                           {children}
                         </li>
                       ),
-                      code({node, inline, className, children, ...props}: any) {
+                      code(props: {inline?: boolean, className?: string, children?: React.ReactNode}) {
+                        const {inline, className, children} = props
                         const match = /language-(\w+)/.exec(className || '')
                         return !inline && match ? (
                           <SyntaxHighlighter
-                            style={oneDark as any}
+                            style={oneDark}
                             language={match[1]}
                             PreTag="div"
                             className="rounded-xl border border-border/20 shadow-sm my-4"
-                            {...props}
                           >
                             {String(children).replace(/\n$/, '')}
                           </SyntaxHighlighter>
                         ) : (
-                          <code className="bg-gradient-to-r from-muted/80 to-muted/60 text-foreground px-2.5 py-1.5 rounded-md text-sm font-mono border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]" {...props}>
+                          <code className="bg-gradient-to-r from-muted/80 to-muted/60 text-foreground px-2.5 py-1.5 rounded-md text-sm font-mono border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
                             {children}
                           </code>
                         )
@@ -569,7 +569,7 @@ export function MarkdownViewer({ content }: { content: string }) {
           },
           p: ({children}) => {
             const childrenArray = React.Children.toArray(children)
-            const processedChildren: any[] = []
+            const processedChildren: React.ReactNode[] = []
             
             childrenArray.forEach((child, index) => {
               if (typeof child === 'string') {
