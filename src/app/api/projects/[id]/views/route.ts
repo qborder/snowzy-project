@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
 import fallbackProjects from '@/data/projects.json'
 
+interface Project {
+  id: string
+  title: string
+  description: string
+  category: string
+  views?: number
+  downloads?: number
+  [key: string]: unknown
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -9,9 +19,9 @@ export async function POST(
   try {
     const projectId = params.id
     
-    let projects = (await kv.get('projects') as any[]) || fallbackProjects
+    const projects = (await kv.get('projects') as Project[]) || fallbackProjects
     
-    const projectIndex = projects.findIndex((p: any) => p.id === projectId)
+    const projectIndex = projects.findIndex((p: Project) => p.id === projectId)
     
     if (projectIndex === -1) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
