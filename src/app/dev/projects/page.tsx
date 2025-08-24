@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
-import { MarkdownEditor } from "@/components/markdown-editor"
+import { MarkdownEditorEnhanced } from "@/components/markdown-editor-enhanced"
 
 const DEFAULT_TEMPLATES = {
   roblox: {
@@ -126,6 +126,26 @@ export default function DevProjectsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const downloadFileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
+  const [autoSaveStatus, setAutoSaveStatus] = useState("")
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (!title && !description && !category && !content && tags.length === 0 && !image && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl) {
+      return // Don't save empty form
+    }
+    
+    const draft = {
+      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, content,
+      cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle,
+      timestamp: Date.now()
+    }
+    
+    localStorage.setItem('projectDraft', JSON.stringify(draft))
+    setAutoSaveStatus("Draft saved")
+    
+    const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
+    return () => clearTimeout(timer)
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -170,6 +190,34 @@ export default function DevProjectsPage() {
     const saved = localStorage.getItem('customTemplates')
     if (saved) {
       setCustomTemplates(JSON.parse(saved))
+    }
+    
+    // Load auto-saved draft
+    const draft = localStorage.getItem('projectDraft')
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft)
+        setTitle(parsed.title || "")
+        setDescription(parsed.description || "")
+        setCategory(parsed.category || "")
+        setDownloadUrl(parsed.downloadUrl || "")
+        setGithubUrl(parsed.githubUrl || "")
+        setDemoUrl(parsed.demoUrl || "")
+        setYoutubeUrl(parsed.youtubeUrl || "")
+        setImage(parsed.image || "")
+        setTags(parsed.tags || [])
+        setContent(parsed.content || "")
+        setCardGradient(parsed.cardGradient || "")
+        setCardColor(parsed.cardColor || "")
+        setUseCustomStyle(parsed.useCustomStyle || false)
+        setTitleColor(parsed.titleColor || "")
+        setTitleGradientFrom(parsed.titleGradientFrom || "")
+        setTitleGradientTo(parsed.titleGradientTo || "")
+        setTitleGradientVia(parsed.titleGradientVia || "")
+        setUseTitleCustomStyle(parsed.useTitleCustomStyle || false)
+      } catch (e) {
+        console.warn('Failed to load draft:', e)
+      }
     }
   }, [])
 
@@ -314,6 +362,7 @@ export default function DevProjectsPage() {
             throw new Error(t || "Update failed")
           }
           setResult("Project updated successfully!")
+          localStorage.removeItem('projectDraft') // Clear draft after successful update
         } else {
           throw new Error("Project not found for update")
         }
@@ -325,6 +374,8 @@ export default function DevProjectsPage() {
         }
         setResult("Project created successfully!")
         
+        // Clear form and remove draft
+        localStorage.removeItem('projectDraft')
         setTitle("")
         setDescription("")
         setCategory("")
@@ -366,14 +417,16 @@ export default function DevProjectsPage() {
         </div>
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
-        <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto bg-background/60 backdrop-blur-sm border-white/20">
-          <TabsTrigger value="creator" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/20">
-            <Sparkles className="h-4 w-4 mr-2" />
-            Project Creator
+        <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-1.5">
+          <TabsTrigger value="creator" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg transition-all duration-300 hover:scale-[1.02]">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-700" />
+            <Sparkles className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:scale-110 group-data-[state=active]:animate-pulse" />
+            <span className="relative z-10">Project Creator</span>
           </TabsTrigger>
-          <TabsTrigger value="editor" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/20">
-            <Edit className="h-4 w-4 mr-2" />
-            Project Editor
+          <TabsTrigger value="editor" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg transition-all duration-300 hover:scale-[1.02]">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-700" />
+            <Edit className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:scale-110 group-data-[state=active]:animate-pulse" />
+            <span className="relative z-10">Project Editor</span>
           </TabsTrigger>
         </TabsList>
         
@@ -428,30 +481,36 @@ export default function DevProjectsPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Tabs defaultValue="basic" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-6 bg-background/60 backdrop-blur-sm border-white/10 p-1 rounded-xl">
-              <TabsTrigger value="basic" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
-                <Sparkles className="h-4 w-4 mr-1" />
-                Basic
+            <TabsList className="grid w-full grid-cols-6 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/10 p-1.5 rounded-xl shadow-lg">
+              <TabsTrigger value="basic" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary/15 data-[state=active]:to-primary/8 data-[state=active]:text-primary rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <Sparkles className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-primary" />
+                <span className="relative z-10">Basic</span>
               </TabsTrigger>
-              <TabsTrigger value="links" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
-                <ExternalLink className="h-4 w-4 mr-1" />
-                Links
+              <TabsTrigger value="links" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500/15 data-[state=active]:to-blue-400/8 data-[state=active]:text-blue-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 via-blue-400/5 to-blue-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <ExternalLink className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-blue-400" />
+                <span className="relative z-10">Links</span>
               </TabsTrigger>
-              <TabsTrigger value="media" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
-                <ImageIcon className="h-4 w-4 mr-1" />
-                Media
+              <TabsTrigger value="media" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-green-500/15 data-[state=active]:to-green-400/8 data-[state=active]:text-green-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-400/0 via-green-400/5 to-green-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <ImageIcon className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-green-400" />
+                <span className="relative z-10">Media</span>
               </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
-                <Code className="h-4 w-4 mr-1" />
-                Page
+              <TabsTrigger value="content" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-500/15 data-[state=active]:to-purple-400/8 data-[state=active]:text-purple-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-400/0 via-purple-400/5 to-purple-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <Code className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-purple-400" />
+                <span className="relative z-10">Page</span>
               </TabsTrigger>
-              <TabsTrigger value="style" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
-                <Palette className="h-4 w-4 mr-1" />
-                Style
+              <TabsTrigger value="style" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-pink-500/15 data-[state=active]:to-pink-400/8 data-[state=active]:text-pink-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-400/0 via-pink-400/5 to-pink-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <Palette className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-pink-400" />
+                <span className="relative z-10">Style</span>
               </TabsTrigger>
-              <TabsTrigger value="templates" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
-                <Sparkles className="h-4 w-4 mr-1" />
-                Templates
+              <TabsTrigger value="templates" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-orange-500/15 data-[state=active]:to-orange-400/8 data-[state=active]:text-orange-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-400/0 via-orange-400/5 to-orange-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <Sparkles className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-orange-400" />
+                <span className="relative z-10">Templates</span>
               </TabsTrigger>
             </TabsList>
             
@@ -535,7 +594,10 @@ export default function DevProjectsPage() {
                           placeholder="Add tags (press Enter or comma)" 
                           className="flex-1"
                         />
-                        <Button type="button" variant="outline" onClick={() => addTag(tagInput.trim())}>Add</Button>
+                        <Button type="button" variant="outline" className="group relative overflow-hidden bg-gradient-to-r from-background/90 to-background/70 hover:from-primary/10 hover:to-primary/5 border border-primary/20 hover:border-primary/40 shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105" onClick={() => addTag(tagInput.trim())}>
+                          <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                          <span className="relative z-10">Add</span>
+                        </Button>
                       </div>
                     </div>
                     <div>
@@ -579,8 +641,9 @@ export default function DevProjectsPage() {
                       <div className="flex gap-2">
                         <EnhancedInput value={downloadUrl} onChange={e => setDownloadUrl(e.target.value)} placeholder="https://releases.com/download" className="flex-1" />
                         <input ref={downloadFileInputRef} type="file" onChange={handleDownloadFileSelect} className="hidden" />
-                        <Button type="button" variant="outline" onClick={() => downloadFileInputRef.current?.click()} disabled={uploading}>
-                          {uploading ? "Uploading..." : "Upload File"}
+                        <Button type="button" variant="outline" className="group relative overflow-hidden bg-gradient-to-r from-background/90 to-background/70 hover:from-blue-500/10 hover:to-blue-400/5 border border-blue-400/20 hover:border-blue-400/40 shadow-md hover:shadow-lg hover:shadow-blue-400/20 transition-all duration-300 hover:scale-105" onClick={() => downloadFileInputRef.current?.click()} disabled={uploading}>
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-blue-400/5 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                          <span className="relative z-10">{uploading ? "Uploading..." : "Upload File"}</span>
                         </Button>
                       </div>
                     </div>
@@ -637,8 +700,9 @@ export default function DevProjectsPage() {
                           <Upload className="h-12 w-12 mx-auto mb-4 opacity-60 group-hover:opacity-100 transition-opacity" />
                           <p className="text-lg font-medium mb-2">Click to select or drag an image</p>
                           <p className="text-sm text-muted-foreground mb-2">Supports JPG, PNG, GIF, WebP</p>
-                          <Button type="button" variant="outline" size="sm" className="mt-2">
-                            Browse Files
+                          <Button type="button" variant="outline" size="sm" className="group relative overflow-hidden mt-2 bg-gradient-to-r from-background/90 to-background/70 hover:from-green-500/10 hover:to-green-400/5 border border-green-400/20 hover:border-green-400/40 shadow-md hover:shadow-lg hover:shadow-green-400/20 transition-all duration-300 hover:scale-105">
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-400/0 via-green-400/5 to-green-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                            <span className="relative z-10">Browse Files</span>
                           </Button>
                         </>
                       )}
@@ -670,10 +734,10 @@ export default function DevProjectsPage() {
               </TabsContent>
               
               <TabsContent value="content" className="space-y-6">
-                <MarkdownEditor
+                <MarkdownEditorEnhanced
                   value={content}
                   onChange={setContent}
-                  placeholder="# Project Documentation
+                  placeholder={`# Project Documentation
 
 ## Overview
 Describe your project in detail...
@@ -684,17 +748,17 @@ Describe your project in detail...
 - Feature 3
 
 ## Installation
-```bash
+\`\`\`bash
 # Add installation instructions
-```
+\`\`\`
 
 ## Usage
-```javascript
+\`\`\`javascript
 // Add code examples
-```
+\`\`\`
 
 ## Contributing
-Instructions for contributors..."
+Instructions for contributors...`}
                   height={500}
                 />
               </TabsContent>
@@ -839,9 +903,10 @@ Instructions for contributors..."
                               setCardColor("")
                               setUseCustomStyle(false)
                             }}
-                            className="w-full"
+                            className="group relative overflow-hidden w-full bg-gradient-to-r from-background/90 to-background/70 hover:from-red-500/10 hover:to-red-400/5 border border-red-400/20 hover:border-red-400/40 shadow-md hover:shadow-lg hover:shadow-red-400/20 transition-all duration-300 hover:scale-[1.02]"
                           >
-                            Reset to Default
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                            <span className="relative z-10">Reset to Default</span>
                           </Button>
                         </div>
                       </>
@@ -995,9 +1060,10 @@ Instructions for contributors..."
                               setTitleGradientVia("")
                               setUseTitleCustomStyle(false)
                             }}
-                            className="w-full"
+                            className="group relative overflow-hidden w-full bg-gradient-to-r from-background/90 to-background/70 hover:from-red-500/10 hover:to-red-400/5 border border-red-400/20 hover:border-red-400/40 shadow-md hover:shadow-lg hover:shadow-red-400/20 transition-all duration-300 hover:scale-[1.02]"
                           >
-                            Reset Title Style
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                            <span className="relative z-10">Reset Title Style</span>
                           </Button>
                         </div>
                       </>
@@ -1040,8 +1106,10 @@ Instructions for contributors..."
                           }
                         }}
                         disabled={!templateName.trim() || !title || !description || !category}
+                        className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/95 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
                       >
-                        Save Template
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                        <span className="relative z-10">Save Template</span>
                       </Button>
                     </div>
                   </CardContent>
@@ -1108,6 +1176,12 @@ Instructions for contributors..."
               
               <div className="flex items-center justify-between pt-6 border-t">
                 <div className="flex items-center gap-3">
+                  {autoSaveStatus && (
+                    <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                      {autoSaveStatus}
+                    </span>
+                  )}
                   {result && (
                     <span className={`text-sm font-medium ${
                       result.includes("success") ? "text-green-400" : "text-red-400"
@@ -1123,7 +1197,7 @@ Instructions for contributors..."
                 </div>
                 <div className="flex gap-3">
                   {editingProject ? (
-                    <Button type="button" variant="destructive" onClick={() => {
+                    <Button type="button" variant="destructive" className="group relative overflow-hidden bg-gradient-to-r from-red-600 via-red-500 to-red-600 hover:from-red-500 hover:via-red-400 hover:to-red-500 shadow-lg hover:shadow-xl hover:shadow-red-500/30 border border-red-500/20 hover:border-red-400/40 transition-all duration-300 hover:scale-105" onClick={() => {
                       setTitle("")
                       setDescription("")
                       setCategory("")
@@ -1147,9 +1221,13 @@ Instructions for contributors..."
                       const url = new URL(window.location.href)
                       url.searchParams.delete('id')
                       router.replace(url.pathname + url.search, { scroll: false })
-                    }}>Cancel Edit</Button>
+                    }}>
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                      <span className="relative z-10">Cancel Edit</span>
+                    </Button>
                   ) : (
-                    <Button type="button" variant="outline" onClick={() => {
+                    <Button type="button" variant="outline" className="group relative overflow-hidden bg-gradient-to-r from-background/90 to-background/70 hover:from-muted/20 hover:to-muted/10 border border-muted-foreground/20 hover:border-muted-foreground/40 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105" onClick={() => {
+                      localStorage.removeItem('projectDraft') // Clear draft
                       setTitle("")
                       setDescription("")
                       setCategory("")
@@ -1168,10 +1246,14 @@ Instructions for contributors..."
                       setTitleGradientTo("")
                       setTitleGradientVia("")
                       setUseTitleCustomStyle(false)
-                    }}>Clear All</Button>
+                    }}>
+                      <div className="absolute inset-0 bg-gradient-to-r from-muted-foreground/0 via-muted-foreground/5 to-muted-foreground/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                      <span className="relative z-10">Clear All</span>
+                    </Button>
                   )}
-                  <Button type="submit" disabled={saving || getMissingRequired().length > 0} className="min-w-[120px]">
-                    {saving ? "Saving..." : editingProject ? "Update Project" : "Save Project"}
+                  <Button type="submit" disabled={saving || getMissingRequired().length > 0} className="group relative overflow-hidden min-w-[120px] bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/95 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    <span className="relative z-10">{saving ? "Saving..." : editingProject ? "Update Project" : "Save Project"}</span>
                   </Button>
                 </div>
               </div>
