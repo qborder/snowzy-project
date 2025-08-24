@@ -178,60 +178,57 @@ export default function ProjectViewPage() {
               </div>
               
               <div className="space-y-6">
-                <div className="flex items-start justify-between gap-6">
-                  <div className="flex-1 space-y-4">
-                    <h1 
-                      className={`text-4xl font-black leading-tight tracking-tight ${
-                        project.titleGradient 
-                          ? 'bg-clip-text text-transparent' 
-                          : project.titleColor 
-                            ? '' 
-                            : 'text-foreground'
-                      }`}
-                      style={{
-                        backgroundImage: project.titleGradient 
-                          ? `linear-gradient(to right, ${project.titleGradient.from}${project.titleGradient.via ? `, ${project.titleGradient.via}` : ''}, ${project.titleGradient.to})`
-                          : undefined,
-                        color: project.titleColor || undefined
-                      }}
+                <h1 
+                  className={`text-4xl font-black leading-tight tracking-tight ${
+                    project.titleGradient 
+                      ? 'bg-clip-text text-transparent' 
+                      : project.titleColor 
+                        ? '' 
+                        : 'text-foreground'
+                  }`}
+                  style={{
+                    backgroundImage: project.titleGradient 
+                      ? `linear-gradient(to right, ${project.titleGradient.from}${project.titleGradient.via ? `, ${project.titleGradient.via}` : ''}, ${project.titleGradient.to})`
+                      : undefined,
+                    color: project.titleColor || undefined
+                  }}
+                >
+                  {project.title}
+                </h1>
+                
+                <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap max-w-4xl font-light">
+                  {project.description}
+                </p>
+                
+                {project.downloadUrl && (
+                  <div className="flex justify-center pt-4">
+                    <Button 
+                      onClick={handleDownload}
+                      disabled={isDownloading}
+                      className="relative overflow-hidden bg-gradient-to-br from-blue-600/90 via-blue-700/90 to-indigo-700/90 hover:from-blue-500/90 hover:via-blue-600/90 hover:to-indigo-600/90 border-2 border-blue-400/30 hover:border-blue-300/50 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                      size="lg"
                     >
-                      {project.title}
-                    </h1>
-                    
-                    <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap max-w-3xl font-light">
-                      {project.description}
-                    </p>
-                  </div>
-                  
-                  {project.downloadUrl && (
-                    <div className="flex-shrink-0">
-                      <Button 
-                        onClick={handleDownload}
-                        disabled={isDownloading}
-                        className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 hover:from-slate-600/90 hover:via-slate-500/90 hover:to-slate-600/90 border border-slate-500/30 hover:border-slate-400/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
-                        size="lg"
-                      >
-                        <div className="flex items-center gap-4 px-2 py-1">
-                          <div className="group-hover/btn:scale-105 transition-transform">
-                            {isDownloading ? (
-                              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                            ) : (
-                              <Download className="h-5 w-5" />
-                            )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500" />
+                      <div className="relative flex items-center gap-3 px-6 py-2">
+                        <div className="p-2 bg-white/15 rounded-xl group-hover/btn:bg-white/25 transition-colors">
+                          {isDownloading ? (
+                            <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                          ) : (
+                            <Download className="h-5 w-5" />
+                          )}
+                        </div>
+                        <div className="text-left">
+                          <div className="text-lg font-bold leading-tight">
+                            {isDownloading ? 'Downloading...' : 'Download Project'}
                           </div>
-                          <div className="text-left">
-                            <div className="text-base font-semibold leading-tight">
-                              {isDownloading ? 'Downloading...' : 'Download Project'}
-                            </div>
-                            <div className="text-sm opacity-90 font-normal leading-tight">
-                              {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
-                            </div>
+                          <div className="text-sm opacity-90 font-medium leading-tight">
+                            {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
                           </div>
                         </div>
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                      </div>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
