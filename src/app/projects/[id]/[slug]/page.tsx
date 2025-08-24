@@ -94,7 +94,7 @@ export default function ProjectViewPage() {
                 <h1 className="text-4xl font-bold mb-2">
                   {project.title}
                 </h1>
-                <div className="flex items-center gap-3 text-muted-foreground">
+                <div className="flex items-center gap-3 text-muted-foreground mb-3">
                   <Badge variant="default" className="text-sm">
                     {project.category === "Roblox" && <Gamepad2 className="h-3 w-3 mr-1" />}
                     {project.category?.includes("Web") && <Globe className="h-3 w-3 mr-1" />}
@@ -108,6 +108,9 @@ export default function ProjectViewPage() {
                     </div>
                   )}
                 </div>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {project.description}
+                </p>
               </div>
             </div>
 
@@ -158,21 +161,10 @@ export default function ProjectViewPage() {
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>About This Project</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {project.description}
-              </p>
-            </CardContent>
-          </Card>
-
           {project.content && (
             <Card>
               <CardHeader>
-                <CardTitle>Documentation</CardTitle>
+                <CardTitle>Description</CardTitle>
               </CardHeader>
               <CardContent>
                 <MarkdownViewer content={project.content} />

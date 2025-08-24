@@ -6,7 +6,7 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Search, Filter, Grid3x3, LayoutList, Clock, Sparkles, Gamepad2, Code, X } from "lucide-react"
+import { Search, Filter, Grid3x3, LayoutList, Clock, Sparkles, Gamepad2, Code, X, TrendingUp, Calendar, Star, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import fallbackProjects from "@/data/projects.json"
 
@@ -33,6 +33,7 @@ export default function ProjectsPage() {
   const [category, setCategory] = useState<string | "all">("all")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [layout, setLayout] = useState<"gallery" | "list">("gallery")
+  const [sortBy, setSortBy] = useState<"latest" | "popular" | "name">("latest")
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -169,26 +170,39 @@ export default function ProjectsPage() {
           className="container mx-auto"
         >
           <div className="mx-auto max-w-4xl text-center mb-4">
-            <motion.h1
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-heading text-4xl md:text-6xl lg:text-7xl mb-6"
+              className="mb-4"
             >
-              <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Project
-              </span>{" "}
-              <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                Downloads
-              </span>
-            </motion.h1>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Badge variant="secondary" className="px-3 py-1">
+                  <Star className="h-3 w-3 mr-1" />
+                  {projects.length} Projects
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Updated Daily
+                </Badge>
+              </div>
+              <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl mb-6">
+                <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  Project
+                </span>{" "}
+                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  Downloads
+                </span>
+              </h1>
+            </motion.div>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-xl text-muted-foreground max-w-2xl mx-auto"
+              className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
             >
               Production-ready code and complete project files. Zero setup, maximum impact.
+              <span className="block text-sm mt-2 opacity-80">Browse {categories.length - 1} categories • {allTags.length} technologies</span>
             </motion.p>
           </div>
 
@@ -198,30 +212,31 @@ export default function ProjectsPage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mb-6"
           >
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/40 backdrop-blur-2xl p-4">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/40 backdrop-blur-2xl p-6">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
+              <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_50%_0%,rgba(255,255,255,0.03),transparent_70%)]" />
               
-              <div className="relative space-y-3">
-                <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
+              <div className="relative space-y-4">
+                <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
                   <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <div className="relative group">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <EnhancedInput
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
-                        placeholder="Search projects, technologies..."
-                        className="pl-10 h-10 bg-background/60 border-white/20"
+                        placeholder="Search projects, technologies, categories..."
+                        className="pl-12 h-12 bg-background/60 border-white/20 text-base placeholder:text-muted-foreground/60 focus:border-primary/30 focus:bg-background/80"
                       />
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 p-1 bg-background/60 border border-white/20 rounded-lg">
                       <Button
                         variant={layout === "gallery" ? "default" : "ghost"}
                         size="sm"
                         onClick={() => setLayout("gallery")}
-                        className="h-7 px-2 text-xs"
+                        className="h-8 px-3 text-xs"
                       >
                         <Grid3x3 className="h-3 w-3 mr-1" />
                         Grid
@@ -230,7 +245,7 @@ export default function ProjectsPage() {
                         variant={layout === "list" ? "default" : "ghost"}
                         size="sm"
                         onClick={() => setLayout("list")}
-                        className="h-7 px-2 text-xs"
+                        className="h-8 px-3 text-xs"
                       >
                         <LayoutList className="h-3 w-3 mr-1" />
                         List
@@ -239,59 +254,76 @@ export default function ProjectsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm text-muted-foreground">
-                      {filtered.length} project{filtered.length !== 1 ? 's' : ''} found
-                    </span>
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground">
+                        {filtered.length}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        project{filtered.length !== 1 ? 's' : ''} found
+                      </span>
+                    </div>
                     {(q || category !== "all" || selectedTags.length > 0) && (
-                      <Badge variant="secondary" className="h-5 text-xs">
-                        <Filter className="h-2 w-2 mr-1" />
-                        Filtered
+                      <Badge variant="secondary" className="h-6 text-xs px-2">
+                        <Filter className="h-3 w-3 mr-1" />
+                        Active Filters
                       </Badge>
                     )}
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Sort by:</span>
-                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">
-                      <Clock className="h-2 w-2 mr-1" />
-                      Latest
-                    </Button>
+                    <span className="text-xs font-medium text-muted-foreground">Sort by:</span>
+                    <div className="relative">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs px-3 gap-1"
+                        onClick={() => {
+                          const options = ["latest", "popular", "name"] as const
+                          const current = options.indexOf(sortBy)
+                          setSortBy(options[(current + 1) % options.length])
+                        }}
+                      >
+                        {sortBy === "latest" && <><Calendar className="h-3 w-3" />Latest</>}
+                        {sortBy === "popular" && <><TrendingUp className="h-3 w-3" />Popular</>}
+                        {sortBy === "name" && <><Code className="h-3 w-3" />Name</>}
+                        <ChevronDown className="h-2 w-2" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-muted-foreground">Categories:</span>
-                    <div className="flex gap-1">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-foreground">Categories:</span>
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         variant={category === "all" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCategory("all")}
-                        className="h-7 px-2 text-xs"
+                        className="h-8 px-3 text-xs font-medium"
                       >
-                        <Sparkles className="h-2 w-2 mr-1" />
-                        All
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        All ({projects.length})
                       </Button>
-                      <Button
-                        variant={category === "Roblox" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCategory("Roblox")}
-                        className="h-7 px-2 text-xs"
-                      >
-                        <Gamepad2 className="h-2 w-2 mr-1" />
-                        Roblox
-                      </Button>
-                      <Button
-                        variant={category === "Web Development" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCategory("Web Development")}
-                        className="h-7 px-2 text-xs"
-                      >
-                        <Code className="h-2 w-2 mr-1" />
-                        Web Dev
-                      </Button>
+                      {categories.filter(cat => cat !== "all").map(cat => {
+                        const count = projects.filter(p => p.category === cat).length
+                        const icon = cat.toLowerCase().includes('roblox') ? Gamepad2 : Code
+                        const IconComponent = icon
+                        return (
+                          <Button
+                            key={cat}
+                            variant={category === cat ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCategory(cat)}
+                            className="h-8 px-3 text-xs font-medium"
+                          >
+                            <IconComponent className="h-3 w-3 mr-1" />
+                            {cat} ({count})
+                          </Button>
+                        )
+                      })}
                     </div>
                   </div>
 
