@@ -9,7 +9,10 @@ import { useEffect, useState } from "react"
 
 export function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [projectCount, setProjectCount] = useState<number | null>(null)
+  const [stats, setStats] = useState({
+    projectCount: null as number | null,
+    totalDownloads: null as number | null
+  })
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -23,22 +26,28 @@ export function HeroSection() {
   }, [])
 
   useEffect(() => {
-    async function fetchProjectCount() {
+    async function fetchStats() {
       try {
-        const response = await fetch('/api/projects')
-        const projects = await response.json()
-        setProjectCount(projects.length)
+        const response = await fetch('/api/stats')
+        const data = await response.json()
+        setStats({
+          projectCount: data.totalProjects,
+          totalDownloads: data.totalDownloads
+        })
       } catch (error) {
-        console.error('Failed to fetch projects:', error)
-        setProjectCount(0)
+        console.error('Failed to fetch stats:', error)
+        setStats({
+          projectCount: 0,
+          totalDownloads: 0
+        })
       }
     }
-    fetchProjectCount()
+    fetchStats()
   }, [])
 
-  const stats = [
-    { label: "Projects", value: projectCount !== null ? `${projectCount}` : "...", icon: FolderOpen },
-    { label: "Downloads", value: "NIL", icon: Download },
+  const heroStats = [
+    { label: "Projects", value: stats.projectCount !== null ? `${stats.projectCount}` : "...", icon: FolderOpen },
+    { label: "Downloads", value: stats.totalDownloads !== null ? `${stats.totalDownloads.toLocaleString()}` : "...", icon: Download },
     { label: "Stars", value: "NIL", icon: Star }
   ]
 
@@ -177,7 +186,7 @@ export function HeroSection() {
               transition={{ duration: 0.4, delay: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
               className="flex flex-wrap items-center gap-6 pt-2"
             >
-              {stats.map((stat, index) => (
+              {heroStats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, scale: 0.8 }}
