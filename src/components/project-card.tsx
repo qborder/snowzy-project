@@ -59,42 +59,76 @@ export function ProjectCard({
     : undefined
   const [imgOk, setImgOk] = useState(true)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
+  const animationRef = useRef<number>()
   const isValidSrc = (s?: string) => !!s && (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/"))
 
   useEffect(() => {
+    const updateTransform = (x: number, y: number, rect: DOMRect) => {
+      if (!cardRef.current || prefersReducedMotion) return
+      
+      const px = Math.max(0, Math.min(1, x / rect.width))
+      const py = Math.max(0, Math.min(1, y / rect.height))
+      
+      const rotateX = (py - 0.5) * 20
+      const rotateY = (0.5 - px) * 20
+      const translateZ = isHovered ? 20 : 0
+      const scale = isHovered ? 1.05 : 1
+      
+      cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`
+      cardRef.current.style.setProperty('--mouse-x', `${x}px`)
+      cardRef.current.style.setProperty('--mouse-y', `${y}px`)
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!cardRef.current) return
+      if (!cardRef.current || prefersReducedMotion) return
       const rect = cardRef.current.getBoundingClientRect()
       const x = e.clientX - rect.left
       const y = e.clientY - rect.top
       setMousePosition({ x, y })
-      cardRef.current.style.setProperty('--mouse-x', `${x}px`)
-      cardRef.current.style.setProperty('--mouse-y', `${y}px`)
-      const px = Math.max(0, Math.min(1, x / rect.width))
-      const py = Math.max(0, Math.min(1, y / rect.height))
-      cardRef.current.style.setProperty('--px', `${px}`)
-      cardRef.current.style.setProperty('--py', `${py}`)
+      
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+      
+      animationRef.current = requestAnimationFrame(() => {
+        updateTransform(x, y, rect)
+      })
+    }
+
+    const handleMouseEnter = () => {
+      if (prefersReducedMotion) return
+      setIsHovered(true)
+      if (cardRef.current) {
+        cardRef.current.style.transition = 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)'
+      }
     }
 
     const handleMouseLeave = () => {
+      setIsHovered(false)
       if (!cardRef.current) return
       cardRef.current.style.setProperty('--mouse-x', `50%`)
       cardRef.current.style.setProperty('--mouse-y', `50%`)
-      cardRef.current.style.setProperty('--px', `0.5`)
-      cardRef.current.style.setProperty('--py', `0.5`)
+      cardRef.current.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)'
+      cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale(1)'
     }
 
     const card = cardRef.current
     if (card) {
+      card.addEventListener('mouseenter', handleMouseEnter)
       card.addEventListener('mousemove', handleMouseMove)
       card.addEventListener('mouseleave', handleMouseLeave)
       return () => {
+        card.removeEventListener('mouseenter', handleMouseEnter)
         card.removeEventListener('mousemove', handleMouseMove)
         card.removeEventListener('mouseleave', handleMouseLeave)
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current)
+        }
       }
     }
-  }, [])
+  }, [prefersReducedMotion, isHovered])
   const rawCover = image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : undefined)
   const cover = isValidSrc(rawCover) && imgOk ? rawCover : undefined
   const useNextImage = (() => {
@@ -108,13 +142,9 @@ export function ProjectCard({
     }
   })()
   return (
-    <motion.div
+    <div
       ref={cardRef}
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: prefersReducedMotion ? 0.2 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-      className="[perspective:1000px] group transform-gpu will-change-transform transition-transform duration-300 [transform-style:preserve-3d] hover:[transform:rotateX(calc((var(--py,0.5)-0.5)*6deg))_rotateY(calc((0.5-var(--px,0.5))*8deg))]"
+      className="group [transform-style:preserve-3d] will-change-transform"
     >
       <Card className={`group/card relative overflow-hidden border-white/10 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] hover:border-white/20 ${
         cardGradient || cardColor 
@@ -243,6 +273,6 @@ export function ProjectCard({
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   )
 }

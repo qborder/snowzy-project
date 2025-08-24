@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server"
 import { kv } from "@vercel/kv"
 import { generateProjectId } from "@/lib/project-utils"
+import fallbackProjects from "@/data/projects.json"
 
 export async function GET() {
   try {
     const projects = await kv.get('projects') || []
     return NextResponse.json(projects)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to read projects"
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json(fallbackProjects, {
+      headers: { 'x-fallback': 'projects.json' }
+    })
   }
 }
 

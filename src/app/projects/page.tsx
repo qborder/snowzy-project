@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Search, Filter, Grid3x3, LayoutList, Clock, Sparkles, Gamepad2, Code, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import fallbackProjects from "@/data/projects.json"
 
 type Project = {
   id?: string
@@ -40,12 +41,15 @@ export default function ProjectsPage() {
     async function fetchProjects() {
       try {
         const res = await fetch('/api/projects')
-        if (!res.ok) throw new Error('Failed to fetch projects')
-        const data = await res.json()
-        setProjects(Array.isArray(data) ? data : [])
+        let data: unknown = []
+        if (res.ok) {
+          data = await res.json()
+        } else {
+          data = fallbackProjects
+        }
+        setProjects(Array.isArray(data) ? (data as any[]) : [])
       } catch (error) {
-        console.error('Error fetching projects:', error)
-        setProjects([])
+        setProjects(Array.isArray(fallbackProjects) ? (fallbackProjects as any[]) : [])
       } finally {
         setLoading(false)
       }
