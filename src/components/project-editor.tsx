@@ -6,9 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Search, Eye, Download, ExternalLink, Grid, List, Trash2, Github } from "lucide-react"
+import { Edit, Search, Eye, Download, ExternalLink, Trash2, Github, Calendar, Tag, Filter, SortAsc, SortDesc, Sparkles, Clock } from "lucide-react"
 import Link from "next/link"
 
 type Project = {
@@ -36,8 +35,9 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
   const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<'title' | 'date' | 'category'>('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [editingProject, setEditingProject] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list")
   const [editForm, setEditForm] = useState<Project | null>(null)
 
   useEffect(() => {
@@ -57,13 +57,29 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
     }
   }
 
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesCategory = categoryFilter === "all" || project.category === categoryFilter
-    return matchesSearch && matchesCategory
-  })
+  const filteredAndSortedProjects = projects
+    .filter(project => {
+      const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           project.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      const matchesCategory = categoryFilter === "all" || project.category === categoryFilter
+      return matchesSearch && matchesCategory
+    })
+    .sort((a, b) => {
+      let comparison = 0
+      switch (sortBy) {
+        case 'title':
+          comparison = a.title.localeCompare(b.title)
+          break
+        case 'date':
+          comparison = new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
+          break
+        case 'category':
+          comparison = a.category.localeCompare(b.category)
+          break
+      }
+      return sortOrder === 'asc' ? comparison : -comparison
+    })
 
   const categories = Array.from(new Set(projects.map(p => p.category)))
 
@@ -78,10 +94,10 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
   }
 
   function selectAllProjects() {
-    if (selectedProjects.size === filteredProjects.length) {
+    if (selectedProjects.size === filteredAndSortedProjects.length) {
       setSelectedProjects(new Set())
     } else {
-      setSelectedProjects(new Set(filteredProjects.map(project => project.id).filter(Boolean) as string[]))
+      setSelectedProjects(new Set(filteredAndSortedProjects.map(project => project.id).filter(Boolean) as string[]))
     }
   }
 
@@ -161,10 +177,11 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-white/10 rounded w-1/3"></div>
-          <div className="h-32 bg-white/10 rounded"></div>
-          <div className="h-32 bg-white/10 rounded"></div>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading your projects...</p>
+          </div>
         </div>
       </div>
     )
@@ -172,294 +189,218 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Edit className="h-5 w-5" />
-            Project Editor
-          </CardTitle>
-          <CardDescription>
-            Manage your existing projects - edit, delete, or organize your portfolio
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <EnhancedInput
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search projects..."
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map(category => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex bg-muted/50 rounded-lg p-1 backdrop-blur-sm border">
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className={`rounded-md transition-all duration-200 ${
-                    viewMode === "list" 
-                      ? "bg-background shadow-sm" 
-                      : "hover:bg-background/50"
-                  }`}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className={`rounded-md transition-all duration-200 ${
-                    viewMode === "grid" 
-                      ? "bg-background shadow-sm" 
-                      : "hover:bg-background/50"
-                  }`}
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+      <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-primary/5 rounded-2xl p-6 border border-white/10">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-primary/20 rounded-xl">
+            <Sparkles className="h-6 w-6 text-primary" />
           </div>
+          <div>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+              Project Manager
+            </h2>
+            <p className="text-muted-foreground">Manage and organize your project portfolio</p>
+          </div>
+        </div>
+      </div>
 
-          {projects.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">No projects found</p>
-              <p className="text-sm text-muted-foreground">Create your first project using the Project Creator tab</p>
+      <div className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <EnhancedInput
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search projects, tags, or descriptions..."
+              className="pl-10 bg-background/60 backdrop-blur-sm border-white/20"
+            />
+          </div>
+          
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="bg-background/60 backdrop-blur-sm border-white/20">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>{category}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="flex gap-2">
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as 'title' | 'date' | 'category')}>
+              <SelectTrigger className="bg-background/60 backdrop-blur-sm border-white/20">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date Created</SelectItem>
+                <SelectItem value="title">Title</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="bg-background/60 backdrop-blur-sm border-white/20"
+            >
+              {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+            </Button>
+          </div>
+        </div>
+
+        {projects.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="p-4 bg-muted/20 rounded-full w-fit mx-auto mb-4">
+              <Edit className="h-12 w-12 text-muted-foreground" />
             </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      checked={selectedProjects.size === filteredProjects.length && filteredProjects.length > 0}
-                      onCheckedChange={selectAllProjects}
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {selectedProjects.size > 0 
-                        ? `${selectedProjects.size} selected` 
-                        : `${filteredProjects.length} projects`}
+            <h3 className="text-xl font-semibold mb-2">No projects yet</h3>
+            <p className="text-muted-foreground mb-6">Create your first project to get started</p>
+            <Button asChild>
+              <Link href="/dev/projects">Create Project</Link>
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between bg-background/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <div className="flex items-center gap-4">
+                <Checkbox
+                  checked={selectedProjects.size === filteredAndSortedProjects.length && filteredAndSortedProjects.length > 0}
+                  onCheckedChange={selectAllProjects}
+                />
+                <div className="text-sm">
+                  {selectedProjects.size > 0 ? (
+                    <span className="font-medium text-primary">
+                      {selectedProjects.size} selected
                     </span>
-                  </div>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      {filteredAndSortedProjects.length} projects
+                    </span>
+                  )}
                 </div>
-                
-                {selectedProjects.size > 0 && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={deleteSelectedProjects}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete ({selectedProjects.size})
-                    </Button>
-                  </div>
-                )}
               </div>
+              
+              {selectedProjects.size > 0 && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={deleteSelectedProjects}
+                  className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border-red-500/30"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete {selectedProjects.size}
+                </Button>
+              )}
+            </div>
 
-              {viewMode === "list" ? (
-                <div className="grid gap-4">
-                  {filteredProjects.map((project, index) => (
-                    <Card key={project.id || index} className="relative">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-4">
-                          <Checkbox
-                            checked={selectedProjects.has(project.id || "")}
-                            onCheckedChange={() => toggleProjectSelection(project.id || "")}
-                          />
-                          
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <h3 className="font-semibold text-lg">{project.title}</h3>
-                                <Badge variant="secondary" className="text-xs mt-1">
-                                  {project.category}
-                                </Badge>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {filteredAndSortedProjects.map((project, index) => (
+                <Card key={project.id || index} className="group relative overflow-hidden bg-gradient-to-br from-background/90 to-background/50 backdrop-blur-sm border border-white/10 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+                  <CardContent className="p-6">
+                    <div className="absolute top-4 left-4">
+                      <Checkbox
+                        checked={selectedProjects.has(project.id || "")}
+                        onCheckedChange={() => toggleProjectSelection(project.id || "")}
+                        className="bg-background/80 backdrop-blur-sm"
+                      />
+                    </div>
+                    
+                    <div className="pt-8 space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                            {project.title}
+                          </h3>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                              {project.category}
+                            </Badge>
+                            {project.createdAt && (
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Clock className="h-3 w-3" />
+                                {new Date(project.createdAt).toLocaleDateString()}
                               </div>
-                              <div className="flex gap-1">
-                                {project.downloadUrl && (
-                                  <Button variant="ghost" size="sm" asChild>
-                                    <Link href={project.downloadUrl} target="_blank">
-                                      <Download className="h-4 w-4" />
-                                    </Link>
-                                  </Button>
-                                )}
-                                {project.githubUrl && (
-                                  <Button variant="ghost" size="sm" asChild>
-                                    <Link href={project.githubUrl} target="_blank">
-                                      <Github className="h-4 w-4" />
-                                    </Link>
-                                  </Button>
-                                )}
-                                {project.demoUrl && (
-                                  <Button variant="ghost" size="sm" asChild>
-                                    <Link href={project.demoUrl} target="_blank">
-                                      <ExternalLink className="h-4 w-4" />
-                                    </Link>
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                              {project.description}
-                            </p>
-                            
-                            <div className="flex flex-wrap gap-1 mb-3">
-                              {project.tags.slice(0, 6).map((tag, tagIndex) => (
-                                <Badge key={tagIndex} variant="outline" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                              {project.tags.length > 6 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{project.tags.length - 6}
-                                </Badge>
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <div className="text-xs text-muted-foreground">
-                                {project.createdAt && new Date(project.createdAt).toLocaleDateString()}
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => startEditing(project.id || "")}
-                                >
-                                  <Edit className="h-4 w-4 mr-1" />
-                                  Edit
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  asChild
-                                >
-                                  <Link href={project.id ? `/projects/${project.id}/${project.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}` : "#"}>
-                                    <Eye className="h-4 w-4 mr-1" />
-                                    View
-                                  </Link>
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredProjects.map((project, index) => (
-                    <Card key={project.id || index} className="relative group hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="absolute top-3 left-3 z-10">
-                          <Checkbox
-                            checked={selectedProjects.has(project.id || "")}
-                            onCheckedChange={() => toggleProjectSelection(project.id || "")}
-                            className="bg-background/80 backdrop-blur-sm"
-                          />
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between pt-6">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-base line-clamp-1 mb-1">{project.title}</h3>
-                              <Badge variant="secondary" className="text-xs">
-                                {project.category}
-                              </Badge>
-                            </div>
-                            <div className="flex gap-1 ml-2">
-                              {project.downloadUrl && (
-                                <Button variant="ghost" size="sm" asChild>
-                                  <Link href={project.downloadUrl} target="_blank">
-                                    <Download className="h-3 w-3" />
-                                  </Link>
-                                </Button>
-                              )}
-                              {project.githubUrl && (
-                                <Button variant="ghost" size="sm" asChild>
-                                  <Link href={project.githubUrl} target="_blank">
-                                    <Github className="h-3 w-3" />
-                                  </Link>
-                                </Button>
-                              )}
-                              {project.demoUrl && (
-                                <Button variant="ghost" size="sm" asChild>
-                                  <Link href={project.demoUrl} target="_blank">
-                                    <ExternalLink className="h-3 w-3" />
-                                  </Link>
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <p className="text-muted-foreground text-sm line-clamp-3">
-                            {project.description}
-                          </p>
-                          
-                          <div className="flex flex-wrap gap-1">
-                            {project.tags.slice(0, 4).map((tag, tagIndex) => (
-                              <Badge key={tagIndex} variant="outline" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {project.tags.length > 4 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{project.tags.length - 4}
-                              </Badge>
                             )}
                           </div>
-                          
-                          <div className="flex items-center justify-between pt-2">
-                            <div className="text-xs text-muted-foreground">
-                              {project.createdAt && new Date(project.createdAt).toLocaleDateString()}
-                            </div>
-                            <div className="flex gap-1">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => startEditing(project.id || "")}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                asChild
-                              >
-                                <Link href={project.id ? `/projects/${project.id}/${project.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}` : "#"}>
-                                  <Eye className="h-3 w-3" />
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+                      </div>
+                      
+                      <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">
+                        {project.description}
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-1">
+                        {project.tags.slice(0, 4).map((tag, tagIndex) => (
+                          <Badge key={tagIndex} variant="outline" className="text-xs bg-background/50 hover:bg-primary/10 transition-colors">
+                            <Tag className="h-2 w-2 mr-1" />
+                            {tag}
+                          </Badge>
+                        ))}
+                        {project.tags.length > 4 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{project.tags.length - 4}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div className="flex gap-1">
+                          {project.downloadUrl && (
+                            <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0 hover:bg-primary/10">
+                              <Link href={project.downloadUrl} target="_blank">
+                                <Download className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          )}
+                          {project.githubUrl && (
+                            <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0 hover:bg-primary/10">
+                              <Link href={project.githubUrl} target="_blank">
+                                <Github className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          )}
+                          {project.demoUrl && (
+                            <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0 hover:bg-primary/10">
+                              <Link href={project.demoUrl} target="_blank">
+                                <ExternalLink className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => startEditing(project.id || "")}
+                            className="bg-primary/10 border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground"
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                            className="hover:bg-primary/10"
+                          >
+                            <Link href={project.id ? `/projects/${project.id}/${project.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}` : "#"}>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
       {!onEditProject && editForm && editingProject !== null && (
         <Card className="mt-6">
