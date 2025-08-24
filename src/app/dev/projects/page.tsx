@@ -88,7 +88,7 @@ export default function DevProjectsPage() {
   const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState(() => {
     const tab = searchParams.get('tab')
-    return tab === 'editor' ? 'editor' : tab === 'edit' ? 'edit' : 'creator'
+    return tab === 'editor' ? 'editor' : 'creator'
   })
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -121,8 +121,6 @@ export default function DevProjectsPage() {
     const url = new URL(window.location.href)
     if (value === 'editor') {
       url.searchParams.set('tab', 'editor')
-    } else if (value === 'edit') {
-      url.searchParams.set('tab', 'edit')
     } else {
       url.searchParams.delete('tab')
     }
@@ -130,15 +128,26 @@ export default function DevProjectsPage() {
   }
 
   function startEditingProject(projectId: string, project: Project) {
-    const handleEditProject = (project: Project) => {
-      setEditingProject(project)
-      setActiveTab('edit')
-      const url = new URL(window.location.href)
-      url.searchParams.set('tab', 'edit')
-      url.searchParams.set('id', projectId)
-      router.replace(url.pathname + url.search, { scroll: false })
-    }
-    handleEditProject(project)
+    setEditingProject(project)
+    setEditingProjectId(projectId)
+    setTitle(project.title || "")
+    setDescription(project.description || "")
+    setCategory(project.category || "")
+    setDownloadUrl(project.downloadUrl || "")
+    setGithubUrl(project.githubUrl || "")
+    setDemoUrl(project.demoUrl || "")
+    setYoutubeUrl(project.youtubeUrl || "")
+    setImage(project.image || "")
+    setTags(project.tags || [])
+    setContent(project.content || "")
+    setCardGradient(project.cardGradient || "")
+    setCardColor(project.cardColor || "")
+    setUseCustomStyle(!!(project.cardGradient || project.cardColor))
+    setActiveTab('creator')
+    const url = new URL(window.location.href)
+    url.searchParams.delete('tab')
+    url.searchParams.set('id', projectId)
+    router.replace(url.pathname + url.search, { scroll: false })
   }
 
   useEffect(() => {
@@ -261,12 +270,32 @@ export default function DevProjectsPage() {
       body.cardColor = cardColor
     }
     try {
-      const res = await fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
-      if (!res.ok) {
-        const t = await res.text()
-        throw new Error(t || "Failed")
+      if (editingProject && editingProjectId) {
+        const response = await fetch('/api/projects')
+        const projects = await response.json()
+        const projectIndex = projects.findIndex((p: Record<string, unknown>, index: number) => index.toString() === editingProjectId)
+        if (projectIndex !== -1) {
+          projects[projectIndex] = { ...projects[projectIndex], ...body }
+          const updateResponse = await fetch('/api/projects', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(projects)
+          })
+          if (!updateResponse.ok) {
+            const t = await updateResponse.text()
+            throw new Error(t || "Update failed")
+          }
+          setResult("Project updated successfully!")
+        }
+      } else {
+        const res = await fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+        if (!res.ok) {
+          const t = await res.text()
+          throw new Error(t || "Failed")
+        }
+        setResult("Project created successfully!")
       }
-      setResult("Project saved successfully!")
+      
       setTitle("")
       setDescription("")
       setCategory("")
@@ -277,6 +306,14 @@ export default function DevProjectsPage() {
       setImage("")
       setTags([])
       setContent("")
+      setCardGradient("")
+      setCardColor("")
+      setUseCustomStyle(false)
+      setEditingProject(null)
+      setEditingProjectId(null)
+      const url = new URL(window.location.href)
+      url.searchParams.delete('id')
+      router.replace(url.pathname + url.search, { scroll: false })
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "error")
@@ -293,10 +330,9 @@ export default function DevProjectsPage() {
       </div>
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 max-w-lg">
+        <TabsList className="grid w-full grid-cols-2 max-w-lg">
           <TabsTrigger value="creator">Project Creator</TabsTrigger>
           <TabsTrigger value="editor">Project Editor</TabsTrigger>
-          <TabsTrigger value="edit">Edit Project</TabsTrigger>
         </TabsList>
         
         <TabsContent value="creator" className="space-y-6">
@@ -785,24 +821,55 @@ Instructions for contributors..."
                       result.includes("success") ? "text-green-400" : "text-red-400"
                     }`}>{result}</span>
                   )}
+                  {editingProject && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary">
+                        Editing: {editingProject.title}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={() => {
-                    setTitle("")
-                    setDescription("")
-                    setCategory("")
-                    setDownloadUrl("")
-                    setGithubUrl("")
-                    setDemoUrl("")
-                    setYoutubeUrl("")
-                    setImage("")
-                    setTags([])
-                    setCardGradient("")
-                    setCardColor("")
-                    setUseCustomStyle(false)
-                  }}>Clear All</Button>
+                  {editingProject ? (
+                    <Button type="button" variant="outline" onClick={() => {
+                      setTitle("")
+                      setDescription("")
+                      setCategory("")
+                      setDownloadUrl("")
+                      setGithubUrl("")
+                      setDemoUrl("")
+                      setYoutubeUrl("")
+                      setImage("")
+                      setTags([])
+                      setContent("")
+                      setCardGradient("")
+                      setCardColor("")
+                      setUseCustomStyle(false)
+                      setEditingProject(null)
+                      setEditingProjectId(null)
+                      const url = new URL(window.location.href)
+                      url.searchParams.delete('id')
+                      router.replace(url.pathname + url.search, { scroll: false })
+                    }}>Cancel Edit</Button>
+                  ) : (
+                    <Button type="button" variant="outline" onClick={() => {
+                      setTitle("")
+                      setDescription("")
+                      setCategory("")
+                      setDownloadUrl("")
+                      setGithubUrl("")
+                      setDemoUrl("")
+                      setYoutubeUrl("")
+                      setImage("")
+                      setTags([])
+                      setContent("")
+                      setCardGradient("")
+                      setCardColor("")
+                      setUseCustomStyle(false)
+                    }}>Clear All</Button>
+                  )}
                   <Button type="submit" disabled={saving || getMissingRequired().length > 0} className="min-w-[120px]">
-                    {saving ? "Saving..." : "Save Project"}
+                    {saving ? "Saving..." : editingProject ? "Update Project" : "Save Project"}
                   </Button>
                 </div>
               </div>
@@ -842,132 +909,6 @@ Instructions for contributors..."
           <ProjectEditor onEditProject={startEditingProject} />
         </TabsContent>
         
-        <TabsContent value="edit" className="space-y-6">
-          {editingProject ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit Project</CardTitle>
-                <CardDescription>Make changes to your project details</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Title</label>
-                    <EnhancedInput
-                      value={editingProject?.title as string || ""}
-                      onChange={e => setEditingProject({...editingProject, title: e.target.value})}
-                      placeholder="Project title"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Category</label>
-                    <EnhancedInput
-                      value={editingProject?.category as string || ""}
-                      onChange={e => setEditingProject({...editingProject, category: e.target.value})}
-                      placeholder="Project category"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Description</label>
-                  <textarea
-                    value={editingProject?.description as string || ""}
-                    onChange={e => setEditingProject({...editingProject, description: e.target.value})}
-                    placeholder="Project description"
-                    className="w-full min-h-[100px] px-3 py-2 rounded-md border bg-background text-sm resize-none"
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Download URL</label>
-                    <EnhancedInput
-                      value={editingProject?.downloadUrl as string || ""}
-                      onChange={e => setEditingProject({...editingProject, downloadUrl: e.target.value})}
-                      placeholder="https://..."
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">GitHub URL</label>
-                    <EnhancedInput
-                      value={editingProject?.githubUrl as string || ""}
-                      onChange={e => setEditingProject({...editingProject, githubUrl: e.target.value})}
-                      placeholder="https://github.com/..."
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Demo URL</label>
-                    <EnhancedInput
-                      value={editingProject?.demoUrl as string || ""}
-                      onChange={e => setEditingProject({...editingProject, demoUrl: e.target.value})}
-                      placeholder="https://..."
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">YouTube URL</label>
-                    <EnhancedInput
-                      value={editingProject?.youtubeUrl as string || ""}
-                      onChange={e => setEditingProject({...editingProject, youtubeUrl: e.target.value})}
-                      placeholder="https://youtube.com/..."
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Tags (comma separated)</label>
-                  <EnhancedInput
-                    value={(editingProject?.tags as string[])?.join(", ") || ""}
-                    onChange={e => setEditingProject({...editingProject, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean)})}
-                    placeholder="tag1, tag2, tag3"
-                  />
-                </div>
-
-                <div className="flex gap-2 justify-end">
-                  <Button variant="outline" onClick={() => setActiveTab('editor')}>
-                    Cancel
-                  </Button>
-                  <Button onClick={async () => {
-                    try {
-                      const response = await fetch('/api/projects')
-                      const projects = await response.json()
-                      const projectIndex = projects.findIndex((p: Record<string, unknown>, index: number) => index.toString() === editingProjectId)
-                      if (projectIndex !== -1) {
-                        projects[projectIndex] = editingProject
-                        const updateResponse = await fetch('/api/projects', {
-                          method: 'PUT',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(projects)
-                        })
-                        if (updateResponse.ok) {
-                          setActiveTab('editor')
-                          setEditingProject(null)
-                          setEditingProjectId(null)
-                        }
-                      }
-                    } catch (error) {
-                      console.error('Error updating project:', error)
-                    }
-                  }}>
-                    Save Changes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <p className="text-muted-foreground mb-4">No project selected for editing</p>
-                <Button onClick={() => setActiveTab('editor')}>
-                  Go to Project Editor
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
       </Tabs>
     </div>
   )
