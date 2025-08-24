@@ -23,6 +23,18 @@ const nextConfig: NextConfig = {
       config.devtool = false;
     }
     
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    };
+    
+    if (isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'framer-motion': 'framer-motion/dist/framer-motion',
+      };
+    }
+    
     config.optimization.splitChunks = {
       chunks: 'all',
       cacheGroups: {
@@ -54,7 +66,6 @@ const nextConfig: NextConfig = {
       fullUrl: false,
     },
   },
-  swcMinify: true,
   productionBrowserSourceMaps: false,
   modularizeImports: {
     '@radix-ui/react-icons': {
