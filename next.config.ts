@@ -37,9 +37,6 @@ const nextConfig: NextConfig = {
     '@radix-ui/react-icons': {
       transform: '@radix-ui/react-icons/{{member}}',
     },
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-    },
   },
 };
 
