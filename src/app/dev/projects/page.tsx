@@ -296,26 +296,21 @@ export default function DevProjectsPage() {
           throw new Error(t || "Failed")
         }
         setResult("Project created successfully!")
+        
+        setTitle("")
+        setDescription("")
+        setCategory("")
+        setDownloadUrl("")
+        setGithubUrl("")
+        setDemoUrl("")
+        setYoutubeUrl("")
+        setImage("")
+        setTags([])
+        setContent("")
+        setCardGradient("")
+        setCardColor("")
+        setUseCustomStyle(false)
       }
-      
-      setTitle("")
-      setDescription("")
-      setCategory("")
-      setDownloadUrl("")
-      setGithubUrl("")
-      setDemoUrl("")
-      setYoutubeUrl("")
-      setImage("")
-      setTags([])
-      setContent("")
-      setCardGradient("")
-      setCardColor("")
-      setUseCustomStyle(false)
-      setEditingProject(null)
-      setEditingProjectId(null)
-      const url = new URL(window.location.href)
-      url.searchParams.delete('id')
-      router.replace(url.pathname + url.search, { scroll: false })
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "error")
@@ -338,6 +333,47 @@ export default function DevProjectsPage() {
         </TabsList>
         
         <TabsContent value="creator" className="space-y-6">
+          {editingProject && (
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-3 w-3 bg-primary rounded-full animate-pulse"></div>
+                    <div>
+                      <p className="font-semibold text-primary">Editing Project: {editingProject.title}</p>
+                      <p className="text-sm text-muted-foreground">Make your changes and click "Update Project" to save</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setTitle("")
+                      setDescription("")
+                      setCategory("")
+                      setDownloadUrl("")
+                      setGithubUrl("")
+                      setDemoUrl("")
+                      setYoutubeUrl("")
+                      setImage("")
+                      setTags([])
+                      setContent("")
+                      setCardGradient("")
+                      setCardColor("")
+                      setUseCustomStyle(false)
+                      setEditingProject(null)
+                      setEditingProjectId(null)
+                      const url = new URL(window.location.href)
+                      url.searchParams.delete('id')
+                      router.replace(url.pathname + url.search, { scroll: false })
+                    }}
+                  >
+                    Exit Edit Mode
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
       
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -833,26 +869,43 @@ Instructions for contributors..."
                 </div>
                 <div className="flex gap-3">
                   {editingProject ? (
-                    <Button type="button" variant="outline" onClick={() => {
-                      setTitle("")
-                      setDescription("")
-                      setCategory("")
-                      setDownloadUrl("")
-                      setGithubUrl("")
-                      setDemoUrl("")
-                      setYoutubeUrl("")
-                      setImage("")
-                      setTags([])
-                      setContent("")
-                      setCardGradient("")
-                      setCardColor("")
-                      setUseCustomStyle(false)
-                      setEditingProject(null)
-                      setEditingProjectId(null)
-                      const url = new URL(window.location.href)
-                      url.searchParams.delete('id')
-                      router.replace(url.pathname + url.search, { scroll: false })
-                    }}>Cancel Edit</Button>
+                    <>
+                      <Button type="button" variant="outline" onClick={() => {
+                        setTitle("")
+                        setDescription("")
+                        setCategory("")
+                        setDownloadUrl("")
+                        setGithubUrl("")
+                        setDemoUrl("")
+                        setYoutubeUrl("")
+                        setImage("")
+                        setTags([])
+                        setContent("")
+                        setCardGradient("")
+                        setCardColor("")
+                        setUseCustomStyle(false)
+                        setEditingProject(null)
+                        setEditingProjectId(null)
+                        const url = new URL(window.location.href)
+                        url.searchParams.delete('id')
+                        router.replace(url.pathname + url.search, { scroll: false })
+                      }}>Cancel Edit</Button>
+                      <Button type="button" variant="secondary" onClick={() => {
+                        setTitle("")
+                        setDescription("")
+                        setCategory("")
+                        setDownloadUrl("")
+                        setGithubUrl("")
+                        setDemoUrl("")
+                        setYoutubeUrl("")
+                        setImage("")
+                        setTags([])
+                        setContent("")
+                        setCardGradient("")
+                        setCardColor("")
+                        setUseCustomStyle(false)
+                      }}>Clear Form</Button>
+                    </>
                   ) : (
                     <Button type="button" variant="outline" onClick={() => {
                       setTitle("")
