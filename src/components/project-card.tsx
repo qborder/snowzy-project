@@ -98,16 +98,11 @@ export function ProjectCard({
   return (
     <motion.div
       ref={cardRef}
-      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-      whileInView={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, amount: 0.4 }}
-      whileHover={prefersReducedMotion ? undefined : {
-        y: -8,
-        scale: 1.02,
-        transition: { duration: 0.3, ease: "easeOut" }
-      }}
       transition={{ duration: prefersReducedMotion ? 0.2 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-      className="[perspective:1000px] group transform-gpu will-change-transform transition-transform duration-300 group-hover:[transform:rotateX(calc((var(--py,0.5)-0.5)*6deg))_rotateY(calc((0.5-var(--px,0.5))*8deg))]"
+      className="[perspective:1000px] group transform-gpu will-change-transform transition-transform duration-300 [transform-style:preserve-3d] hover:[transform:rotateX(calc((var(--py,0.5)-0.5)*6deg))_rotateY(calc((0.5-var(--px,0.5))*8deg))]"
     >
       <Card className={`group/card relative overflow-hidden border-white/10 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] hover:border-white/20 ${
         cardGradient || cardColor 
