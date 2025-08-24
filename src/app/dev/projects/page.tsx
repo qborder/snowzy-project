@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette } from "lucide-react"
+import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 import { MarkdownEditor } from "@/components/markdown-editor"
@@ -353,16 +353,28 @@ export default function DevProjectsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Project Management Studio</h1>
-        <p className="text-muted-foreground">Create, edit, and manage your project portfolio</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+      <div className="container mx-auto max-w-7xl py-8">
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl border border-primary/20 shadow-lg">
+              <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">Project Management Studio</h1>
+          </div>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Create stunning project showcases with advanced customization tools and live preview</p>
+        </div>
       
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 max-w-lg">
-          <TabsTrigger value="creator">Project Creator</TabsTrigger>
-          <TabsTrigger value="editor">Project Editor</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
+        <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto bg-background/60 backdrop-blur-sm border-white/20">
+          <TabsTrigger value="creator" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/20">
+            <Sparkles className="h-4 w-4 mr-2" />
+            Project Creator
+          </TabsTrigger>
+          <TabsTrigger value="editor" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/20">
+            <Edit className="h-4 w-4 mr-2" />
+            Project Editor
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="creator" className="space-y-6">
@@ -415,27 +427,49 @@ export default function DevProjectsPage() {
       
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="basic">Basic</TabsTrigger>
-              <TabsTrigger value="links">Links</TabsTrigger>
-              <TabsTrigger value="media">Media</TabsTrigger>
-              <TabsTrigger value="content">Page</TabsTrigger>
-              <TabsTrigger value="style">Style</TabsTrigger>
-              <TabsTrigger value="templates">Templates</TabsTrigger>
+              <Tabs defaultValue="basic" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-6 bg-background/60 backdrop-blur-sm border-white/10 p-1 rounded-xl">
+              <TabsTrigger value="basic" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
+                <Sparkles className="h-4 w-4 mr-1" />
+                Basic
+              </TabsTrigger>
+              <TabsTrigger value="links" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
+                <ExternalLink className="h-4 w-4 mr-1" />
+                Links
+              </TabsTrigger>
+              <TabsTrigger value="media" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
+                <ImageIcon className="h-4 w-4 mr-1" />
+                Media
+              </TabsTrigger>
+              <TabsTrigger value="content" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
+                <Code className="h-4 w-4 mr-1" />
+                Page
+              </TabsTrigger>
+              <TabsTrigger value="style" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
+                <Palette className="h-4 w-4 mr-1" />
+                Style
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg">
+                <Sparkles className="h-4 w-4 mr-1" />
+                Templates
+              </TabsTrigger>
             </TabsList>
             
             <form onSubmit={onSubmit}>
               <TabsContent value="basic" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5" />
-                      Project Details
+                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">Project Details</p>
+                        <p className="text-sm text-muted-foreground font-normal">Essential information about your project</p>
+                      </div>
                     </CardTitle>
-                    <CardDescription>Tell us about your project</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6 p-6">
                     <div>
                       <label className="text-sm font-medium mb-2 block">Project Title</label>
                       <EnhancedInput value={title} onChange={e => setTitle(e.target.value)} placeholder="My Awesome Project" className="text-lg" />
@@ -471,12 +505,19 @@ export default function DevProjectsPage() {
                   </CardContent>
                 </Card>
                 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Technologies & Tags</CardTitle>
-                    <CardDescription>Add tags to help others find your project</CardDescription>
+                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
+                        <Tag className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">Technologies & Tags</p>
+                        <p className="text-sm text-muted-foreground font-normal">Help others discover your project</p>
+                      </div>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6 p-6">
                     <div>
                       <div className="flex flex-wrap gap-2 mb-3">
                         {tags.map(tag => (
@@ -512,12 +553,19 @@ export default function DevProjectsPage() {
               </TabsContent>
               
               <TabsContent value="links" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Project Links</CardTitle>
-                    <CardDescription>Add URLs to showcase your project</CardDescription>
+                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
+                        <ExternalLink className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">Project Links</p>
+                        <p className="text-sm text-muted-foreground font-normal">Connect your project resources</p>
+                      </div>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6 p-6">
                     <div>
                       <label className="text-sm font-medium mb-2 block">GitHub Repository</label>
                       <EnhancedInput value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username/repo" />
@@ -545,15 +593,19 @@ export default function DevProjectsPage() {
               </TabsContent>
               
               <TabsContent value="media" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <ImageIcon className="h-5 w-5" />
-                      Project Image
+                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
+                        <ImageIcon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">Project Image</p>
+                        <p className="text-sm text-muted-foreground font-normal">Visual showcase for your project</p>
+                      </div>
                     </CardTitle>
-                    <CardDescription>Add a cover image for your project</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6 p-6">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -1128,12 +1180,19 @@ Instructions for contributors..."
           </div>
           
           <div className="lg:col-span-1">
-            <Card className="sticky top-8">
-              <CardHeader>
-                <CardTitle>Live Preview</CardTitle>
-                <CardDescription>See how your project card will look</CardDescription>
+            <Card className="sticky top-8 bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
+                    <Eye className="h-5 w-5 text-primary animate-pulse" />
+                  </div>
+                  <div>
+                    <p className="text-xl font-bold">Live Preview</p>
+                    <p className="text-sm text-muted-foreground font-normal">See your project card in real-time</p>
+                  </div>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <ProjectCard
                   title={title || "Your Project Title"}
                   description={description || "Your project description will appear here. Make it compelling to attract viewers!"}
@@ -1166,6 +1225,7 @@ Instructions for contributors..."
         </TabsContent>
         
       </Tabs>
+      </div>
     </div>
   )
 }
