@@ -72,6 +72,12 @@ type Project = {
   cardGradient?: string
   cardColor?: string
   content?: string
+  titleColor?: string
+  titleGradient?: {
+    from: string
+    to: string
+    via?: string
+  }
 }
 
 type CustomTemplate = {
@@ -108,6 +114,11 @@ export default function DevProjectsPage() {
   const [cardGradient, setCardGradient] = useState("")
   const [cardColor, setCardColor] = useState("")
   const [useCustomStyle, setUseCustomStyle] = useState(false)
+  const [titleColor, setTitleColor] = useState("")
+  const [titleGradientFrom, setTitleGradientFrom] = useState("")
+  const [titleGradientTo, setTitleGradientTo] = useState("")
+  const [titleGradientVia, setTitleGradientVia] = useState("")
+  const [useTitleCustomStyle, setUseTitleCustomStyle] = useState(false)
   const [customTemplates, setCustomTemplates] = useState<Record<string, CustomTemplate>>({})
   const [templateName, setTemplateName] = useState("")
   const [tagInput, setTagInput] = useState("")
@@ -143,6 +154,11 @@ export default function DevProjectsPage() {
     setCardGradient(project.cardGradient || "")
     setCardColor(project.cardColor || "")
     setUseCustomStyle(!!(project.cardGradient || project.cardColor))
+    setTitleColor(project.titleColor || "")
+    setTitleGradientFrom(project.titleGradient?.from || "")
+    setTitleGradientTo(project.titleGradient?.to || "")
+    setTitleGradientVia(project.titleGradient?.via || "")
+    setUseTitleCustomStyle(!!(project.titleColor || project.titleGradient))
     setActiveTab('creator')
     const url = new URL(window.location.href)
     url.searchParams.delete('tab')
@@ -269,6 +285,18 @@ export default function DevProjectsPage() {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
     }
+    if (useTitleCustomStyle) {
+      if (titleColor) {
+        body.titleColor = titleColor
+      }
+      if (titleGradientFrom && titleGradientTo) {
+        body.titleGradient = {
+          from: titleGradientFrom,
+          to: titleGradientTo,
+          via: titleGradientVia || undefined
+        }
+      }
+    }
     try {
       if (editingProject && editingProjectId) {
         const response = await fetch('/api/projects')
@@ -310,6 +338,11 @@ export default function DevProjectsPage() {
         setCardGradient("")
         setCardColor("")
         setUseCustomStyle(false)
+        setTitleColor("")
+        setTitleGradientFrom("")
+        setTitleGradientTo("")
+        setTitleGradientVia("")
+        setUseTitleCustomStyle(false)
       }
     } catch (err: unknown) {
       const error = err as Error
@@ -361,6 +394,11 @@ export default function DevProjectsPage() {
                       setCardGradient("")
                       setCardColor("")
                       setUseCustomStyle(false)
+                      setTitleColor("")
+                      setTitleGradientFrom("")
+                      setTitleGradientTo("")
+                      setTitleGradientVia("")
+                      setUseTitleCustomStyle(false)
                       setEditingProject(null)
                       setEditingProjectId(null)
                       const url = new URL(window.location.href)
@@ -614,9 +652,9 @@ Instructions for contributors..."
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Palette className="h-5 w-5" />
-                      Card Styling
+                      Project Styling
                     </CardTitle>
-                    <CardDescription>Customize how your project card looks</CardDescription>
+                    <CardDescription>Customize how your project looks</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -744,6 +782,160 @@ Instructions for contributors..."
                             className="w-full"
                           >
                             Reset to Default
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Palette className="h-5 w-5" />
+                      Title Styling
+                    </CardTitle>
+                    <CardDescription>Customize the project title appearance</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="text-sm font-medium">Use Custom Title Style</label>
+                        <p className="text-xs text-muted-foreground">Override default title styling</p>
+                      </div>
+                      <Switch 
+                        checked={useTitleCustomStyle}
+                        onCheckedChange={setUseTitleCustomStyle}
+                      />
+                    </div>
+                    
+                    {useTitleCustomStyle && (
+                      <>
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Title Color</label>
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-8 gap-2">
+                              {[
+                                "#ffffff", "#f8fafc", "#e2e8f0", "#cbd5e1", "#94a3b8",
+                                "#64748b", "#475569", "#334155", "#1e293b", "#0f172a",
+                                "#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4",
+                                "#3b82f6", "#6366f1", "#8b5cf6", "#a855f7", "#d946ef",
+                                "#ec4899", "#f43f5e", "#10b981", "#14b8a6", "#0ea5e9",
+                                "#6d28d9", "#7c3aed", "#c026d3", "#db2777", "#be185d",
+                                "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0891b2"
+                              ].map(color => (
+                                <button
+                                  key={color}
+                                  type="button"
+                                  onClick={() => {
+                                    setTitleColor(color)
+                                    setTitleGradientFrom("")
+                                    setTitleGradientTo("")
+                                    setTitleGradientVia("")
+                                  }}
+                                  className={`h-10 rounded-lg border-2 transition-all ${
+                                    titleColor === color && !titleGradientFrom 
+                                      ? 'border-primary scale-110' 
+                                      : 'border-transparent hover:border-white/20 hover:scale-105'
+                                  }`}
+                                  style={{ backgroundColor: color }}
+                                />
+                              ))}
+                            </div>
+                            <EnhancedInput 
+                              value={titleColor}
+                              onChange={e => {
+                                setTitleColor(e.target.value)
+                                setTitleGradientFrom("")
+                                setTitleGradientTo("")
+                                setTitleGradientVia("")
+                              }}
+                              placeholder="Custom hex color (e.g., #3b82f6)"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Title Gradient</label>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground mb-1 block">From Color</label>
+                              <EnhancedInput 
+                                value={titleGradientFrom}
+                                onChange={e => {
+                                  setTitleGradientFrom(e.target.value)
+                                  setTitleColor("")
+                                }}
+                                placeholder="#3b82f6"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground mb-1 block">To Color</label>
+                              <EnhancedInput 
+                                value={titleGradientTo}
+                                onChange={e => {
+                                  setTitleGradientTo(e.target.value)
+                                  setTitleColor("")
+                                }}
+                                placeholder="#8b5cf6"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground mb-1 block">Via Color (Optional)</label>
+                              <EnhancedInput 
+                                value={titleGradientVia}
+                                onChange={e => setTitleGradientVia(e.target.value)}
+                                placeholder="#6366f1"
+                              />
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 pt-2">
+                              {[
+                                { name: "Blue to Purple", from: "#3b82f6", to: "#8b5cf6", via: "#6366f1" },
+                                { name: "Pink to Orange", from: "#ec4899", to: "#f97316", via: "#ef4444" },
+                                { name: "Green to Blue", from: "#10b981", to: "#0ea5e9", via: "#06b6d4" },
+                                { name: "Purple to Pink", from: "#8b5cf6", to: "#ec4899", via: "#c084fc" },
+                                { name: "Orange to Red", from: "#f97316", to: "#ef4444", via: "#fb7185" },
+                                { name: "Teal to Purple", from: "#14b8a6", to: "#a855f7", via: "#3b82f6" }
+                              ].map(gradient => (
+                                <button
+                                  key={gradient.name}
+                                  type="button"
+                                  onClick={() => {
+                                    setTitleGradientFrom(gradient.from)
+                                    setTitleGradientTo(gradient.to)
+                                    setTitleGradientVia(gradient.via)
+                                    setTitleColor("")
+                                  }}
+                                  className={`h-12 rounded-lg text-xs font-medium text-white transition-all ${
+                                    titleGradientFrom === gradient.from && titleGradientTo === gradient.to
+                                      ? 'ring-2 ring-primary scale-105'
+                                      : 'hover:scale-105'
+                                  }`}
+                                  style={{
+                                    background: `linear-gradient(to right, ${gradient.from}, ${gradient.via}, ${gradient.to})`
+                                  }}
+                                >
+                                  {gradient.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-2">
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setTitleColor("")
+                              setTitleGradientFrom("")
+                              setTitleGradientTo("")
+                              setTitleGradientVia("")
+                              setUseTitleCustomStyle(false)
+                            }}
+                            className="w-full"
+                          >
+                            Reset Title Style
                           </Button>
                         </div>
                       </>
@@ -883,6 +1075,11 @@ Instructions for contributors..."
                       setCardGradient("")
                       setCardColor("")
                       setUseCustomStyle(false)
+                      setTitleColor("")
+                      setTitleGradientFrom("")
+                      setTitleGradientTo("")
+                      setTitleGradientVia("")
+                      setUseTitleCustomStyle(false)
                       setEditingProject(null)
                       setEditingProjectId(null)
                       const url = new URL(window.location.href)
@@ -904,6 +1101,11 @@ Instructions for contributors..."
                       setCardGradient("")
                       setCardColor("")
                       setUseCustomStyle(false)
+                      setTitleColor("")
+                      setTitleGradientFrom("")
+                      setTitleGradientTo("")
+                      setTitleGradientVia("")
+                      setUseTitleCustomStyle(false)
                     }}>Clear All</Button>
                   )}
                   <Button type="submit" disabled={saving || getMissingRequired().length > 0} className="min-w-[120px]">
@@ -936,6 +1138,12 @@ Instructions for contributors..."
                   projectId="12345"
                   cardGradient={useCustomStyle ? cardGradient : undefined}
                   cardColor={useCustomStyle ? cardColor : undefined}
+                  titleColor={useTitleCustomStyle ? titleColor : undefined}
+                  titleGradient={useTitleCustomStyle && titleGradientFrom && titleGradientTo ? {
+                    from: titleGradientFrom,
+                    to: titleGradientTo,
+                    via: titleGradientVia || undefined
+                  } : undefined}
                 />
               </CardContent>
             </Card>

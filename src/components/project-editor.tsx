@@ -22,6 +22,12 @@ type Project = {
   image?: string
   tags: string[]
   createdAt?: string
+  titleColor?: string
+  titleGradient?: {
+    from: string
+    to: string
+    via?: string
+  }
 }
 
 type ProjectEditorProps = {

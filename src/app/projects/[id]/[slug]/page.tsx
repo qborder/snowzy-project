@@ -22,6 +22,12 @@ type Project = {
   tags?: string[]
   createdAt?: string
   content?: string
+  titleColor?: string
+  titleGradient?: {
+    from: string
+    to: string
+    via?: string
+  }
 }
 
 export default function ProjectViewPage() {
@@ -127,7 +133,21 @@ export default function ProjectViewPage() {
               </div>
               
               <div className="space-y-4">
-                <h1 className="text-4xl font-black bg-gradient-to-r from-foreground via-primary to-purple-400 bg-clip-text text-transparent leading-tight tracking-tight">
+                <h1 
+                  className={`text-4xl font-black leading-tight tracking-tight ${
+                    project.titleGradient 
+                      ? 'bg-clip-text text-transparent' 
+                      : project.titleColor 
+                        ? '' 
+                        : 'text-foreground'
+                  }`}
+                  style={{
+                    backgroundImage: project.titleGradient 
+                      ? `linear-gradient(to right, ${project.titleGradient.from}${project.titleGradient.via ? `, ${project.titleGradient.via}` : ''}, ${project.titleGradient.to})`
+                      : undefined,
+                    color: project.titleColor || undefined
+                  }}
+                >
                   {project.title}
                 </h1>
                 

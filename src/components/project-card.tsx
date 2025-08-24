@@ -25,6 +25,12 @@ interface ProjectCardProps {
   projectId?: string
   cardGradient?: string
   cardColor?: string
+  titleColor?: string
+  titleGradient?: {
+    from: string
+    to: string
+    via?: string
+  }
 }
 
 export function ProjectCard({
@@ -41,7 +47,9 @@ export function ProjectCard({
   projectIndex,
   projectId,
   cardGradient,
-  cardColor
+  cardColor,
+  titleColor,
+  titleGradient
 }: ProjectCardProps) {
   const prefersReducedMotion = useReducedMotion()
   const ytId = youtubeUrl
@@ -216,9 +224,21 @@ export function ProjectCard({
               )}
             </div>
           </div>
-          <CardTitle className={`${reduce ? "text-lg line-clamp-1" : "line-clamp-2"} ${
-            cardGradient || cardColor ? 'text-white' : ''
-          }`}>{title}</CardTitle>
+          <CardTitle 
+            className={`${reduce ? "text-lg line-clamp-1" : "line-clamp-2"} ${
+              titleGradient 
+                ? 'bg-clip-text text-transparent' 
+                : titleColor 
+                  ? '' 
+                  : cardGradient || cardColor ? 'text-white' : ''
+            }`}
+            style={{
+              backgroundImage: titleGradient 
+                ? `linear-gradient(to right, ${titleGradient.from}${titleGradient.via ? `, ${titleGradient.via}` : ''}, ${titleGradient.to})`
+                : undefined,
+              color: titleColor || undefined
+            }}
+          >{title}</CardTitle>
           <CardDescription className={`${reduce ? "line-clamp-2" : "line-clamp-3"} ${
             cardGradient || cardColor ? 'text-white/90' : ''
           }`}>{description}</CardDescription>
