@@ -3,11 +3,21 @@ import { kv } from "@vercel/kv"
 import { generateProjectId } from "@/lib/project-utils"
 import fallbackProjects from "@/data/projects.json"
 
+interface Project {
+  id: string
+  title: string
+  description: string
+  category: string
+  views?: number
+  downloads?: number
+  [key: string]: unknown
+}
+
 export async function GET() {
   try {
-    const projects = (await kv.get('projects') as any[]) || fallbackProjects
+    const projects = (await kv.get('projects') as Project[]) || fallbackProjects
     
-    const projectsWithDefaults = projects.map((project: any) => ({
+    const projectsWithDefaults = projects.map((project: Project) => ({
       ...project,
       views: project.views || 0,
       downloads: project.downloads || 0
@@ -16,7 +26,7 @@ export async function GET() {
     return NextResponse.json(projectsWithDefaults)
   } catch (error) {
     console.error('Failed to fetch projects:', error)
-    return NextResponse.json(fallbackProjects.map((project: any) => ({
+    return NextResponse.json(fallbackProjects.map((project: Project) => ({
       ...project,
       views: project.views || 0,
       downloads: project.downloads || 0
