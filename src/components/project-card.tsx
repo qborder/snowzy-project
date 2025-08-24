@@ -154,16 +154,23 @@ export function ProjectCard({
       ref={cardRef}
       className="group [transform-style:preserve-3d] will-change-transform"
     >
-      <Card className={`group/card relative overflow-hidden border-white/10 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] hover:border-white/20 ${
+      <Card className={`group/card relative overflow-hidden transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] ${
         cardGradient || cardColor 
-          ? `${cardGradient || cardColor}` 
-          : 'bg-background/60 hover:bg-background/80'
+          ? `${cardGradient || cardColor} border-white/20 hover:border-white/30` 
+          : 'bg-background/60 hover:bg-background/80 border-white/10 backdrop-blur-md hover:border-white/20'
       }`}>
-        <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),rgba(255,255,255,0.08)_30%,transparent_70%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(220px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.12),transparent_55%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/10 group-hover:ring-white/30 transition-all duration-300" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.06)_0deg,transparent_120deg,transparent_240deg,rgba(255,255,255,0.06)_360deg)] [mask:linear-gradient(white,transparent)]" />
+        {!(cardGradient || cardColor) && (
+          <>
+            <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),rgba(255,255,255,0.08)_30%,transparent_70%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(220px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.12),transparent_55%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/10 group-hover:ring-white/30 transition-all duration-300" />
+            <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.06)_0deg,transparent_120deg,transparent_240deg,rgba(255,255,255,0.06)_360deg)] [mask:linear-gradient(white,transparent)]" />
+          </>
+        )}
+        {(cardGradient || cardColor) && (
+          <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(600px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.1),transparent_60%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        )}
         {cover && (
           <div className="relative aspect-video overflow-hidden bg-muted">
             <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.035 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.3 }}>

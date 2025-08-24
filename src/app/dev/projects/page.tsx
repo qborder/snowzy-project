@@ -675,39 +675,46 @@ Instructions for contributors..."
                           <div className="space-y-2">
                             <div className="grid grid-cols-4 gap-2">
                               {[
-                                "bg-gradient-to-br from-blue-500 to-purple-600",
-                                "bg-gradient-to-br from-green-400 to-blue-500",
-                                "bg-gradient-to-br from-pink-500 to-rose-500",
-                                "bg-gradient-to-br from-purple-500 to-pink-500",
-                                "bg-gradient-to-br from-yellow-400 to-orange-500",
-                                "bg-gradient-to-br from-cyan-500 to-blue-500",
-                                "bg-gradient-to-br from-red-500 to-pink-500",
-                                "bg-gradient-to-br from-indigo-500 to-purple-500",
-                                "bg-gradient-to-br from-emerald-400 to-cyan-400",
-                                "bg-gradient-to-br from-orange-400 to-red-500",
-                                "bg-gradient-to-br from-teal-400 to-blue-500",
-                                "bg-gradient-to-br from-violet-500 to-purple-500",
-                                "bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600",
-                                "bg-gradient-to-r from-green-300 via-blue-500 to-purple-600",
-                                "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400",
-                                "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200",
-                                "bg-gradient-to-tr from-black via-zinc-900 to-black",
-                                "bg-gradient-to-tr from-zinc-900 via-neutral-800 to-black",
-                                "bg-gradient-to-tr from-slate-900 via-gray-800 to-neutral-900",
-                                "bg-gradient-to-b from-gray-900 via-zinc-800 to-slate-900",
-                                "bg-gradient-to-br from-neutral-900 via-neutral-800 to-black",
-                                "bg-gradient-to-r from-black via-gray-900 to-black",
-                                "bg-gradient-to-bl from-pink-200 via-purple-400 to-indigo-200",
-                                "bg-gradient-to-bl from-green-200 via-green-400 to-purple-700",
-                                "bg-gradient-to-tl from-red-400 via-gray-300 to-blue-500",
-                                "bg-gradient-to-tl from-amber-200 via-violet-600 to-sky-900",
-                                "bg-gradient-to-b from-violet-200 to-pink-200",
-                                "bg-gradient-to-b from-blue-200 to-cyan-200"
+                                "bg-gradient-to-br from-blue-600 to-purple-700",
+                                "bg-gradient-to-br from-emerald-500 to-blue-600",
+                                "bg-gradient-to-br from-rose-500 to-pink-600",
+                                "bg-gradient-to-br from-purple-600 to-pink-600",
+                                "bg-gradient-to-br from-orange-500 to-red-600",
+                                "bg-gradient-to-br from-cyan-500 to-blue-600",
+                                "bg-gradient-to-br from-red-600 to-rose-600",
+                                "bg-gradient-to-br from-indigo-600 to-purple-700",
+                                "bg-gradient-to-br from-teal-500 to-cyan-600",
+                                "bg-gradient-to-br from-amber-500 to-orange-600",
+                                "bg-gradient-to-br from-violet-600 to-purple-700",
+                                "bg-gradient-to-br from-emerald-600 to-teal-600",
+                                "bg-gradient-to-r from-blue-700 via-purple-600 to-violet-700",
+                                "bg-gradient-to-r from-emerald-600 via-cyan-500 to-blue-600",
+                                "bg-gradient-to-r from-rose-600 via-pink-500 to-purple-600",
+                                "bg-gradient-to-r from-orange-600 via-red-500 to-rose-600",
+                                "bg-gradient-to-br from-slate-900 to-slate-700",
+                                "bg-gradient-to-br from-zinc-900 to-zinc-700",
+                                "bg-gradient-to-br from-gray-900 to-gray-700",
+                                "bg-gradient-to-br from-neutral-900 to-neutral-700",
+                                "bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-800",
+                                "bg-gradient-to-r from-black via-gray-900 to-slate-900",
+                                "bg-gradient-to-br from-fuchsia-600 to-pink-700",
+                                "bg-gradient-to-br from-sky-500 to-indigo-600",
+                                "bg-gradient-to-br from-lime-500 to-emerald-600",
+                                "bg-gradient-to-br from-yellow-500 to-orange-600",
+                                "bg-gradient-to-r from-indigo-700 via-purple-600 to-pink-600",
+                                "bg-gradient-to-r from-teal-600 via-emerald-500 to-green-600",
+                                "bg-gradient-to-r from-red-700 via-rose-600 to-pink-600",
+                                "bg-gradient-to-r from-blue-800 via-indigo-700 to-purple-700",
+                                "bg-gradient-to-br from-emerald-700 to-cyan-700",
+                                "bg-gradient-to-br from-violet-700 to-fuchsia-700"
                               ].map(gradient => (
                                 <button
                                   key={gradient}
                                   type="button"
-                                  onClick={() => setCardGradient(gradient)}
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    setCardGradient(gradient)
+                                  }}
                                   className={`h-12 rounded-lg ${gradient} ${cardGradient === gradient ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''} hover:scale-105 transition-transform`}
                                 />
                               ))}
@@ -751,7 +758,8 @@ Instructions for contributors..."
                                 <button
                                   key={color}
                                   type="button"
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.preventDefault()
                                     setCardColor(color)
                                     setCardGradient("")
                                   }}
@@ -827,7 +835,8 @@ Instructions for contributors..."
                                 <button
                                   key={color}
                                   type="button"
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.preventDefault()
                                     setTitleColor(color)
                                     setTitleGradientFrom("")
                                     setTitleGradientTo("")
@@ -900,7 +909,8 @@ Instructions for contributors..."
                                 <button
                                   key={gradient.name}
                                   type="button"
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.preventDefault()
                                     setTitleGradientFrom(gradient.from)
                                     setTitleGradientTo(gradient.to)
                                     setTitleGradientVia(gradient.via)
