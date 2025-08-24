@@ -203,8 +203,8 @@ export default function ProjectViewPage() {
                       <Code className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">Documentation</p>
-                      <p className="text-sm text-muted-foreground font-normal">Detailed information and usage guide</p>
+                      <p className="text-2xl font-bold text-foreground">Description</p>
+                      <p className="text-sm text-muted-foreground font-normal">Detailed information about the project</p>
                     </div>
                   </CardTitle>
                 </CardHeader>
