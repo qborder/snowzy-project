@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye } from "lucide-react"
+import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor"
 
 type Project = {
@@ -28,6 +28,8 @@ type Project = {
     to: string
     via?: string
   }
+  views?: number
+  downloads?: number
 }
 
 export default function ProjectViewPage() {
@@ -49,6 +51,16 @@ export default function ProjectViewPage() {
           notFound()
         }
         setProject(foundProject)
+        
+        // Increment view count when project detail page is visited
+        try {
+          await fetch(`/api/projects/${projectId}/views`, {
+            method: 'POST',
+          })
+        } catch (error) {
+          console.error('Failed to increment view count:', error)
+        }
+        
       } catch (err) {
         console.error("Error loading project:", err)
         notFound()
@@ -298,6 +310,35 @@ export default function ProjectViewPage() {
                         <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
                         <span className="font-medium">{project.tags.length} technologies</span>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {(project.views || project.downloads) && (
+                <Card className="bg-gradient-to-br from-background/80 via-background/90 to-primary/5 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="p-1.5 bg-gradient-to-br from-primary/40 to-primary/20 rounded-lg border border-primary/30 shadow-md">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                      </div>
+                      <h3 className="text-lg font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Analytics</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {project.views && (
+                        <div className="text-center p-3 bg-background/50 rounded-lg border border-white/10">
+                          <Eye className="h-5 w-5 text-primary mx-auto mb-1" />
+                          <div className="text-xl font-bold">{project.views.toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">Views</div>
+                        </div>
+                      )}
+                      {project.downloads && (
+                        <div className="text-center p-3 bg-background/50 rounded-lg border border-white/10">
+                          <ArrowDown className="h-5 w-5 text-primary mx-auto mb-1" />
+                          <div className="text-xl font-bold">{project.downloads.toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">Downloads</div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

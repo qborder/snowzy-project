@@ -10,7 +10,9 @@
       "Template",
       "Asset"
     ],
-    "createdAt": "2025-08-22T03:19:37.539Z"
+    "createdAt": "2025-08-22T03:19:37.539Z",
+    "views": 2847,
+    "downloads": 156
   },
   {
     "id": "49270",
@@ -24,7 +26,9 @@
       "Scripting",
       "Asset"
     ],
-    "createdAt": "2025-08-21T23:10:48.245Z"
+    "createdAt": "2025-08-21T23:10:48.245Z",
+    "views": 1923,
+    "downloads": 87
   },
   {
     "id": "12345",
@@ -38,6 +42,8 @@
       "Scripting",
       "Asset"
     ],
-    "createdAt": "2024-01-15T10:30:00.000Z"
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "views": 4512,
+    "downloads": 203
   }
 ]

@@ -6,7 +6,7 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Search, Filter, Grid3x3, LayoutList, Clock, Sparkles, Gamepad2, Code, X, TrendingUp, Calendar, Star, ChevronDown } from "lucide-react"
+import { Search, Filter, Grid3x3, Columns3, Clock, Sparkles, Gamepad2, Code, X, TrendingUp, Calendar, Star, ChevronDown, LayoutGrid } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import fallbackProjects from "@/data/projects.json"
 
@@ -24,6 +24,8 @@ type Project = {
   createdAt?: string
   cardGradient?: string
   cardColor?: string
+  views?: number
+  downloads?: number
 }
 
 export default function ProjectsPage() {
@@ -32,7 +34,7 @@ export default function ProjectsPage() {
   const [q, setQ] = useState("")
   const [category, setCategory] = useState<string | "all">("all")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [layout, setLayout] = useState<"gallery" | "list">("gallery")
+  const [layout, setLayout] = useState<"gallery" | "masonry" | "compact">("gallery")
   const [sortBy, setSortBy] = useState<"latest" | "popular" | "name">("latest")
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -97,10 +99,10 @@ export default function ProjectsPage() {
     const spCat = (searchParams.get("cat") as string | null) || "all"
     const spTags = searchParams.get("tags") || ""
     const rawLayout = (searchParams.get("layout") as string | null)
-    let spLayout: "gallery" | "list" = "gallery"
-    if (rawLayout === "list") spLayout = "list"
+    let spLayout: "gallery" | "masonry" | "compact" = "gallery"
+    if (rawLayout === "masonry") spLayout = "masonry"
+    if (rawLayout === "compact") spLayout = "compact"
     if (rawLayout === "gallery") spLayout = "gallery"
-    if (rawLayout === "comfortable" || rawLayout === "compact") spLayout = "gallery"
     setQ(spQ)
     setCategory(spCat)
     setSelectedTags(spTags ? spTags.split(",").filter(Boolean) : [])
@@ -128,8 +130,10 @@ export default function ProjectsPage() {
     setSelectedTags([])
   }
 
-  const gridClass = layout === "list"
-    ? "mx-auto grid justify-center gap-4 md:max-w-[70rem] grid-cols-1"
+  const gridClass = layout === "compact"
+    ? "mx-auto grid justify-center gap-4 md:max-w-[70rem] grid-cols-1 sm:grid-cols-2"
+    : layout === "masonry"
+    ? "mx-auto columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 space-y-6"
     : "mx-auto grid justify-center gap-5 sm:grid-cols-2 md:max-w-[90rem] md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 
   if (loading) {
@@ -212,9 +216,11 @@ export default function ProjectsPage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mb-6"
           >
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/40 backdrop-blur-2xl p-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
-              <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_50%_0%,rgba(255,255,255,0.03),transparent_70%)]" />
+            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-background/60 backdrop-blur-2xl p-8 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-primary/10" />
+              <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_50%_0%,rgba(255,255,255,0.05),transparent_70%)]" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-500/20 to-transparent rounded-full blur-xl"></div>
               
               <div className="relative space-y-4">
                 <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
@@ -231,24 +237,33 @@ export default function ProjectsPage() {
                   </div>
                   
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 p-1 bg-background/60 border border-white/20 rounded-lg">
+                    <div className="flex items-center gap-1 p-1 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg">
                       <Button
-                        variant={layout === "gallery" ? "default" : "ghost"}
+                        variant={layout === "gallery" ? "gradient" : "ghost"}
                         size="sm"
                         onClick={() => setLayout("gallery")}
-                        className="h-8 px-3 text-xs"
+                        className="h-9 px-3 text-xs font-medium rounded-lg"
                       >
                         <Grid3x3 className="h-3 w-3 mr-1" />
                         Grid
                       </Button>
                       <Button
-                        variant={layout === "list" ? "default" : "ghost"}
+                        variant={layout === "masonry" ? "gradient" : "ghost"}
                         size="sm"
-                        onClick={() => setLayout("list")}
-                        className="h-8 px-3 text-xs"
+                        onClick={() => setLayout("masonry")}
+                        className="h-9 px-3 text-xs font-medium rounded-lg"
                       >
-                        <LayoutList className="h-3 w-3 mr-1" />
-                        List
+                        <Columns3 className="h-3 w-3 mr-1" />
+                        Masonry
+                      </Button>
+                      <Button
+                        variant={layout === "compact" ? "gradient" : "ghost"}
+                        size="sm"
+                        onClick={() => setLayout("compact")}
+                        className="h-9 px-3 text-xs font-medium rounded-lg"
+                      >
+                        <LayoutGrid className="h-3 w-3 mr-1" />
+                        Compact
                       </Button>
                     </div>
                   </div>
@@ -299,12 +314,12 @@ export default function ProjectsPage() {
                     <span className="text-sm font-medium text-foreground">Categories:</span>
                     <div className="flex flex-wrap gap-2">
                       <Button
-                        variant={category === "all" ? "default" : "outline"}
+                        variant={category === "all" ? "gradient" : "glass"}
                         size="sm"
                         onClick={() => setCategory("all")}
-                        className="h-8 px-3 text-xs font-medium"
+                        className="h-9 px-4 text-xs font-medium rounded-xl"
                       >
-                        <Sparkles className="h-3 w-3 mr-1" />
+                        <Sparkles className="h-3 w-3 mr-1.5" />
                         All ({projects.length})
                       </Button>
                       {categories.filter(cat => cat !== "all").map(cat => {
@@ -314,12 +329,12 @@ export default function ProjectsPage() {
                         return (
                           <Button
                             key={cat}
-                            variant={category === cat ? "default" : "outline"}
+                            variant={category === cat ? "gradient" : "glass"}
                             size="sm"
                             onClick={() => setCategory(cat)}
-                            className="h-8 px-3 text-xs font-medium"
+                            className="h-9 px-4 text-xs font-medium rounded-xl"
                           >
-                            <IconComponent className="h-3 w-3 mr-1" />
+                            <IconComponent className="h-3 w-3 mr-1.5" />
                             {cat} ({count})
                           </Button>
                         )
@@ -329,11 +344,12 @@ export default function ProjectsPage() {
 
                   {(q || category !== "all" || selectedTags.length > 0) && (
                     <Button
-                      variant="outline"
+                      variant="destructive"
                       size="sm"
                       onClick={clearFilters}
-                      className="h-7 px-2 text-xs"
+                      className="h-8 px-3 text-xs font-medium rounded-xl"
                     >
+                      <X className="h-3 w-3 mr-1" />
                       Clear all
                     </Button>
                   )}
@@ -390,8 +406,10 @@ export default function ProjectsPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-            className={layout === "list" 
-              ? "space-y-4" 
+            className={layout === "compact" 
+              ? "grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
+              : layout === "masonry"
+              ? "columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6"
               : "grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
             }
           >
@@ -411,7 +429,7 @@ export default function ProjectsPage() {
                     }
                   }}
                   layout
-                  className={layout === "list" ? "w-full" : ""}
+                  className={layout === "masonry" ? "break-inside-avoid mb-6" : "w-full"}
                 >
                   <ProjectCard
                     title={project.title}
@@ -423,8 +441,10 @@ export default function ProjectsPage() {
                     youtubeUrl={project.youtubeUrl}
                     image={project.image}
                     tags={project.tags}
-                    reduce={layout === "list"}
+                    reduce={layout === "compact"}
                     projectId={project.id}
+                    views={project.views}
+                    downloads={project.downloads}
                   />
                 </motion.div>
               )

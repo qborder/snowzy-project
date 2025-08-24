@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Download, Github, Youtube, BookOpen } from "lucide-react"
+import { ExternalLink, Download, Github, Youtube, BookOpen, Eye, ArrowDown } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
@@ -31,6 +31,8 @@ interface ProjectCardProps {
     to: string
     via?: string
   }
+  views?: number
+  downloads?: number
 }
 
 export function ProjectCard({
@@ -49,9 +51,24 @@ export function ProjectCard({
   cardGradient,
   cardColor,
   titleColor,
-  titleGradient
+  titleGradient,
+  views = 0,
+  downloads = 0,
 }: ProjectCardProps) {
   const prefersReducedMotion = useReducedMotion()
+  
+  const handleViewClick = async () => {
+    if (projectId) {
+      try {
+        await fetch(`/api/projects/${projectId}/views`, {
+          method: 'POST',
+        })
+      } catch (error) {
+        console.error('Failed to increment view count:', error)
+      }
+    }
+  }
+  
   const ytId = youtubeUrl
     ? (() => {
         try {
@@ -274,12 +291,39 @@ export function ProjectCard({
               )
             })()}
           </div>
+          
+          {(views > 0 || downloads > 0) && (
+            <div className="flex items-center gap-4 px-3 py-2 bg-background/50 rounded-lg border border-white/10 backdrop-blur-sm">
+              {views > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Eye className="h-3.5 w-3.5" />
+                  <span className="font-medium">{views.toLocaleString()}</span>
+                  <span className="opacity-80">views</span>
+                </div>
+              )}
+              {downloads > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <ArrowDown className="h-3.5 w-3.5" />
+                  <span className="font-medium">{downloads.toLocaleString()}</span>
+                  <span className="opacity-80">downloads</span>
+                </div>
+              )}
+            </div>
+          )}
+          
           <div className="flex gap-3">
             {(() => {
               const viewHref = projectId ? `/projects/${projectId}/${generateSlug(title)}` : (demoUrl || githubUrl || downloadUrl)
               return viewHref ? (
-                <Button className="relative overflow-hidden flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/30" asChild>
-                  <Link href={viewHref} target={projectId ? "_self" : "_blank"}>
+                <Button 
+                  className="relative overflow-hidden flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/30" 
+                  asChild
+                >
+                  <Link 
+                    href={viewHref} 
+                    target={projectId ? "_self" : "_blank"}
+                    onClick={handleViewClick}
+                  >
                     <ExternalLink className="mr-2 h-4 w-4" />
                     View
                   </Link>
