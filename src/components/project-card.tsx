@@ -292,16 +292,16 @@ export function ProjectCard({
             })()}
           </div>
           
-          {(views > 0 || downloads > 0) && (
+          {(views !== undefined || downloads !== undefined) && (
             <div className="flex items-center gap-4 px-3 py-2 bg-background/50 rounded-lg border border-white/10 backdrop-blur-sm">
-              {views > 0 && (
+              {views !== undefined && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Eye className="h-3.5 w-3.5" />
                   <span className="font-medium">{views.toLocaleString()}</span>
                   <span className="opacity-80">views</span>
                 </div>
               )}
-              {downloads > 0 && (
+              {downloads !== undefined && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <ArrowDown className="h-3.5 w-3.5" />
                   <span className="font-medium">{downloads.toLocaleString()}</span>

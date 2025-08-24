@@ -348,7 +348,7 @@ export default function ProjectViewPage() {
                 </Card>
               )}
 
-              {(project.views || project.downloads) && (
+              {(project.views !== undefined || project.downloads !== undefined) && (
                 <Card className="bg-gradient-to-br from-background/80 via-background/90 to-primary/5 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-2 mb-4">
@@ -358,14 +358,14 @@ export default function ProjectViewPage() {
                       <h3 className="text-lg font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Analytics</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      {project.views && (
+                      {project.views !== undefined && (
                         <div className="text-center p-3 bg-background/50 rounded-lg border border-white/10">
                           <Eye className="h-5 w-5 text-primary mx-auto mb-1" />
                           <div className="text-xl font-bold">{project.views.toLocaleString()}</div>
                           <div className="text-xs text-muted-foreground">Views</div>
                         </div>
                       )}
-                      {project.downloads && (
+                      {project.downloads !== undefined && (
                         <div className="text-center p-3 bg-background/50 rounded-lg border border-white/10">
                           <ArrowDown className="h-5 w-5 text-primary mx-auto mb-1" />
                           <div className="text-xl font-bold">{project.downloads.toLocaleString()}</div>

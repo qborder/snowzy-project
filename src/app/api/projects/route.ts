@@ -5,12 +5,22 @@ import fallbackProjects from "@/data/projects.json"
 
 export async function GET() {
   try {
-    const projects = await kv.get('projects') || []
-    return NextResponse.json(projects)
-  } catch (err: unknown) {
-    return NextResponse.json(fallbackProjects, {
-      headers: { 'x-fallback': 'projects.json' }
-    })
+    const projects = (await kv.get('projects') as any[]) || fallbackProjects
+    
+    const projectsWithDefaults = projects.map((project: any) => ({
+      ...project,
+      views: project.views || 0,
+      downloads: project.downloads || 0
+    }))
+    
+    return NextResponse.json(projectsWithDefaults)
+  } catch (error) {
+    console.error('Failed to fetch projects:', error)
+    return NextResponse.json(fallbackProjects.map((project: any) => ({
+      ...project,
+      views: project.views || 0,
+      downloads: project.downloads || 0
+    })))
   }
 }
 
