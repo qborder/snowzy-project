@@ -221,28 +221,46 @@ export function ProjectCard({
         )}
         <CardHeader className={reduce ? "pt-4 pb-2" : undefined}>
           <div className="flex items-start justify-between mb-2">
-            <Badge variant="secondary" className={`text-xs transition-transform duration-200 group-hover:translate-y-[-1px] group-hover:scale-[1.02] ${
-              cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
-            }`}>{category}</Badge>
-            <div className="flex gap-1">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className={`text-xs transition-transform duration-200 group-hover:translate-y-[-1px] group-hover:scale-[1.02] ${
+                cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
+              }`}>{category}</Badge>
+              {(views !== undefined || downloads !== undefined) && (
+                <div className="flex items-center gap-2">
+                  {views !== undefined && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Eye className="h-3 w-3" />
+                      <span className="font-medium">{views.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {downloads !== undefined && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <ArrowDown className="h-3 w-3" />
+                      <span className="font-medium">{downloads.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-1.5">
               {githubUrl && (
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-white/30" asChild>
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-primary/20 hover:to-primary/10 border border-white/10 hover:border-primary/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
                   <Link href={githubUrl} target="_blank">
-                    <Github className="h-3.5 w-3.5" />
+                    <Github className="h-4 w-4 transition-transform duration-200 group-hover/btn:rotate-12" />
                   </Link>
                 </Button>
               )}
               {demoUrl && (
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-white/30" asChild>
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-blue-500/20 hover:to-blue-400/10 border border-white/10 hover:border-blue-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-400/25 focus-visible:ring-2 focus-visible:ring-blue-400/50" asChild>
                   <Link href={demoUrl} target="_blank">
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                   </Link>
                 </Button>
               )}
               {youtubeUrl && (
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-white/30" asChild>
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-red-500/20 hover:to-red-400/10 border border-white/10 hover:border-red-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/25 focus-visible:ring-2 focus-visible:ring-red-400/50" asChild>
                   <Link href={youtubeUrl} target="_blank">
-                    <Youtube className="h-3.5 w-3.5" />
+                    <Youtube className="h-4 w-4 transition-transform duration-200 group-hover/btn:scale-110" />
                   </Link>
                 </Button>
               )}
@@ -292,31 +310,12 @@ export function ProjectCard({
             })()}
           </div>
           
-          {(views !== undefined || downloads !== undefined) && (
-            <div className="flex items-center gap-4 px-3 py-2 bg-background/50 rounded-lg border border-white/10 backdrop-blur-sm">
-              {views !== undefined && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="font-medium">{views.toLocaleString()}</span>
-                  <span className="opacity-80">views</span>
-                </div>
-              )}
-              {downloads !== undefined && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <ArrowDown className="h-3.5 w-3.5" />
-                  <span className="font-medium">{downloads.toLocaleString()}</span>
-                  <span className="opacity-80">downloads</span>
-                </div>
-              )}
-            </div>
-          )}
-          
           <div className="flex gap-3">
             {(() => {
               const viewHref = projectId ? `/projects/${projectId}/${generateSlug(title)}` : (demoUrl || githubUrl || downloadUrl)
               return viewHref ? (
                 <Button 
-                  className="relative overflow-hidden flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/30" 
+                  className="group/main relative overflow-hidden flex-1 h-11 font-semibold bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/95 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primary/50" 
                   asChild
                 >
                   <Link 
@@ -324,8 +323,9 @@ export function ProjectCard({
                     target={projectId ? "_self" : "_blank"}
                     onClick={handleViewClick}
                   >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover/main:translate-x-full transition-transform duration-700" />
+                    <ExternalLink className="mr-2 h-4 w-4 transition-transform duration-200 group-hover/main:scale-110" />
+                    <span className="relative z-10">View</span>
                   </Link>
                 </Button>
               ) : null
@@ -333,10 +333,11 @@ export function ProjectCard({
             {(() => {
               const learnHref = youtubeUrl || githubUrl
               return learnHref ? (
-                <Button variant="outline" className="flex-1 h-11 font-medium border-white/20 hover:border-white/30 hover:bg-white/5 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/30" asChild>
+                <Button variant="outline" className="group/learn relative overflow-hidden flex-1 h-11 font-semibold bg-gradient-to-r from-background/80 to-background/60 hover:from-background/90 hover:to-background/80 border border-muted-foreground/20 hover:border-muted-foreground/30 hover:bg-primary/5 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
                   <Link href={learnHref} target="_blank">
-                    {youtubeUrl ? <Youtube className="mr-2 h-4 w-4" /> : <BookOpen className="mr-2 h-4 w-4" />}
-                    Learn
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-hover/learn:translate-x-full transition-transform duration-700" />
+                    {youtubeUrl ? <Youtube className="mr-2 h-4 w-4 transition-all duration-200 group-hover/learn:scale-110" /> : <BookOpen className="mr-2 h-4 w-4 transition-all duration-200 group-hover/learn:scale-110 group-hover/learn:text-primary" />}
+                    <span className="relative z-10">Learn</span>
                   </Link>
                 </Button>
               ) : null
