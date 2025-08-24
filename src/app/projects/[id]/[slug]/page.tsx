@@ -36,6 +36,7 @@ export default function ProjectViewPage() {
   const params = useParams()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   useEffect(() => {
     async function loadProject() {
@@ -75,6 +76,38 @@ export default function ProjectViewPage() {
     const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
     const match = url.match(regex)
     return match ? `https://www.youtube.com/embed/${match[1]}` : null
+  }
+
+  async function handleDownload() {
+    if (!project?.downloadUrl || !project?.id) return
+    
+    setIsDownloading(true)
+    
+    try {
+      // Increment download counter
+      const response = await fetch(`/api/projects/${project.id}/downloads`, {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setProject(prev => prev ? { ...prev, downloads: data.downloads } : null)
+      }
+      
+      // Start download
+      const link = document.createElement('a')
+      link.href = project.downloadUrl
+      link.download = ''
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+    } catch (error) {
+      console.error('Download failed:', error)
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   if (loading) {
@@ -372,17 +405,28 @@ export default function ProjectViewPage() {
                     </Link>
                   )}
                   {project.downloadUrl && (
-                    <Link href={project.downloadUrl} target="_blank">
-                      <Button className="w-full justify-start h-16 bg-background/60 border border-white/20 hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:border-primary/30 transition-all duration-500 hover:scale-105 hover:shadow-lg rounded-2xl" variant="outline" size="lg">
-                        <div className="p-2 bg-primary/10 rounded-xl mr-4">
-                          <Download className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex flex-col items-start">
-                          <span className="font-bold text-lg text-foreground">Download</span>
-                          <span className="text-sm text-muted-foreground font-light">Get project files</span>
-                        </div>
-                      </Button>
-                    </Link>
+                    <Button 
+                      onClick={handleDownload}
+                      disabled={isDownloading}
+                      className="w-full justify-start h-16 bg-gradient-to-r from-green-600 via-green-500 to-green-400 hover:from-green-500 hover:via-green-400 hover:to-green-300 border-0 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      size="lg"
+                    >
+                      <div className="p-2 bg-white/20 rounded-xl mr-4 group-hover/btn:bg-white/30 transition-colors">
+                        {isDownloading ? (
+                          <div className="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full" />
+                        ) : (
+                          <Download className="h-6 w-6" />
+                        )}
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <span className="font-bold text-lg">
+                          {isDownloading ? 'Downloading...' : 'Download Project'}
+                        </span>
+                        <span className="text-sm opacity-90 font-light">
+                          {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
+                        </span>
+                      </div>
+                    </Button>
                   )}
                   {project.githubUrl && (
                     <Link href={project.githubUrl} target="_blank">
