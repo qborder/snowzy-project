@@ -71,6 +71,10 @@ export function ProjectCard({
       setMousePosition({ x, y })
       cardRef.current.style.setProperty('--mouse-x', `${x}px`)
       cardRef.current.style.setProperty('--mouse-y', `${y}px`)
+      const px = Math.max(0, Math.min(1, x / rect.width))
+      const py = Math.max(0, Math.min(1, y / rect.height))
+      cardRef.current.style.setProperty('--px', `${px}`)
+      cardRef.current.style.setProperty('--py', `${py}`)
     }
 
     const card = cardRef.current
@@ -97,27 +101,27 @@ export function ProjectCard({
       initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
       whileInView={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
-      whileHover={prefersReducedMotion ? undefined : { 
-        y: -8, 
-        rotateX: 2,
+      whileHover={prefersReducedMotion ? undefined : {
+        y: -8,
         scale: 1.02,
         transition: { duration: 0.3, ease: "easeOut" }
       }}
       transition={{ duration: prefersReducedMotion ? 0.2 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-      className="[perspective:1000px] group"
+      className="[perspective:1000px] group transform-gpu will-change-transform transition-transform duration-300 group-hover:[transform:rotateX(calc((var(--py,0.5)-0.5)*6deg))_rotateY(calc((0.5-var(--px,0.5))*8deg))]"
     >
-      <Card className={`group/card overflow-hidden border-white/10 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] hover:border-white/20 relative ${
+      <Card className={`group/card relative overflow-hidden border-white/10 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] hover:border-white/20 ${
         cardGradient || cardColor 
           ? `${cardGradient || cardColor}` 
           : 'bg-background/60 hover:bg-background/80'
       }`}>
         <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),rgba(255,255,255,0.08)_30%,transparent_70%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(200px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.1),transparent_50%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(220px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.12),transparent_55%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/10 group-hover:ring-white/30 transition-all duration-300" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.06)_0deg,transparent_120deg,transparent_240deg,rgba(255,255,255,0.06)_360deg)] [mask:linear-gradient(white,transparent)]" />
         {cover && (
           <div className="relative aspect-video overflow-hidden bg-muted">
-            <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.03 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.3 }}>
+            <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.035 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.3 }}>
               {useNextImage ? (
                 <Image
                   src={cover}
@@ -137,7 +141,7 @@ export function ProjectCard({
               )}
             </motion.div>
             <div className="pointer-events-none absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(300px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.1),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(320px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.1),transparent_62%)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
           </div>
         )}
@@ -148,26 +152,26 @@ export function ProjectCard({
         )}
         <CardHeader className={reduce ? "pt-4 pb-2" : undefined}>
           <div className="flex items-start justify-between mb-2">
-            <Badge variant="secondary" className={`text-xs ${
+            <Badge variant="secondary" className={`text-xs transition-transform duration-200 group-hover:translate-y-[-1px] group-hover:scale-[1.02] ${
               cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
             }`}>{category}</Badge>
             <div className="flex gap-1">
               {githubUrl && (
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors" asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-white/30" asChild>
                   <Link href={githubUrl} target="_blank">
                     <Github className="h-3.5 w-3.5" />
                   </Link>
                 </Button>
               )}
               {demoUrl && (
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors" asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-white/30" asChild>
                   <Link href={demoUrl} target="_blank">
                     <ExternalLink className="h-3.5 w-3.5" />
                   </Link>
                 </Button>
               )}
               {youtubeUrl && (
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors" asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-white/30" asChild>
                   <Link href={youtubeUrl} target="_blank">
                     <Youtube className="h-3.5 w-3.5" />
                   </Link>
@@ -191,7 +195,7 @@ export function ProjectCard({
               return (
                 <>
                   {shown.map((tag, index) => (
-                    <Badge key={index} variant="outline" className={`text-xs transition-transform group-hover:translate-y-[-1px] ${
+                    <Badge key={index} variant="outline" className={`text-xs transition-transform duration-200 group-hover:translate-y-[-1px] group-hover:scale-[1.02] ${
                       cardGradient || cardColor ? 'bg-black/20 text-white border-white/30' : ''
                     }`}>
                       {tag}
@@ -210,7 +214,7 @@ export function ProjectCard({
             {(() => {
               const viewHref = projectId ? `/projects/${projectId}/${generateSlug(title)}` : (demoUrl || githubUrl || downloadUrl)
               return viewHref ? (
-                <Button className="flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200" asChild>
+                <Button className="relative overflow-hidden flex-1 h-11 font-medium bg-primary hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/30" asChild>
                   <Link href={viewHref} target={projectId ? "_self" : "_blank"}>
                     <ExternalLink className="mr-2 h-4 w-4" />
                     View
@@ -221,7 +225,7 @@ export function ProjectCard({
             {(() => {
               const learnHref = youtubeUrl || githubUrl
               return learnHref ? (
-                <Button variant="outline" className="flex-1 h-11 font-medium border-white/20 hover:border-white/30 hover:bg-white/5 transition-all duration-200" asChild>
+                <Button variant="outline" className="flex-1 h-11 font-medium border-white/20 hover:border-white/30 hover:bg-white/5 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/30" asChild>
                   <Link href={learnHref} target="_blank">
                     {youtubeUrl ? <Youtube className="mr-2 h-4 w-4" /> : <BookOpen className="mr-2 h-4 w-4" />}
                     Learn

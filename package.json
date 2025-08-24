@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:turbo": "next dev --turbo",
     "start": "next start",
     "lint": "eslint",
     "analyze": "cross-env ANALYZE=true next build"
