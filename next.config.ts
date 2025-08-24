@@ -28,7 +28,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   output: 'standalone',
-  transpilePackages: ['lucide-react', 'framer-motion'],
   logging: {
     fetches: {
       fullUrl: false,
