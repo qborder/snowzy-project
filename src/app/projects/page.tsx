@@ -48,9 +48,9 @@ export default function ProjectsPage() {
         } else {
           data = fallbackProjects
         }
-        setProjects(Array.isArray(data) ? (data as any[]) : [])
-      } catch (error) {
-        setProjects(Array.isArray(fallbackProjects) ? (fallbackProjects as any[]) : [])
+        setProjects(Array.isArray(data) ? (data as Project[]) : [])
+      } catch {
+        setProjects(Array.isArray(fallbackProjects) ? (fallbackProjects as Project[]) : [])
       } finally {
         setLoading(false)
       }
