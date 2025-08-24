@@ -24,10 +24,10 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
   },
-  compress: true,
+  //compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  output: 'standalone',
+  //output: 'standalone',
   logging: {
     fetches: {
       fullUrl: false,
