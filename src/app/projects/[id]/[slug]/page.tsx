@@ -149,7 +149,7 @@ export default function ProjectViewPage() {
 
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-purple-500/5 to-primary/5 rounded-3xl blur-3xl -z-10"></div>
-          <div className="bg-gradient-to-br from-background/90 via-background/95 to-background/90 backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-background/90 via-background/95 to-background/90 backdrop-blur-xl rounded-[3rem] p-8 border border-white/10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-purple-500/20 to-transparent rounded-full blur-xl"></div>
             
@@ -177,55 +177,61 @@ export default function ProjectViewPage() {
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <h1 
-                  className={`text-4xl font-black leading-tight tracking-tight ${
-                    project.titleGradient 
-                      ? 'bg-clip-text text-transparent' 
-                      : project.titleColor 
-                        ? '' 
-                        : 'text-foreground'
-                  }`}
-                  style={{
-                    backgroundImage: project.titleGradient 
-                      ? `linear-gradient(to right, ${project.titleGradient.from}${project.titleGradient.via ? `, ${project.titleGradient.via}` : ''}, ${project.titleGradient.to})`
-                      : undefined,
-                    color: project.titleColor || undefined
-                  }}
-                >
-                  {project.title}
-                </h1>
-                
-                <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap max-w-4xl font-light">
-                  {project.description}
-                </p>
-                
-                {project.downloadUrl && (
-                  <div className="mt-6">
-                    <Button 
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 hover:from-slate-600/90 hover:via-slate-500/90 hover:to-slate-600/90 border border-slate-500/30 hover:border-slate-400/50 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] text-white group/btn rounded-xl disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 font-medium backdrop-blur-sm"
-                      size="default"
+              <div className="space-y-6">
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex-1 space-y-4">
+                    <h1 
+                      className={`text-4xl font-black leading-tight tracking-tight ${
+                        project.titleGradient 
+                          ? 'bg-clip-text text-transparent' 
+                          : project.titleColor 
+                            ? '' 
+                            : 'text-foreground'
+                      }`}
+                      style={{
+                        backgroundImage: project.titleGradient 
+                          ? `linear-gradient(to right, ${project.titleGradient.from}${project.titleGradient.via ? `, ${project.titleGradient.via}` : ''}, ${project.titleGradient.to})`
+                          : undefined,
+                        color: project.titleColor || undefined
+                      }}
                     >
-                      <div className="mr-3 group-hover/btn:scale-105 transition-transform">
-                        {isDownloading ? (
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                        ) : (
-                          <Download className="h-4 w-4" />
-                        )}
-                      </div>
-                      <div className="flex flex-col items-start">
-                        <span className="text-sm font-semibold">
-                          {isDownloading ? 'Downloading...' : 'Download Project'}
-                        </span>
-                        <span className="text-xs opacity-80 font-normal">
-                          {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
-                        </span>
-                      </div>
-                    </Button>
+                      {project.title}
+                    </h1>
+                    
+                    <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap max-w-3xl font-light">
+                      {project.description}
+                    </p>
                   </div>
-                )}
+                  
+                  {project.downloadUrl && (
+                    <div className="flex-shrink-0">
+                      <Button 
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 hover:from-slate-600/90 hover:via-slate-500/90 hover:to-slate-600/90 border border-slate-500/30 hover:border-slate-400/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] text-white group/btn rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
+                        size="lg"
+                      >
+                        <div className="flex items-center gap-4 px-2 py-1">
+                          <div className="group-hover/btn:scale-105 transition-transform">
+                            {isDownloading ? (
+                              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                            ) : (
+                              <Download className="h-5 w-5" />
+                            )}
+                          </div>
+                          <div className="text-left">
+                            <div className="text-base font-semibold leading-tight">
+                              {isDownloading ? 'Downloading...' : 'Download Project'}
+                            </div>
+                            <div className="text-sm opacity-90 font-normal leading-tight">
+                              {project.downloads ? `${project.downloads.toLocaleString()} downloads` : 'Get project files'}
+                            </div>
+                          </div>
+                        </div>
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
