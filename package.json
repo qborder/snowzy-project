@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "SKIP_ENV_VALIDATION=true next build",
+    "build": "next build --turbopack",
+    "build:webpack": "next build",
     "build:turbo": "next dev --turbo",
     "start": "next start",
     "lint": "eslint",
