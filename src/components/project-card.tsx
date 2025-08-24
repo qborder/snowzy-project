@@ -77,10 +77,22 @@ export function ProjectCard({
       cardRef.current.style.setProperty('--py', `${py}`)
     }
 
+    const handleMouseLeave = () => {
+      if (!cardRef.current) return
+      cardRef.current.style.setProperty('--mouse-x', `50%`)
+      cardRef.current.style.setProperty('--mouse-y', `50%`)
+      cardRef.current.style.setProperty('--px', `0.5`)
+      cardRef.current.style.setProperty('--py', `0.5`)
+    }
+
     const card = cardRef.current
     if (card) {
       card.addEventListener('mousemove', handleMouseMove)
-      return () => card.removeEventListener('mousemove', handleMouseMove)
+      card.addEventListener('mouseleave', handleMouseLeave)
+      return () => {
+        card.removeEventListener('mousemove', handleMouseMove)
+        card.removeEventListener('mouseleave', handleMouseLeave)
+      }
     }
   }, [])
   const rawCover = image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : undefined)
