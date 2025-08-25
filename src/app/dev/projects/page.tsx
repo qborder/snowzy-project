@@ -131,15 +131,20 @@ export default function DevProjectsPage() {
   const [uploading, setUploading] = useState(false)
   const [autoSaveStatus, setAutoSaveStatus] = useState("")
 
-  // Auto-save functionality
+  // Auto-save functionality - saves EVERYTHING
   useEffect(() => {
-    if (!title && !description && !category && !content && tags.length === 0 && !image && !icon && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl) {
-      return // Don't save empty form
+    if (!title && !description && !category && !content && tags.length === 0 && !image && !icon && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl && !editingProject) {
+      return // Don't save completely empty state
     }
     
     const draft = {
+      // Form fields
       title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content,
+      // Styling
       cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle,
+      // UI State
+      activeTab, editingProjectId, editingProject, templateName, tagInput,
+      // Timestamp
       timestamp: Date.now()
     }
     
@@ -148,7 +153,7 @@ export default function DevProjectsPage() {
     
     const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
     return () => clearTimeout(timer)
-  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle])
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -191,16 +196,13 @@ export default function DevProjectsPage() {
   }
 
   useEffect(() => {
-    const saved = localStorage.getItem('customTemplates')
-    if (saved) {
-      setCustomTemplates(JSON.parse(saved))
-    }
-    
-    // Load auto-saved draft
+    // Load auto-saved draft - restores EVERYTHING
     const draft = localStorage.getItem('projectDraft')
     if (draft) {
       try {
         const parsed = JSON.parse(draft)
+        
+        // Form fields
         setTitle(parsed.title || "")
         setDescription(parsed.description || "")
         setCategory(parsed.category || "")
@@ -212,6 +214,8 @@ export default function DevProjectsPage() {
         setIcon(parsed.icon || "")
         setTags(parsed.tags || [])
         setContent(parsed.content || "")
+        
+        // Styling
         setCardGradient(parsed.cardGradient || "")
         setCardColor(parsed.cardColor || "")
         setUseCustomStyle(parsed.useCustomStyle || false)
@@ -220,11 +224,43 @@ export default function DevProjectsPage() {
         setTitleGradientTo(parsed.titleGradientTo || "")
         setTitleGradientVia(parsed.titleGradientVia || "")
         setUseTitleCustomStyle(parsed.useTitleCustomStyle || false)
+        
+        // UI State
+        if (parsed.activeTab) setActiveTab(parsed.activeTab)
+        if (parsed.editingProjectId) setEditingProjectId(parsed.editingProjectId)
+        if (parsed.editingProject) setEditingProject(parsed.editingProject)
+        if (parsed.templateName) setTemplateName(parsed.templateName)
+        if (parsed.tagInput) setTagInput(parsed.tagInput)
+        
+        
+        // Update URL if we're in editing mode
+        if (parsed.editingProjectId && parsed.activeTab === 'creator') {
+          const url = new URL(window.location.href)
+          url.searchParams.set('id', parsed.editingProjectId)
+          router.replace(url.pathname + url.search, { scroll: false })
+        } else if (parsed.activeTab === 'editor') {
+          const url = new URL(window.location.href)
+          url.searchParams.set('tab', 'editor')
+          router.replace(url.pathname + url.search, { scroll: false })
+        }
+        
+        console.log('Draft restored with full state:', {
+          editingMode: !!parsed.editingProjectId,
+          activeTab: parsed.activeTab,
+          hasContent: !!(parsed.title || parsed.description)
+        })
+        
       } catch (e) {
         console.warn('Failed to load draft:', e)
       }
     }
-  }, [])
+    
+    // Load custom templates separately (not part of draft system)
+    const saved = localStorage.getItem('customTemplates')
+    if (saved) {
+      setCustomTemplates(JSON.parse(saved))
+    }
+  }, [router])
 
   function addTag(tag: string) {
     if (tag && !tags.includes(tag)) {
