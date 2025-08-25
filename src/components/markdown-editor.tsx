@@ -319,7 +319,6 @@ export function MarkdownEditor({
               data-color-mode="auto"
               textareaProps={{
                 placeholder,
-                ref: textareaRef,
                 style: {
                   fontSize: 14,
                   backgroundColor: "transparent",
