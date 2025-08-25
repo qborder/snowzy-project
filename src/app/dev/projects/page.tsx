@@ -254,24 +254,55 @@ export default function DevProjectsPage() {
     }
   }
 
-  function handleDrop(e: React.DragEvent) {
+  async function handleDrop(e: React.DragEvent) {
     e.preventDefault()
     setDragActive(false)
     const files = Array.from(e.dataTransfer.files)
     const imageFile = files.find(file => file.type.startsWith('image/'))
-    if (imageFile) {
-      const reader = new FileReader()
-      reader.onload = () => setImage(reader.result as string || "")
-      reader.readAsDataURL(imageFile)
+    if (!imageFile) return
+    try {
+      setUploading(true)
+      setResult("")
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(imageFile.name)}`, { 
+        method: "POST", 
+        body: imageFile 
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Upload failed")
+      }
+      setImage(data.url)
+      setResult("Image uploaded successfully")
+    } catch (err: unknown) {
+      const error = err as Error
+      setResult(error.message || "Upload error")
+    } finally {
+      setUploading(false)
     }
   }
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onload = () => setImage(reader.result as string || "")
-      reader.readAsDataURL(file)
+    if (!file || !file.type.startsWith('image/')) return
+    try {
+      setUploading(true)
+      setResult("")
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
+        method: "POST", 
+        body: file 
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Upload failed")
+      }
+      setImage(data.url)
+      setResult("Image uploaded successfully")
+    } catch (err: unknown) {
+      const error = err as Error
+      setResult(error.message || "Upload error")
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
   }
 
