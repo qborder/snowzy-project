@@ -130,6 +130,8 @@ export default function DevProjectsPage() {
   const downloadFileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [autoSaveStatus, setAutoSaveStatus] = useState("")
+  const [previewReduce, setPreviewReduce] = useState(true)
+  const [previewSize, setPreviewSize] = useState<"sm" | "md" | "lg">("md")
 
   // Auto-save functionality - saves EVERYTHING
   useEffect(() => {
@@ -144,6 +146,8 @@ export default function DevProjectsPage() {
       cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle,
       // UI State
       activeTab, editingProjectId, editingProject, templateName, tagInput,
+      // Preview
+      previewReduce, previewSize,
       // Timestamp
       timestamp: Date.now()
     }
@@ -153,7 +157,7 @@ export default function DevProjectsPage() {
     
     const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
     return () => clearTimeout(timer)
-  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput])
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -231,6 +235,9 @@ export default function DevProjectsPage() {
         if (parsed.editingProject) setEditingProject(parsed.editingProject)
         if (parsed.templateName) setTemplateName(parsed.templateName)
         if (parsed.tagInput) setTagInput(parsed.tagInput)
+        // Preview
+        if (typeof parsed.previewReduce === 'boolean') setPreviewReduce(parsed.previewReduce)
+        if (parsed.previewSize) setPreviewSize(parsed.previewSize)
         
         
         // Update URL if we're in editing mode
@@ -563,6 +570,14 @@ export default function DevProjectsPage() {
                       setTitleGradientTo("")
                       setTitleGradientVia("")
                       setUseTitleCustomStyle(false)
+                      setPreviewReduce(true)
+                      setPreviewSize('md')
+                      setSlug("")
+                      setIsPrivate(false)
+                      setIsNsfw(false)
+                      setLicense("")
+                      setVersion("")
+                      setReleaseNotes("")
                       setEditingProject(null)
                       setEditingProjectId(null)
                       const url = new URL(window.location.href)
@@ -712,6 +727,7 @@ export default function DevProjectsPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
+              
               
               <TabsContent value="links" className="space-y-6">
                 <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
@@ -1418,6 +1434,14 @@ Instructions for contributors...`}
                       setTitleGradientTo("")
                       setTitleGradientVia("")
                       setUseTitleCustomStyle(false)
+                      setPreviewReduce(true)
+                      setPreviewSize('md')
+                      setSlug("")
+                      setIsPrivate(false)
+                      setIsNsfw(false)
+                      setLicense("")
+                      setVersion("")
+                      setReleaseNotes("")
                     }}>
                       <div className="absolute inset-0 bg-gradient-to-r from-muted-foreground/0 via-muted-foreground/5 to-muted-foreground/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
                       <span className="relative z-10">Clear All</span>
@@ -1447,6 +1471,42 @@ Instructions for contributors...`}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="inline-flex items-center gap-1 p-1 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg">
+                    <Button
+                      type="button"
+                      variant={previewSize === 'sm' ? 'gradient' : 'ghost'}
+                      size="sm"
+                      onClick={() => setPreviewSize('sm')}
+                      className="h-8 px-3 text-xs rounded-lg"
+                    >
+                      SM
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={previewSize === 'md' ? 'gradient' : 'ghost'}
+                      size="sm"
+                      onClick={() => setPreviewSize('md')}
+                      className="h-8 px-3 text-xs rounded-lg"
+                    >
+                      MD
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={previewSize === 'lg' ? 'gradient' : 'ghost'}
+                      size="sm"
+                      onClick={() => setPreviewSize('lg')}
+                      className="h-8 px-3 text-xs rounded-lg"
+                    >
+                      LG
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Compact</span>
+                    <Switch checked={previewReduce} onCheckedChange={setPreviewReduce} />
+                  </div>
+                </div>
+                <div className={`mx-auto ${previewSize==='sm' ? 'max-w-sm' : previewSize==='lg' ? 'max-w-xl' : 'max-w-md'}`}>
                 <ProjectCard
                   title={title || "Your Project Title"}
                   description={description || "Your project description will appear here. Make it compelling to attract viewers!"}
@@ -1458,7 +1518,7 @@ Instructions for contributors...`}
                   image={image || undefined}
                   icon={icon || undefined}
                   tags={tags.length ? tags : ["Sample", "Tags"]}
-                  reduce
+                  reduce={previewReduce}
                   projectId="12345"
                   cardGradient={useCustomStyle ? cardGradient : undefined}
                   cardColor={useCustomStyle ? cardColor : undefined}
@@ -1469,6 +1529,7 @@ Instructions for contributors...`}
                     via: titleGradientVia || undefined
                   } : undefined}
                 />
+                </div>
               </CardContent>
             </Card>
           </div>

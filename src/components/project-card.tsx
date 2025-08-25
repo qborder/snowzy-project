@@ -177,7 +177,7 @@ export function ProjectCard({
         cardGradient || cardColor 
           ? `${cardGradient || cardColor} border-white/20 hover:border-white/40 shadow-lg` 
           : 'bg-background/70 hover:bg-background/90 border-white/15 backdrop-blur-lg hover:border-white/30 shadow-md hover:shadow-xl'
-      }`}>
+      } ring-1 ring-white/10 hover:ring-white/20` }>
         {!(cardGradient || cardColor) && (
           <>
             <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/25 via-primary/5 to-primary/15 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
@@ -191,29 +191,42 @@ export function ProjectCard({
           <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(600px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.1),transparent_60%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
         )}
         {cover && (
-          <div className="relative aspect-video overflow-hidden bg-muted">
-            <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, ease: "easeOut" }}>
-              {useNextImage ? (
-                <Image
-                  src={cover}
-                  alt={title}
-                  width={400}
-                  height={225}
-                  className="h-full w-full object-cover object-center"
-                  onError={() => setImgOk(false)}
-                />
-              ) : (
-                <img
-                  src={cover}
-                  alt={title}
-                  className="h-full w-full object-cover object-center"
-                  onError={() => setImgOk(false)}
-                />
-              )}
-            </motion.div>
-            <div className="pointer-events-none absolute inset-0 bg-white/0 group-hover:bg-white/8 transition-colors duration-500" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),transparent_65%)] opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-            <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent" />
+          <div className="relative aspect-video overflow-visible bg-muted">
+            <div className="relative h-full w-full overflow-hidden">
+              <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, ease: "easeOut" }}>
+                {useNextImage ? (
+                  <Image
+                    src={cover}
+                    alt={title}
+                    width={400}
+                    height={225}
+                    className="h-full w-full object-cover object-center"
+                    onError={() => setImgOk(false)}
+                  />
+                ) : (
+                  <img
+                    src={cover}
+                    alt={title}
+                    className="h-full w-full object-cover object-center"
+                    onError={() => setImgOk(false)}
+                  />
+                )}
+              </motion.div>
+              <div className="pointer-events-none absolute inset-0 bg-white/0 group-hover:bg-white/8 transition-colors duration-500" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),transparent_65%)] opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+              <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent" />
+            </div>
+            {icon && isValidSrc(icon) && (
+              <div className="absolute bottom-[-50px] left-4 z-[60]">
+                <div className="h-28 w-28 rounded-2xl overflow-hidden bg-gradient-to-br from-background via-background to-muted/10 border border-white/10 shadow-xl">
+                  <img 
+                    src={icon} 
+                    alt={`${title} icon`}
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+              </div>
+            )}
             <div className="absolute top-2 right-2 flex gap-1.5 items-center">
               {githubUrl && (
                 <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-black/30 to-black/20 hover:from-primary/40 hover:to-primary/30 border border-white/20 hover:border-primary/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50 backdrop-blur-sm" asChild>
@@ -240,8 +253,19 @@ export function ProjectCard({
           </div>
         )}
         {!cover && (
-          <div className="relative overflow-hidden bg-gradient-to-br from-muted/50 via-background to-muted/30">
+          <div className="relative overflow-visible bg-gradient-to-br from-muted/50 via-background to-muted/30">
             <div className="aspect-video" />
+            {icon && isValidSrc(icon) && (
+              <div className="absolute bottom-[-50px] left-4 z-[60]">
+                <div className="h-28 w-28 rounded-2xl overflow-hidden bg-gradient-to-br from-background via-background to-muted/10 border border-white/10 shadow-xl">
+                  <img 
+                    src={icon} 
+                    alt={`${title} icon`}
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+              </div>
+            )}
             <div className="absolute top-2 right-2 flex gap-1.5 items-center">
               {githubUrl && (
                 <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/40 to-muted/20 hover:from-primary/30 hover:to-primary/20 border border-white/10 hover:border-primary/40 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
@@ -267,19 +291,11 @@ export function ProjectCard({
             </div>
           </div>
         )}
-        {icon && isValidSrc(icon) && (
-          <div className="absolute top-[142px] left-4 z-50">
-            <div className="h-28 w-28 rounded-2xl overflow-hidden bg-gradient-to-br from-background via-background to-muted/10 border border-white/10 shadow-xl">
-              <img 
-                src={icon} 
-                alt={`${title} icon`}
-                className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-              />
-            </div>
-          </div>
-        )}
-        <CardHeader className={reduce ? "pt-5 pb-0.5" : icon && isValidSrc(icon) ? "pt-3 pb-3" : "pt-4 pb-4"}>
-          <div className={`flex items-start justify-between mb-3 ${icon && isValidSrc(icon) ? 'ml-29' : ''}`}>
+        <div className="px-6">
+          <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+        </div>
+        <CardHeader className={reduce ? "pt-5 pb-0.5 px-6" : "pt-4 pb-4 px-6"}>
+          <div className={`flex items-start justify-between mb-3 ${icon && isValidSrc(icon) ? 'sm:ml-24 md:ml-28 lg:ml-32' : ''}`}>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className={`text-xs font-medium px-3 py-1 transition-all duration-300 group-hover:translate-y-[-2px] group-hover:scale-[1.05] hover:shadow-md ${
                 cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
@@ -321,7 +337,7 @@ export function ProjectCard({
             cardGradient || cardColor ? 'text-white/90' : ''
           }`}>{description}</CardDescription>
         </CardHeader>
-        <CardContent className={reduce ? "space-y-3 pt-0 px-4 pb-4" : "space-y-4 px-6 pb-6"}>
+        <CardContent className={reduce ? "space-y-3 pt-0 px-6 pb-5" : "space-y-4 px-6 pb-6"}>
           <div className="flex flex-wrap gap-1">
             {(() => {
               const max = reduce ? 4 : 6
@@ -351,7 +367,7 @@ export function ProjectCard({
               const viewHref = projectId ? `/projects/${projectId}/${generateSlug(title)}` : (demoUrl || githubUrl || downloadUrl)
               return viewHref ? (
                 <Button 
-                  className="group/main relative overflow-hidden flex-1 h-12 font-bold bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-2xl hover:shadow-primary/40 border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary/60 rounded-xl" 
+                  className={`group/main relative overflow-hidden flex-1 ${reduce ? 'h-10' : 'h-12'} font-bold bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-2xl hover:shadow-primary/40 border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary/60 rounded-xl`} 
                   asChild
                 >
                   <Link 
@@ -360,7 +376,7 @@ export function ProjectCard({
                     onClick={handleViewClick}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 -translate-x-full group-hover/main:translate-x-full transition-transform duration-1000" />
-                    <ExternalLink className="mr-2 h-5 w-5 transition-transform duration-300 group-hover/main:scale-110 group-hover/main:rotate-3" />
+                    <ExternalLink className="mr-2 h-5 w-5 transition-transform duration-300 group-hover/main:scale-110 group-hover/main:rotate-3 group-hover/main:translate-x-0.5 group-hover/main:-translate-y-0.5" />
                     <span className="relative z-10">View</span>
                   </Link>
                 </Button>
@@ -369,10 +385,10 @@ export function ProjectCard({
             {(() => {
               const learnHref = youtubeUrl || githubUrl
               return learnHref ? (
-                <Button variant="outline" className="group/learn relative overflow-hidden flex-1 h-12 font-bold bg-gradient-to-r from-background/80 to-background/60 hover:from-background/95 hover:to-background/85 border border-muted-foreground/25 hover:border-muted-foreground/40 hover:bg-primary/8 shadow-md hover:shadow-xl transition-all duration-500 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary/60 rounded-xl" asChild>
+                <Button variant="outline" className={`group/learn relative overflow-hidden flex-1 ${reduce ? 'h-10' : 'h-12'} font-bold bg-gradient-to-r from-background/80 to-background/60 hover:from-background/95 hover:to-background/85 border border-muted-foreground/25 hover:border-muted-foreground/40 hover:bg-primary/8 shadow-md hover:shadow-xl transition-all duration-500 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary/60 rounded-xl`} asChild>
                   <Link href={learnHref} target="_blank">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/8 to-primary/0 -translate-x-full group-hover/learn:translate-x-full transition-transform duration-1000" />
-                    {youtubeUrl ? <Youtube className="mr-2 h-5 w-5 transition-all duration-300 group-hover/learn:scale-110 group-hover/learn:-rotate-6" /> : <BookOpen className="mr-2 h-5 w-5 transition-all duration-300 group-hover/learn:scale-110 group-hover/learn:text-primary group-hover/learn:rotate-12" />}
+                    {youtubeUrl ? <Youtube className="mr-2 h-5 w-5 transition-all duration-300 group-hover/learn:scale-110 group-hover/learn:-rotate-6 group-hover/learn:translate-x-0.5 group-hover/learn:-translate-y-0.5" /> : <BookOpen className="mr-2 h-5 w-5 transition-all duration-300 group-hover/learn:scale-110 group-hover/learn:text-primary group-hover/learn:rotate-12 group-hover/learn:translate-x-0.5 group-hover/learn:-translate-y-0.5" />}
                     <span className="relative z-10">Learn</span>
                   </Link>
                 </Button>
