@@ -6,7 +6,7 @@
   "outputDirectory": ".next",
   "functions": {
     "app/**": {
-      "runtime": "nodejs22.x"
+      "runtime": "nodejs24.6.4"
     }
   },
   "build": {
