@@ -1420,6 +1420,7 @@ Instructions for contributors...`}
                   demoUrl={demoUrl || undefined}
                   youtubeUrl={youtubeUrl || undefined}
                   image={image || undefined}
+                  icon={icon || undefined}
                   tags={tags.length ? tags : ["Sample", "Tags"]}
                   reduce
                   projectId="12345"

@@ -20,6 +20,7 @@ type Project = {
   demoUrl?: string
   youtubeUrl?: string
   image?: string
+  icon?: string
   tags: string[]
   createdAt?: string
   cardGradient?: string
@@ -440,6 +441,7 @@ export default function ProjectsPage() {
                     demoUrl={project.demoUrl}
                     youtubeUrl={project.youtubeUrl}
                     image={project.image}
+                    icon={project.icon}
                     tags={project.tags}
                     reduce={layout === "compact"}
                     projectId={project.id}

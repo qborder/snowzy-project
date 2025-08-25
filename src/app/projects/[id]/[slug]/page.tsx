@@ -244,35 +244,6 @@ export default function ProjectViewPage() {
               </Card>
             )}
 
-            {project.image && (
-              <Card className="bg-background/70 backdrop-blur-xl border-white/20 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 group rounded-3xl">
-                <CardHeader className="bg-gradient-to-br from-green-500/15 via-green-400/10 to-emerald-500/5 border-b border-green-400/20 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-transparent to-emerald-500/5 opacity-50"></div>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-400/20 to-transparent rounded-full blur-2xl"></div>
-                  <CardTitle className="flex items-center gap-4 text-xl relative z-10">
-                    <div className="relative group/icon">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-green-400 via-emerald-500 to-green-400 rounded-2xl blur opacity-40 group-hover/icon:opacity-60 transition duration-300 animate-pulse"></div>
-                      <div className="relative p-4 bg-gradient-to-br from-green-400/40 via-green-400/25 to-emerald-500/15 rounded-2xl border border-green-400/30 shadow-2xl backdrop-blur-sm">
-                        <Eye className="h-7 w-7 text-green-400 drop-shadow-lg" />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-3xl font-black text-foreground bg-gradient-to-r from-foreground via-green-400 to-foreground bg-clip-text text-transparent leading-tight">Project Preview</p>
-                      <p className="text-sm text-muted-foreground font-medium opacity-80">Visual showcase and screenshots</p>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-8">
-                  <div className="rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
-                    <img 
-                      src={project.image} 
-                      alt={project.title}
-                      className="w-full transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           <div className="lg:col-span-1 space-y-6">

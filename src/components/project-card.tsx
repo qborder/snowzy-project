@@ -156,7 +156,7 @@ export function ProjectCard({
       }
     }
   }, [prefersReducedMotion, isHovered])
-  const rawCover = image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : undefined)
+  const rawCover = image || (ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : undefined)
   const cover = isValidSrc(rawCover) && imgOk ? rawCover : undefined
   const useNextImage = (() => {
     if (!cover) return false
@@ -173,18 +173,18 @@ export function ProjectCard({
       ref={cardRef}
       className="group [transform-style:preserve-3d] will-change-transform"
     >
-      <Card className={`group/card relative overflow-hidden transition-all duration-500 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.25)] ${
+      <Card className={`group/card relative overflow-hidden rounded-2xl transition-all duration-700 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] hover:shadow-primary/20 ${
         cardGradient || cardColor 
-          ? `${cardGradient || cardColor} border-white/20 hover:border-white/30` 
-          : 'bg-background/60 hover:bg-background/80 border-white/10 backdrop-blur-md hover:border-white/20'
+          ? `${cardGradient || cardColor} border-white/20 hover:border-white/40 shadow-lg` 
+          : 'bg-background/70 hover:bg-background/90 border-white/15 backdrop-blur-lg hover:border-white/30 shadow-md hover:shadow-xl'
       }`}>
         {!(cardGradient || cardColor) && (
           <>
-            <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-            <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),rgba(255,255,255,0.08)_30%,transparent_70%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-            <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(220px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.12),transparent_55%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/10 group-hover:ring-white/30 transition-all duration-300" />
-            <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.06)_0deg,transparent_120deg,transparent_240deg,rgba(255,255,255,0.06)_360deg)] [mask:linear-gradient(white,transparent)]" />
+            <div className="pointer-events-none absolute -inset-0.5 rounded-[inherit] bg-gradient-to-br from-primary/25 via-primary/5 to-primary/15 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(500px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.2),rgba(255,255,255,0.12)_30%,transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-[radial-gradient(280px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(59,130,246,0.18),transparent_60%)] opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute -inset-px rounded-[inherit] ring-1 ring-white/15 group-hover:ring-white/40 group-hover:ring-2 transition-all duration-500" />
+            <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.08)_0deg,transparent_120deg,transparent_240deg,rgba(255,255,255,0.08)_360deg)] [mask:linear-gradient(white,transparent)]" />
           </>
         )}
         {(cardGradient || cardColor) && (
@@ -192,39 +192,96 @@ export function ProjectCard({
         )}
         {cover && (
           <div className="relative aspect-video overflow-hidden bg-muted">
-            <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.035 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.3 }}>
+            <motion.div initial={{ scale: 1 }} whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }} transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, ease: "easeOut" }}>
               {useNextImage ? (
                 <Image
                   src={cover}
                   alt={title}
                   width={400}
                   height={225}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center"
                   onError={() => setImgOk(false)}
                 />
               ) : (
                 <img
                   src={cover}
                   alt={title}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center"
                   onError={() => setImgOk(false)}
                 />
               )}
             </motion.div>
-            <div className="pointer-events-none absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(320px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.1),transparent_62%)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-            <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-white/0 group-hover:bg-white/8 transition-colors duration-500" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),rgba(255,255,255,0.15),transparent_65%)] opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent" />
+            <div className="absolute top-2 right-2 flex gap-1.5 items-center">
+              {githubUrl && (
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-black/30 to-black/20 hover:from-primary/40 hover:to-primary/30 border border-white/20 hover:border-primary/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50 backdrop-blur-sm" asChild>
+                  <Link href={githubUrl} target="_blank">
+                    <Github className="h-4 w-4 text-white transition-transform duration-200 group-hover/btn:rotate-12" />
+                  </Link>
+                </Button>
+              )}
+              {demoUrl && (
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-black/30 to-black/20 hover:from-blue-500/40 hover:to-blue-400/30 border border-white/20 hover:border-blue-400/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-400/25 focus-visible:ring-2 focus-visible:ring-blue-400/50 backdrop-blur-sm" asChild>
+                  <Link href={demoUrl} target="_blank">
+                    <ExternalLink className="h-4 w-4 text-white transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                  </Link>
+                </Button>
+              )}
+              {youtubeUrl && (
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-black/30 to-black/20 hover:from-red-500/40 hover:to-red-400/30 border border-white/20 hover:border-red-400/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/25 focus-visible:ring-2 focus-visible:ring-red-400/50 backdrop-blur-sm" asChild>
+                  <Link href={youtubeUrl} target="_blank">
+                    <Youtube className="h-4 w-4 text-white transition-transform duration-200 group-hover/btn:scale-110" />
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         )}
         {!cover && (
           <div className="relative overflow-hidden bg-gradient-to-br from-muted/50 via-background to-muted/30">
             <div className="aspect-video" />
+            <div className="absolute top-2 right-2 flex gap-1.5 items-center">
+              {githubUrl && (
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/40 to-muted/20 hover:from-primary/30 hover:to-primary/20 border border-white/10 hover:border-primary/40 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
+                  <Link href={githubUrl} target="_blank">
+                    <Github className="h-4 w-4 transition-transform duration-200 group-hover/btn:rotate-12" />
+                  </Link>
+                </Button>
+              )}
+              {demoUrl && (
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/40 to-muted/20 hover:from-blue-500/30 hover:to-blue-400/20 border border-white/10 hover:border-blue-400/40 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-400/25 focus-visible:ring-2 focus-visible:ring-blue-400/50" asChild>
+                  <Link href={demoUrl} target="_blank">
+                    <ExternalLink className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                  </Link>
+                </Button>
+              )}
+              {youtubeUrl && (
+                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/40 to-muted/20 hover:from-red-500/30 hover:to-red-400/20 border border-white/10 hover:border-red-400/40 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/25 focus-visible:ring-2 focus-visible:ring-red-400/50" asChild>
+                  <Link href={youtubeUrl} target="_blank">
+                    <Youtube className="h-4 w-4 transition-transform duration-200 group-hover/btn:scale-110" />
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         )}
-        <CardHeader className={reduce ? "pt-4 pb-2" : undefined}>
-          <div className="flex items-start justify-between mb-2">
+        {icon && isValidSrc(icon) && (
+          <div className="absolute top-[142px] left-4 z-50">
+            <div className="h-28 w-28 rounded-2xl overflow-hidden bg-gradient-to-br from-background via-background to-muted/10 border border-white/10 shadow-xl">
+              <img 
+                src={icon} 
+                alt={`${title} icon`}
+                className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+              />
+            </div>
+          </div>
+        )}
+        <CardHeader className={reduce ? "pt-3 pb-0.5" : icon && isValidSrc(icon) ? "pt-5 pb-3" : "pt-4 pb-4"}>
+          <div className={`flex items-start justify-between mb-3 ${icon && isValidSrc(icon) ? 'ml-29' : ''}`}>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className={`text-xs transition-transform duration-200 group-hover:translate-y-[-1px] group-hover:scale-[1.02] ${
+              <Badge variant="secondary" className={`text-xs font-medium px-3 py-1 transition-all duration-300 group-hover:translate-y-[-2px] group-hover:scale-[1.05] hover:shadow-md ${
                 cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
               }`}>{category}</Badge>
               {(views !== undefined || downloads !== undefined) && (
@@ -244,41 +301,9 @@ export function ProjectCard({
                 </div>
               )}
             </div>
-            <div className="flex gap-1.5 items-center">
-              {icon && isValidSrc(icon) && (
-                <div className="h-8 w-8 rounded-lg overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 border border-white/10 flex-shrink-0">
-                  <img 
-                    src={icon} 
-                    alt={`${title} icon`}
-                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-                  />
-                </div>
-              )}
-              {githubUrl && (
-                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-primary/20 hover:to-primary/10 border border-white/10 hover:border-primary/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
-                  <Link href={githubUrl} target="_blank">
-                    <Github className="h-4 w-4 transition-transform duration-200 group-hover/btn:rotate-12" />
-                  </Link>
-                </Button>
-              )}
-              {demoUrl && (
-                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-blue-500/20 hover:to-blue-400/10 border border-white/10 hover:border-blue-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-400/25 focus-visible:ring-2 focus-visible:ring-blue-400/50" asChild>
-                  <Link href={demoUrl} target="_blank">
-                    <ExternalLink className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                  </Link>
-                </Button>
-              )}
-              {youtubeUrl && (
-                <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-red-500/20 hover:to-red-400/10 border border-white/10 hover:border-red-400/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/25 focus-visible:ring-2 focus-visible:ring-red-400/50" asChild>
-                  <Link href={youtubeUrl} target="_blank">
-                    <Youtube className="h-4 w-4 transition-transform duration-200 group-hover/btn:scale-110" />
-                  </Link>
-                </Button>
-              )}
-            </div>
           </div>
           <CardTitle 
-            className={`${reduce ? "text-lg line-clamp-1" : "line-clamp-2"} ${
+            className={`${reduce ? "text-xl line-clamp-1" : "text-2xl line-clamp-2"} font-bold tracking-tight leading-tight ${
               titleGradient 
                 ? 'bg-clip-text text-transparent' 
                 : titleColor 
@@ -292,7 +317,7 @@ export function ProjectCard({
               color: titleColor || undefined
             }}
           >{title}</CardTitle>
-          <CardDescription className={`${reduce ? "line-clamp-2" : "line-clamp-3"} ${
+          <CardDescription className={`${reduce ? "line-clamp-2 text-sm" : "line-clamp-3 text-base"} leading-relaxed mt-2 ${
             cardGradient || cardColor ? 'text-white/90' : ''
           }`}>{description}</CardDescription>
         </CardHeader>
@@ -305,14 +330,14 @@ export function ProjectCard({
               return (
                 <>
                   {shown.map((tag, index) => (
-                    <Badge key={index} variant="outline" className={`text-xs transition-transform duration-200 group-hover:translate-y-[-1px] group-hover:scale-[1.02] ${
+                    <Badge key={index} variant="outline" className={`text-xs font-medium px-3 py-1 rounded-full transition-all duration-300 group-hover:translate-y-[-2px] group-hover:scale-[1.05] hover:shadow-sm ${
                       cardGradient || cardColor ? 'bg-black/20 text-white border-white/30' : ''
                     }`}>
                       {tag}
                     </Badge>
                   ))}
                   {extra > 0 && (
-                    <Badge variant="secondary" className={`text-[10px] px-2 ${
+                    <Badge variant="secondary" className={`text-[11px] px-3 py-1 rounded-full font-medium ${
                       cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
                     }`}>+{extra}</Badge>
                   )}
@@ -326,7 +351,7 @@ export function ProjectCard({
               const viewHref = projectId ? `/projects/${projectId}/${generateSlug(title)}` : (demoUrl || githubUrl || downloadUrl)
               return viewHref ? (
                 <Button 
-                  className="group/main relative overflow-hidden flex-1 h-11 font-semibold bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/95 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primary/50" 
+                  className="group/main relative overflow-hidden flex-1 h-12 font-bold bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-2xl hover:shadow-primary/40 border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary/60 rounded-xl" 
                   asChild
                 >
                   <Link 
@@ -334,8 +359,8 @@ export function ProjectCard({
                     target={projectId ? "_self" : "_blank"}
                     onClick={handleViewClick}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover/main:translate-x-full transition-transform duration-700" />
-                    <ExternalLink className="mr-2 h-4 w-4 transition-transform duration-200 group-hover/main:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 -translate-x-full group-hover/main:translate-x-full transition-transform duration-1000" />
+                    <ExternalLink className="mr-2 h-5 w-5 transition-transform duration-300 group-hover/main:scale-110 group-hover/main:rotate-3" />
                     <span className="relative z-10">View</span>
                   </Link>
                 </Button>
@@ -344,10 +369,10 @@ export function ProjectCard({
             {(() => {
               const learnHref = youtubeUrl || githubUrl
               return learnHref ? (
-                <Button variant="outline" className="group/learn relative overflow-hidden flex-1 h-11 font-semibold bg-gradient-to-r from-background/80 to-background/60 hover:from-background/90 hover:to-background/80 border border-muted-foreground/20 hover:border-muted-foreground/30 hover:bg-primary/5 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
+                <Button variant="outline" className="group/learn relative overflow-hidden flex-1 h-12 font-bold bg-gradient-to-r from-background/80 to-background/60 hover:from-background/95 hover:to-background/85 border border-muted-foreground/25 hover:border-muted-foreground/40 hover:bg-primary/8 shadow-md hover:shadow-xl transition-all duration-500 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-primary/60 rounded-xl" asChild>
                   <Link href={learnHref} target="_blank">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-hover/learn:translate-x-full transition-transform duration-700" />
-                    {youtubeUrl ? <Youtube className="mr-2 h-4 w-4 transition-all duration-200 group-hover/learn:scale-110" /> : <BookOpen className="mr-2 h-4 w-4 transition-all duration-200 group-hover/learn:scale-110 group-hover/learn:text-primary" />}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/8 to-primary/0 -translate-x-full group-hover/learn:translate-x-full transition-transform duration-1000" />
+                    {youtubeUrl ? <Youtube className="mr-2 h-5 w-5 transition-all duration-300 group-hover/learn:scale-110 group-hover/learn:-rotate-6" /> : <BookOpen className="mr-2 h-5 w-5 transition-all duration-300 group-hover/learn:scale-110 group-hover/learn:text-primary group-hover/learn:rotate-12" />}
                     <span className="relative z-10">Learn</span>
                   </Link>
                 </Button>
