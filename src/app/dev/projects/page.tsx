@@ -1430,12 +1430,6 @@ Instructions for contributors...`}
                       setUseTitleCustomStyle(false)
                       setPreviewReduce(true)
                       setPreviewSize('md')
-                      setSlug("")
-                      setIsPrivate(false)
-                      setIsNsfw(false)
-                      setLicense("")
-                      setVersion("")
-                      setReleaseNotes("")
                     }}>
                       <div className="absolute inset-0 bg-gradient-to-r from-muted-foreground/0 via-muted-foreground/5 to-muted-foreground/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
                       <span className="relative z-10">Clear All</span>
