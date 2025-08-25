@@ -1,85 +1,58 @@
 import { NextResponse } from "next/server"
 import { put } from "@vercel/blob"
-import { storeFileMapping } from "@/lib/file-storage"
-
-function generateFileHash(content: ArrayBuffer): string {
-  const array = new Uint8Array(content)
-  let hash = 0
-  for (let i = 0; i < array.length; i++) {
-    const char = array[i]
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash
-  }
-  return Math.abs(hash).toString(36)
-}
+import { storeFile } from "@/lib/file-storage"
 
 export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const filename = searchParams.get("filename")
-    const contentType = request.headers.get("content-type")
-    
     if (!filename) {
       return NextResponse.json({ error: "No filename provided" }, { status: 400 })
     }
     if (!request.body) {
       return NextResponse.json({ error: "No file body provided" }, { status: 400 })
     }
-
-    const bodyBuffer = await request.arrayBuffer()
-    const fileSize = bodyBuffer.byteLength
-    const contentHash = generateFileHash(bodyBuffer)
     
-    // Check for duplicates first
-    const duplicateCheck = storeFileMapping(
-      filename,
-      "",
-      fileSize,
-      contentType || undefined,
-      contentHash
-    )
+    console.log(`[Upload] Starting upload for file: ${filename}`)
+    console.log(`[Upload] Environment check - VERCEL: ${!!process.env.VERCEL}, KV_REST_API_URL: ${!!process.env.KV_REST_API_URL}`)
     
-    if (duplicateCheck.isExisting) {
-      const baseUrl = new URL(request.url).origin
-      return NextResponse.json({
-        url: `${baseUrl}${duplicateCheck.customUrl}`,
-        filename: filename,
-        size: fileSize,
-        type: contentType,
-        uploadedAt: new Date().toISOString(),
-        isDuplicate: true,
-        message: "File already exists, returning existing file"
-      })
-    }
+    const fileBuffer = Buffer.from(await request.arrayBuffer())
+    console.log(`[Upload] File buffer size: ${fileBuffer.length} bytes`)
     
-    // Upload new file
-    const blob = await put(filename, bodyBuffer, {
+    const blob = await put(filename, fileBuffer, {
       access: "public",
-      addRandomSuffix: false,
-      contentType: contentType || undefined
+      addRandomSuffix: true
     })
+    console.log(`[Upload] Blob upload successful: ${blob.url}`)
     
-    // Update the mapping with the blob URL
-    const finalResult = storeFileMapping(
+    const result = await storeFile({
       filename,
-      blob.url,
-      fileSize,
-      contentType || undefined,
-      contentHash
-    )
+      blobUrl: blob.url,
+      mimeType: request.headers.get('content-type') || undefined,
+      fileSize: fileBuffer.length,
+      content: fileBuffer
+    })
+    console.log(`[Upload] File storage successful: ${result.id} -> ${result.displayName}`)
     
     const baseUrl = new URL(request.url).origin
     
     return NextResponse.json({
-      url: `${baseUrl}${finalResult.customUrl}`,
-      filename: filename,
-      size: fileSize,
-      type: contentType,
-      uploadedAt: new Date().toISOString(),
-      isDuplicate: false
+      success: true,
+      id: result.id,
+      filename: result.displayName,
+      url: `${baseUrl}${result.downloadUrl}`,
+      size: fileBuffer.length,
+      uploadedAt: new Date().toISOString()
     })
   } catch (error) {
-    console.error('Upload error:', error)
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
+    console.error('[Upload] Upload failed with error:', error)
+    console.error('[Upload] Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ 
+      error: "Upload failed", 
+      details: errorMessage,
+      timestamp: new Date().toISOString()
+    }, { status: 500 })
   }
 }

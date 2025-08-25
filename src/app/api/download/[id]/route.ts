@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getFileMapping } from "@/lib/file-storage"
+import { getFileById } from "@/lib/file-storage"
 
 export async function GET(
   request: Request,
@@ -7,25 +7,15 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const fileMapping = getFileMapping(id)
+    const fileData = await getFileById(id)
     
-    if (!fileMapping) {
+    if (!fileData) {
       return NextResponse.json({ error: "File not found" }, { status: 404 })
     }
     
-    const response = NextResponse.redirect(fileMapping.blobUrl)
-    
-    response.headers.set('Content-Disposition', `inline; filename="${fileMapping.slugifiedName}"`)
-    if (fileMapping.mimeType) {
-      response.headers.set('Content-Type', fileMapping.mimeType)
-    }
-    if (fileMapping.fileSize) {
-      response.headers.set('Content-Length', fileMapping.fileSize.toString())
-    }
-    
-    return response
+    return NextResponse.redirect(fileData.blobUrl)
   } catch (error) {
-    console.error('Download error:', error)
+    console.error('File download failed:', error)
     return NextResponse.json({ error: "Invalid request" }, { status: 400 })
   }
 }

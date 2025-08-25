@@ -277,10 +277,7 @@ export default function DevProjectsPage() {
         throw new Error(data?.error || "Upload failed")
       }
       setImage(data.url)
-      const message = data.isDuplicate 
-        ? `Image uploaded successfully (${data.message})`
-        : "Image uploaded successfully"
-      setResult(message)
+      setResult("Image uploaded successfully")
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "Upload error")
@@ -304,10 +301,7 @@ export default function DevProjectsPage() {
         throw new Error(data?.error || "Upload failed")
       }
       setImage(data.url)
-      const message = data.isDuplicate 
-        ? `Image uploaded successfully (${data.message})`
-        : "Image uploaded successfully"
-      setResult(message)
+      setResult("Image uploaded successfully")
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "Upload error")
@@ -332,10 +326,7 @@ export default function DevProjectsPage() {
         throw new Error(data?.error || "Upload failed")
       }
       setIcon(data.url)
-      const message = data.isDuplicate 
-        ? `Icon uploaded successfully (${data.message})`
-        : "Icon uploaded successfully"
-      setResult(message)
+      setResult("Icon uploaded successfully")
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "Upload error")
@@ -360,10 +351,7 @@ export default function DevProjectsPage() {
         throw new Error(data?.error || "Upload failed")
       }
       setDownloadUrl(data.url)
-      const message = data.isDuplicate 
-        ? `File uploaded successfully (${data.message})`
-        : "File uploaded successfully"
-      setResult(message)
+      setResult("File uploaded successfully")
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "Upload error")

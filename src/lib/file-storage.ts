@@ -1,144 +1,169 @@
-type FileMapping = {
+import { kv } from '@vercel/kv'
+import crypto from 'crypto'
+
+type FileData = {
   id: string
-  customUrl: string
-  blobUrl: string
-  filename: string
   originalName: string
-  slugifiedName: string
-  fileSize?: number
+  displayName: string
+  blobUrl: string
   mimeType?: string
-  contentHash?: string
+  fileSize?: number
   uploadedAt: string
+  contentHash: string
 }
 
-type FileIndex = {
-  [cleanName: string]: string
-}
+const localStore: Map<string, FileData> = new Map()
+const localNameIndex: Map<string, string> = new Map()
 
-type HashIndex = {
-  [hash: string]: string
-}
+const isVercelEnvironment = () => !!process.env.VERCEL || !!process.env.KV_REST_API_URL
 
-const fileStore: Record<string, FileMapping> = {}
-const nameIndex: FileIndex = {}
-const hashIndex: HashIndex = {}
-
-function slugify(text: string): string {
-  return text
+function createBeautifulName(filename: string): string {
+  const ext = filename.split('.').pop() || ''
+  const nameWithoutExt = filename.replace(/\.[^/.]+$/, '')
+  const cleanName = nameWithoutExt
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-}
-
-function generateReadableName(filename: string): string {
-  const name = filename.replace(/\.[^/.]+$/, '')
-  const ext = filename.split('.').pop()?.toLowerCase() || ''
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
   
-  const words = name.split(/[^a-zA-Z0-9]+/).filter(Boolean)
-  const readableName = words.join('-')
-  
-  return `${readableName}.${ext}`
-}
-
-function generateFileHash(content: ArrayBuffer): string {
-  const array = new Uint8Array(content)
-  let hash = 0
-  for (let i = 0; i < array.length; i++) {
-    const char = array[i]
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash
-  }
-  return Math.abs(hash).toString(36)
+  return ext ? `${cleanName}.${ext}` : cleanName
 }
 
 function generateUniqueId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9)
+  return crypto.randomBytes(8).toString('hex')
 }
 
-export function generateCustomUrl(filename: string): string {
-  const name = filename.replace(/\.[^/.]+$/, '')
-  const ext = filename.split('.').pop()?.toLowerCase() || ''
-  const cleanName = slugify(name)
+function generateContentHash(content: Buffer): string {
+  return crypto.createHash('md5').update(content).digest('hex').slice(0, 8)
+}
+
+export async function storeFile(file: {
+  filename: string
+  blobUrl: string
+  mimeType?: string
+  fileSize?: number
+  content?: Buffer
+}): Promise<{ id: string; displayName: string; downloadUrl: string }> {
+  const id = generateUniqueId()
+  const displayName = createBeautifulName(file.filename)
+  const contentHash = file.content ? generateContentHash(file.content) : crypto.randomBytes(4).toString('hex')
   
-  let finalName = `${cleanName}.${ext}`
-  let counter = 1
+  console.log(`[Storage] Storing file: ${file.filename} -> ${displayName} (ID: ${id})`)
   
-  while (nameIndex[finalName]) {
-    finalName = `${cleanName}-${counter}.${ext}`
-    counter++
+  const fileData: FileData = {
+    id,
+    originalName: file.filename,
+    displayName,
+    blobUrl: file.blobUrl,
+    mimeType: file.mimeType,
+    fileSize: file.fileSize,
+    uploadedAt: new Date().toISOString(),
+    contentHash
   }
   
-  return finalName
-}
-
-export function findDuplicateFile(
-  contentHash: string,
-  filename: string,
-  fileSize: number,
-  mimeType?: string
-): FileMapping | null {
-  const existingId = hashIndex[contentHash]
-  if (!existingId) return null
+  let kvSuccess = false
   
-  const existing = fileStore[existingId]
-  if (!existing) return null
-  
-  const isSameFile = existing.fileSize === fileSize && 
-                    existing.mimeType === mimeType && 
-                    existing.originalName === filename
-                    
-  return isSameFile ? existing : null
-}
-
-export function storeFileMapping(
-  filename: string,
-  blobUrl: string,
-  fileSize?: number,
-  mimeType?: string,
-  contentHash?: string
-): { id: string, customUrl: string, isExisting?: boolean } {
-  if (contentHash) {
-    const duplicate = findDuplicateFile(contentHash, filename, fileSize || 0, mimeType)
-    if (duplicate) {
-      return { id: duplicate.id, customUrl: duplicate.customUrl, isExisting: true }
+  if (isVercelEnvironment()) {
+    try {
+      console.log(`[Storage] Attempting KV storage for file: ${id}`)
+      const kvResults = await Promise.allSettled([
+        kv.hset(`file:${id}`, fileData),
+        kv.set(`name:${displayName}`, id)
+      ])
+      
+      const failedOps = kvResults.filter(r => r.status === 'rejected')
+      if (failedOps.length > 0) {
+        console.warn(`[Storage] ${failedOps.length} KV operations failed:`, failedOps)
+        throw new Error('KV operations failed')
+      }
+      
+      console.log(`[Storage] KV storage successful for file: ${id}`)
+      kvSuccess = true
+    } catch (error) {
+      console.error(`[Storage] KV storage failed for file: ${id}`, error)
+      console.log(`[Storage] Falling back to memory storage`)
     }
   }
   
-  const id = generateUniqueId()
-  const slugifiedName = generateCustomUrl(filename)
-  const customUrl = `/api/download/${slugifiedName}`
+  if (!kvSuccess) {
+    localStore.set(id, fileData)
+    localNameIndex.set(displayName, id)
+    console.log(`[Storage] Memory storage successful for file: ${id}`)
+  }
   
-  const mapping: FileMapping = {
+  return {
     id,
-    customUrl,
-    blobUrl,
-    filename,
-    originalName: filename,
-    slugifiedName,
-    fileSize,
-    mimeType,
-    contentHash,
-    uploadedAt: new Date().toISOString()
+    displayName,
+    downloadUrl: `/api/files/${displayName}`
   }
-  
-  fileStore[id] = mapping
-  nameIndex[slugifiedName] = id
-  if (contentHash) {
-    hashIndex[contentHash] = id
-  }
-  
-  return { id, customUrl }
 }
 
-export function getFileMapping(identifier: string): FileMapping | null {
-  if (fileStore[identifier]) {
-    return fileStore[identifier]
+export async function getFileById(id: string): Promise<FileData | null> {
+  if (isVercelEnvironment()) {
+    try {
+      return await kv.hgetall(`file:${id}`) as FileData | null
+    } catch (error) {
+      console.warn('KV storage failed, falling back to memory:', error)
+    }
   }
   
-  const id = nameIndex[identifier]
-  if (id && fileStore[id]) {
-    return fileStore[id]
+  return localStore.get(id) || null
+}
+
+export async function getFileByName(displayName: string): Promise<FileData | null> {
+  if (isVercelEnvironment()) {
+    try {
+      const id = await kv.get(`name:${displayName}`)
+      if (id && typeof id === 'string') {
+        return await getFileById(id)
+      }
+    } catch (error) {
+      console.warn('KV storage failed, falling back to memory:', error)
+    }
+  }
+  
+  const id = localNameIndex.get(displayName)
+  if (id) {
+    return localStore.get(id) || null
   }
   
   return null
+}
+
+export async function deleteFile(id: string): Promise<boolean> {
+  const fileData = await getFileById(id)
+  if (!fileData) return false
+  
+  if (isVercelEnvironment()) {
+    try {
+      await kv.del(`file:${id}`)
+      await kv.del(`name:${fileData.displayName}`)
+    } catch (error) {
+      console.warn('KV storage failed, falling back to memory:', error)
+    }
+  }
+  
+  localStore.delete(id)
+  localNameIndex.delete(fileData.displayName)
+  
+  return true
+}
+
+export async function listFiles(): Promise<FileData[]> {
+  if (isVercelEnvironment()) {
+    try {
+      const keys = await kv.keys('file:*')
+      const files = await Promise.all(
+        keys.map(async (key) => {
+          const id = key.replace('file:', '')
+          return await getFileById(id)
+        })
+      )
+      return files.filter(Boolean) as FileData[]
+    } catch (error) {
+      console.warn('KV storage failed, falling back to memory:', error)
+    }
+  }
+  
+  return Array.from(localStore.values())
 }

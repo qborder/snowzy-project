@@ -1,0 +1,22 @@
+{
+  "fileStore": {
+    "meqii67ng2z6o": {
+      "id": "meqii67ng2z6o",
+      "customUrl": "/api/download/thumbnail.jpeg",
+      "blobUrl": "",
+      "filename": "thumbnail.jpeg",
+      "originalName": "thumbnail.jpeg",
+      "slugifiedName": "thumbnail.jpeg",
+      "fileSize": 35991,
+      "mimeType": "image/jpeg",
+      "contentHash": "oia0p5",
+      "uploadedAt": "2025-08-25T02:42:44.339Z"
+    }
+  },
+  "nameIndex": {
+    "thumbnail.jpeg": "meqii67ng2z6o"
+  },
+  "hashIndex": {
+    "oia0p5": "meqii67ng2z6o"
+  }
+}

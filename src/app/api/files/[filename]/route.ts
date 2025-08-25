@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-
-const FILE_MAP: Record<string, string> = {}
+import { getFileByName } from "@/lib/file-storage"
 
 export async function GET(
   request: Request,
@@ -8,14 +7,15 @@ export async function GET(
 ) {
   try {
     const { filename } = await params
-    const blobUrl = FILE_MAP[filename]
+    const fileData = await getFileByName(filename)
     
-    if (!blobUrl) {
+    if (!fileData) {
       return NextResponse.json({ error: "File not found" }, { status: 404 })
     }
     
-    return NextResponse.redirect(blobUrl)
-  } catch {
+    return NextResponse.redirect(fileData.blobUrl)
+  } catch (error) {
+    console.error('File retrieval failed:', error)
     return NextResponse.json({ error: "Invalid request" }, { status: 400 })
   }
 }
