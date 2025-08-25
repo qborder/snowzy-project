@@ -316,7 +316,6 @@ export function MarkdownEditor({
               height={isFullscreen ? window.innerHeight - 250 : height}
               preview="edit"
               hideToolbar={false}
-              data-color-mode="auto"
               textareaProps={{
                 placeholder,
                 style: {
@@ -326,14 +325,6 @@ export function MarkdownEditor({
                   lineHeight: 1.6
                 }
               }}
-              toolbarCommands={[
-                'undo', 'redo', '|',
-                'bold', 'italic', 'strikethrough', '|',
-                'title', 'divider', 'link', 'quote', 'code', 'codeBlock', '|',
-                'unordered-list', 'ordered-list', 'checked-list', '|',
-                'table', 'image', '|',
-                'preview', 'fullscreen'
-              ]}
             />
           </div>
         )}
@@ -346,7 +337,6 @@ export function MarkdownEditor({
               height={isFullscreen ? window.innerHeight - 200 : height}
               preview="preview"
               hideToolbar
-              data-color-mode="auto"
             />
           </div>
         )}
