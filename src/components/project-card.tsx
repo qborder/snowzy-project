@@ -20,6 +20,7 @@ interface ProjectCardProps {
   youtubeUrl?: string
   tags: string[]
   image?: string
+  icon?: string
   reduce?: boolean
   projectIndex?: number
   projectId?: string
@@ -45,6 +46,7 @@ export function ProjectCard({
   youtubeUrl,
   tags,
   image,
+  icon,
   reduce,
   projectIndex,
   projectId,
@@ -242,7 +244,16 @@ export function ProjectCard({
                 </div>
               )}
             </div>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5 items-center">
+              {icon && isValidSrc(icon) && (
+                <div className="h-8 w-8 rounded-lg overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 border border-white/10 flex-shrink-0">
+                  <img 
+                    src={icon} 
+                    alt={`${title} icon`}
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+              )}
               {githubUrl && (
                 <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 hover:from-primary/20 hover:to-primary/10 border border-white/10 hover:border-primary/30 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
                   <Link href={githubUrl} target="_blank">

@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  const { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, cardGradient, cardColor, content } = body || {}
+  const { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, cardGradient, cardColor, content } = body || {}
   if (!title || !description || !category || !Array.isArray(tags)) {
     return NextResponse.json({ error: "Missing required fields: title, description, category, tags[]" }, { status: 400 })
   }
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
   if (demoUrl) project.demoUrl = demoUrl
   if (youtubeUrl) project.youtubeUrl = youtubeUrl
   if (image) project.image = image
+  if (icon) project.icon = icon
   if (cardGradient) project.cardGradient = cardGradient
   if (cardColor) project.cardColor = cardColor
   if (content) project.content = content

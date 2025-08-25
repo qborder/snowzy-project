@@ -107,6 +107,7 @@ export default function DevProjectsPage() {
   const [demoUrl, setDemoUrl] = useState("")
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [image, setImage] = useState("")
+  const [icon, setIcon] = useState("")
   const [tags, setTags] = useState<string[]>([])
   const [content, setContent] = useState("")
   const [saving, setSaving] = useState(false)
@@ -124,18 +125,19 @@ export default function DevProjectsPage() {
   const [tagInput, setTagInput] = useState("")
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const iconFileInputRef = useRef<HTMLInputElement>(null)
   const downloadFileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [autoSaveStatus, setAutoSaveStatus] = useState("")
 
   // Auto-save functionality
   useEffect(() => {
-    if (!title && !description && !category && !content && tags.length === 0 && !image && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl) {
+    if (!title && !description && !category && !content && tags.length === 0 && !image && !icon && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl) {
       return // Don't save empty form
     }
     
     const draft = {
-      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, content,
+      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content,
       cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle,
       timestamp: Date.now()
     }
@@ -145,7 +147,7 @@ export default function DevProjectsPage() {
     
     const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
     return () => clearTimeout(timer)
-  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle])
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -169,6 +171,7 @@ export default function DevProjectsPage() {
     setDemoUrl(project.demoUrl || "")
     setYoutubeUrl(project.youtubeUrl || "")
     setImage(project.image || "")
+    setIcon(project.icon || "")
     setTags(project.tags || [])
     setContent(project.content || "")
     setCardGradient(project.cardGradient || "")
@@ -205,6 +208,7 @@ export default function DevProjectsPage() {
         setDemoUrl(parsed.demoUrl || "")
         setYoutubeUrl(parsed.youtubeUrl || "")
         setImage(parsed.image || "")
+        setIcon(parsed.icon || "")
         setTags(parsed.tags || [])
         setContent(parsed.content || "")
         setCardGradient(parsed.cardGradient || "")
@@ -306,6 +310,31 @@ export default function DevProjectsPage() {
     }
   }
 
+  async function handleIconFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    try {
+      setUploading(true)
+      setResult("")
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
+        method: "POST", 
+        body: file 
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Upload failed")
+      }
+      setIcon(data.url)
+      setResult("Icon uploaded successfully")
+    } catch (err: unknown) {
+      const error = err as Error
+      setResult(error.message || "Upload error")
+    } finally {
+      setUploading(false)
+      if (iconFileInputRef.current) iconFileInputRef.current.value = ""
+    }
+  }
+
   async function handleDownloadFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -359,7 +388,7 @@ export default function DevProjectsPage() {
       setResult(`Missing required fields: ${missing.join(", ")}`)
       return
     }
-    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, tags, content }
+    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
@@ -415,6 +444,7 @@ export default function DevProjectsPage() {
         setDemoUrl("")
         setYoutubeUrl("")
         setImage("")
+        setIcon("")
         setTags([])
         setContent("")
         setCardGradient("")
@@ -485,6 +515,7 @@ export default function DevProjectsPage() {
                       setDemoUrl("")
                       setYoutubeUrl("")
                       setImage("")
+                      setIcon("")
                       setTags([])
                       setContent("")
                       setCardGradient("")
@@ -753,6 +784,77 @@ export default function DevProjectsPage() {
                             variant="ghost" 
                             size="icon"
                             onClick={() => setImage("")}
+                            className="hover:bg-red-500/20"
+                          >
+                            <X className="h-4 w-4 text-red-400" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
+                  <CardHeader className="bg-gradient-to-r from-orange-500/5 to-orange-400/10 border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-orange-500/20 to-orange-400/10 rounded-xl border border-orange-400/20">
+                        <ImageIcon className="h-5 w-5 text-orange-400" />
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">Project Icon</p>
+                        <p className="text-sm text-muted-foreground font-normal">Optional square icon for your project</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 p-6">
+                    <input
+                      ref={iconFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleIconFileSelect}
+                      className="hidden"
+                    />
+                    <div
+                      className="relative border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer group border-white/20 hover:border-orange-400/40 hover:bg-orange-500/5"
+                      onClick={() => iconFileInputRef.current?.click()}
+                    >
+                      {icon ? (
+                        <div className="relative">
+                          <img src={icon} alt="Icon Preview" className="w-24 h-24 mx-auto rounded-lg object-cover" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                            <div className="text-white">
+                              <Upload className="h-6 w-6 mx-auto mb-1" />
+                              <p className="text-xs font-medium">Click to change</p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 mx-auto mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                          <p className="text-base font-medium mb-1">Click to select an icon</p>
+                          <p className="text-xs text-muted-foreground mb-2">Square format recommended</p>
+                          <Button type="button" variant="outline" size="sm" className="group relative overflow-hidden mt-2 bg-gradient-to-r from-background/90 to-background/70 hover:from-orange-500/10 hover:to-orange-400/5 border border-orange-400/20 hover:border-orange-400/40 shadow-md hover:shadow-lg hover:shadow-orange-400/20 transition-all duration-300 hover:scale-105">
+                            <div className="absolute inset-0 bg-gradient-to-r from-orange-400/0 via-orange-400/5 to-orange-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                            <span className="relative z-10">Browse Files</span>
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <label className="text-sm font-medium mb-2 block">Or paste icon URL</label>
+                      <div className="flex gap-2">
+                        <EnhancedInput 
+                          value={icon} 
+                          onChange={e => setIcon(e.target.value)} 
+                          placeholder="https://images.com/icon.png"
+                          className="flex-1" 
+                        />
+                        {icon && (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => setIcon("")}
                             className="hover:bg-red-500/20"
                           >
                             <X className="h-4 w-4 text-red-400" />
@@ -1237,6 +1339,7 @@ Instructions for contributors...`}
                       setDemoUrl("")
                       setYoutubeUrl("")
                       setImage("")
+                      setIcon("")
                       setTags([])
                       setContent("")
                       setCardGradient("")
@@ -1267,6 +1370,7 @@ Instructions for contributors...`}
                       setDemoUrl("")
                       setYoutubeUrl("")
                       setImage("")
+                      setIcon("")
                       setTags([])
                       setContent("")
                       setCardGradient("")
