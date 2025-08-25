@@ -10,13 +10,128 @@ import { Separator } from "@/components/ui/separator"
 import { 
   Eye, Edit, FileText, Copy, Download, Save, Maximize2, Minimize2, 
   Bold, Italic, Code, Link, List, Image, Quote, Table, Heading,
-  Sparkles, Zap, Settings, Palette
+  Sparkles, Zap, Settings, Palette, CheckSquare, Terminal, Check
 } from "lucide-react"
 import { toast } from "sonner"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { useTheme } from 'next-themes'
+
+interface CodeBlockProps {
+  language: string
+  children: string
+  showLineNumbers?: boolean
+}
+
+function CodeBlock({ language, children, showLineNumbers = true }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false)
+  const { theme } = useTheme()
+  
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(children)
+      setCopied(true)
+      toast.success("Code copied!", { icon: "📋", duration: 1500 })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      toast.error("Failed to copy code")
+    }
+  }
+  
+  const getLanguageIcon = (lang: string) => {
+    const iconMap: Record<string, string> = {
+      javascript: "JS",
+      typescript: "TS",
+      python: "PY",
+      java: "JAVA",
+      cpp: "C++",
+      c: "C",
+      html: "HTML",
+      css: "CSS",
+      json: "JSON",
+      xml: "XML",
+      sql: "SQL",
+      bash: "BASH",
+      shell: "SH",
+      rust: "RS",
+      go: "GO",
+      php: "PHP"
+    }
+    return iconMap[lang.toLowerCase()] || "CODE"
+  }
+  
+  return (
+    <div className="group relative my-6 overflow-hidden rounded-lg border border-border/40 bg-background shadow-md hover:shadow-lg transition-all duration-200">
+      <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-b border-border/40">
+        <div className="flex items-center gap-3">
+          <div className="px-2 py-1 text-xs font-mono font-semibold bg-primary/10 text-primary rounded border border-primary/20">
+            {getLanguageIcon(language)}
+          </div>
+          <span className="text-sm text-muted-foreground font-mono">{language}</span>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={copyCode}
+          className="h-8 px-3 text-xs border-transparent hover:border-border/60 hover:bg-background/80 transition-all duration-200"
+        >
+          {copied ? (
+            <>
+              <Check className="h-3.5 w-3.5 mr-1.5 text-green-600" />
+              <span className="text-green-600 font-medium">Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5 mr-1.5" />
+              <span>Copy</span>
+            </>
+          )}
+        </Button>
+      </div>
+      <div className="relative">
+        <SyntaxHighlighter
+          style={theme === 'dark' ? vscDarkPlus : vs}
+          language={language}
+          PreTag="div"
+          showLineNumbers={showLineNumbers}
+          lineNumberStyle={{
+            minWidth: '3em',
+            paddingRight: '1em',
+            color: theme === 'dark' ? '#6B7280' : '#9CA3AF',
+            borderRight: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
+            marginRight: '1em',
+            textAlign: 'right',
+            userSelect: 'none',
+            backgroundColor: 'transparent'
+          }}
+          customStyle={{
+            margin: 0,
+            padding: '1.25rem',
+            background: 'transparent',
+            fontSize: '0.875rem',
+            lineHeight: '1.6',
+            fontFamily: 'JetBrains Mono, Fira Code, ui-monospace, SFMono-Regular, SF Mono, Monaco, Consolas, Liberation Mono, DejaVu Sans Mono, monospace',
+            color: 'inherit',
+            textShadow: 'none',
+            filter: 'none'
+          }}
+          codeTagProps={{
+            style: {
+              color: 'inherit',
+              background: 'transparent',
+              textShadow: 'none',
+              filter: 'none'
+            }
+          }}
+        >
+          {children.replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      </div>
+    </div>
+  )
+}
 
 interface MarkdownEditorEnhancedProps {
   value: string
@@ -120,6 +235,7 @@ export function MarkdownEditorEnhanced({
     { icon: List, label: "List", action: () => insertAtCursor("- ", "", "list item"), color: "text-pink-500", bg: "from-pink-500/10 to-pink-500/5", border: "border-pink-500/20", hoverBg: "hover:from-pink-500/20 hover:to-pink-500/10", hoverBorder: "hover:border-pink-500/30" },
     { icon: Quote, label: "Quote", action: () => insertAtCursor("> ", "", "quote"), color: "text-indigo-500", bg: "from-indigo-500/10 to-indigo-500/5", border: "border-indigo-500/20", hoverBg: "hover:from-indigo-500/20 hover:to-indigo-500/10", hoverBorder: "hover:border-indigo-500/30" },
     { icon: Image, label: "Image", action: () => insertAtCursor("![", "](image-url)", "alt text"), color: "text-emerald-500", bg: "from-emerald-500/10 to-emerald-500/5", border: "border-emerald-500/20", hoverBg: "hover:from-emerald-500/20 hover:to-emerald-500/10", hoverBorder: "hover:border-emerald-500/30" },
+    { icon: CheckSquare, label: "Checkbox", action: () => insertAtCursor("- [ ] ", "", "task item"), color: "text-violet-500", bg: "from-violet-500/10 to-violet-500/5", border: "border-violet-500/20", hoverBg: "hover:from-violet-500/20 hover:to-violet-500/10", hoverBorder: "hover:border-violet-500/30" },
   ]
 
   const themeClasses = {
@@ -300,34 +416,49 @@ export function MarkdownEditorEnhanced({
                           {children}
                         </a>
                       ),
-                      ul: ({children}) => (
-                        <ul className="space-y-2 list-disc pl-6 mb-4">
-                          {children}
-                        </ul>
-                      ),
+                      ul: ({children, className}) => {
+                        const isTaskList = className?.includes('contains-task-list')
+                        return (
+                          <ul className={`space-y-2 mb-4 ${isTaskList ? 'list-none pl-0' : 'list-disc pl-6'}`}>
+                            {children}
+                          </ul>
+                        )
+                      },
                       ol: ({children}) => (
                         <ol className="space-y-2 list-decimal pl-6 mb-4">
                           {children}
                         </ol>
                       ),
-                      li: ({children}) => (
-                        <li className="text-foreground leading-relaxed">
-                          {children}
-                        </li>
-                      ),
+                      li: ({children, className}) => {
+                        const isTaskListItem = className?.includes('task-list-item')
+                        return (
+                          <li className={`text-foreground leading-relaxed ${isTaskListItem ? 'list-none' : ''}`}>
+                            {children}
+                          </li>
+                        )
+                      },
+                      input: ({type, checked, disabled}) => {
+                        if (type === 'checkbox') {
+                          return (
+                            <input 
+                              type="checkbox" 
+                              checked={checked}
+                              disabled={disabled}
+                              className="mr-2 h-4 w-4 rounded border-border/50 text-primary focus:ring-primary/30 focus:ring-2 bg-background cursor-pointer disabled:cursor-default align-baseline translate-y-[1px]"
+                              readOnly
+                            />
+                          )
+                        }
+                        return <input type={type} checked={checked} disabled={disabled} />
+                      },
                       code: ({inline, className, children}: {inline?: boolean, className?: string, children?: React.ReactNode}) => {
                         const match = /language-(\w+)/.exec(className || '')
                         return !inline && match ? (
-                          <SyntaxHighlighter
-                            style={oneDark}
-                            language={match[1]}
-                            PreTag="div"
-                            className="rounded-xl border border-border/20 shadow-sm my-4"
-                          >
-                            {String(children).replace(/\n$/, '')}
-                          </SyntaxHighlighter>
+                          <CodeBlock language={match[1]}>
+                            {String(children)}
+                          </CodeBlock>
                         ) : (
-                          <code className="bg-gradient-to-r from-muted/80 to-muted/60 text-foreground px-2.5 py-1.5 rounded-md text-sm font-mono border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+                          <code className="bg-gradient-to-r from-primary/10 to-primary/5 text-foreground px-2.5 py-1.5 rounded-lg text-sm font-mono border border-primary/20 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] hover:border-primary/30 font-semibold">
                             {children}
                           </code>
                         )
@@ -496,16 +627,11 @@ export function MarkdownViewer({ content }: { content: string }) {
           code: ({inline, className, children}: {inline?: boolean, className?: string, children?: React.ReactNode}) => {
             const match = /language-(\w+)/.exec(className || '')
             return !inline && match ? (
-              <SyntaxHighlighter
-                style={oneDark}
-                language={match[1]}
-                PreTag="div"
-                className="rounded-xl border border-border/20 shadow-sm my-4"
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
+              <CodeBlock language={match[1]}>
+                {String(children)}
+              </CodeBlock>
             ) : (
-              <code className="bg-gradient-to-r from-muted/80 to-muted/60 text-foreground px-2.5 py-1.5 rounded-md text-sm font-mono border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+              <code className="bg-gradient-to-r from-primary/10 to-primary/5 text-foreground px-2.5 py-1.5 rounded-lg text-sm font-mono border border-primary/20 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] hover:border-primary/30 font-semibold">
                 {children}
               </code>
             )
