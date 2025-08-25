@@ -473,11 +473,6 @@ export function MarkdownViewer({ content }: { content: string }) {
               {children}
             </h4>
           ),
-          p: ({children}) => (
-            <p className="leading-7 mb-6 [&:not(:first-child)]:mt-6 text-foreground">
-              {children}
-            </p>
-          ),
           blockquote: ({children}) => (
             <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground bg-muted/30 py-2 rounded-r-lg">
               {children}
