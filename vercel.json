@@ -4,6 +4,16 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
   "outputDirectory": ".next",
+  "functions": {
+    "app/**": {
+      "runtime": "nodejs22.x"
+    }
+  },
+  "build": {
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

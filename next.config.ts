@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'framer-motion', '@fluentui/react-components', '@fluentui/react-icons'],
+    webpackBuildWorker: true,
+    parallelServerCompiles: true,
+    parallelServerBuildTraces: true,
+    optimisticClientCache: true,
   },
   turbopack: {
       rules: {
@@ -14,7 +18,10 @@ const nextConfig: NextConfig = {
     },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    styledComponents: true,
   },
+  //swcMinify: true,
+  compress: true,
   images: {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -24,7 +31,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
   },
-  //compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
   //output: 'standalone',
