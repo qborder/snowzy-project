@@ -278,7 +278,7 @@ export function ProjectCard({
             </div>
           </div>
         )}
-        <CardHeader className={reduce ? "pt-3 pb-0.5" : icon && isValidSrc(icon) ? "pt-5 pb-3" : "pt-4 pb-4"}>
+        <CardHeader className={reduce ? "pt-5 pb-0.5" : icon && isValidSrc(icon) ? "pt-3 pb-3" : "pt-4 pb-4"}>
           <div className={`flex items-start justify-between mb-3 ${icon && isValidSrc(icon) ? 'ml-29' : ''}`}>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className={`text-xs font-medium px-3 py-1 transition-all duration-300 group-hover:translate-y-[-2px] group-hover:scale-[1.05] hover:shadow-md ${
