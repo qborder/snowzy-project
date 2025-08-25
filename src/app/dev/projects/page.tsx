@@ -67,6 +67,7 @@ type Project = {
   demoUrl?: string
   youtubeUrl?: string
   image?: string
+  icon?: string
   tags: string[]
   createdAt?: string
   cardGradient?: string

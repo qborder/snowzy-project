@@ -10,6 +10,7 @@ interface Project {
   category: string
   views?: number
   downloads?: number
+  icon?: string
   [key: string]: unknown
 }
 

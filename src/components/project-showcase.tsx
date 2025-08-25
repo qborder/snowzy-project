@@ -16,6 +16,7 @@ type Project = {
   demoUrl?: string
   youtubeUrl?: string
   image?: string
+  icon?: string
   tags: string[]
 }
 
