@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag } from "lucide-react"
+import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 import { MarkdownEditorEnhanced } from "@/components/markdown-editor-enhanced"
@@ -88,6 +88,92 @@ type CustomTemplate = {
   tags: string[]
   cardGradient?: string
   cardColor?: string
+}
+
+const TemplateCard = ({ template, onApply, onDelete, isCustom }: { 
+  template: CustomTemplate,
+  onApply: () => void,
+  onDelete?: () => void,
+  isCustom: boolean
+}) => {
+  return (
+    <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-white/20 border-white/5 bg-gradient-to-br from-background/80 to-background/50 backdrop-blur-sm">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <CardHeader className="relative z-10 pb-3">
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-base font-semibold text-foreground/90 line-clamp-1">
+            {template.title}
+          </CardTitle>
+          {isCustom && onDelete && (
+            <Button 
+              type="button"
+              variant="ghost" 
+              size="icon" 
+              className="h-7 w-7 -mt-1.5 -mr-1.5 rounded-full opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete()
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+        <CardDescription className="line-clamp-2 text-sm h-10">
+          {template.description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="relative z-10 pt-0">
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {template.tags.slice(0, 4).map((tag, i) => (
+            <Badge 
+              key={i} 
+              variant="outline" 
+              className="text-[10px] px-1.5 py-0.5 h-5 bg-background/60 backdrop-blur-sm border-white/5 text-muted-foreground font-normal"
+            >
+              {tag}
+            </Badge>
+          ))}
+          {template.tags.length > 4 && (
+            <Badge 
+              variant="outline" 
+              className="text-[10px] px-1.5 py-0.5 h-5 bg-background/60 backdrop-blur-sm border-white/5 text-muted-foreground font-normal"
+            >
+              +{template.tags.length - 4}
+            </Badge>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 bg-background/60 backdrop-blur-sm hover:bg-primary/5 hover:text-foreground transition-colors border-white/10 group/btn min-w-[100px]"
+            onClick={onApply}
+          >
+            <div className="flex items-center justify-center w-full gap-1.5">
+              <span>Apply</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </Button>
+          {isCustom && onDelete && (
+            <Button 
+              type="button"
+              variant="ghost" 
+              size="icon"
+              className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete()
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 export default function DevProjectsPage() {
@@ -299,6 +385,37 @@ export default function DevProjectsPage() {
     if (template.cardColor) {
       setCardColor(template.cardColor)
       setUseCustomStyle(true)
+    }
+  }
+
+  async function handleIconDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragActive(false)
+    const files = Array.from(e.dataTransfer.files)
+    const imageFile = files.find(file => file.type.startsWith('image/'))
+    if (!imageFile) return
+    try {
+      setUploading(true)
+      setResult("")
+      const res = await fetch(`/api/upload?filename=icon_${Date.now()}_${encodeURIComponent(imageFile.name)}`, { 
+        method: 'POST',
+        body: imageFile,
+        headers: {
+          'Content-Type': imageFile.type
+        }
+      })
+      const data = await res.json()
+      if (data.url) {
+        setIcon(data.url)
+        setResult("Icon uploaded successfully!")
+      } else {
+        setResult("Failed to upload icon: " + (data.error || 'Unknown error'))
+      }
+    } catch (error) {
+      console.error('Error uploading icon:', error)
+      setResult("Error uploading icon: " + (error instanceof Error ? error.message : 'Unknown error'))
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -624,98 +741,175 @@ export default function DevProjectsPage() {
             
             <form onSubmit={onSubmit}>
               <TabsContent value="basic" className="space-y-6">
-                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
+                <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
+                  <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-white/5 p-5">
+                    <CardTitle className="flex items-center gap-4">
+                      <div className="p-2.5 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20 shadow-sm group-hover:shadow-primary/20 transition-all duration-300">
                         <Sparkles className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
-                        <p className="text-xl font-bold">Project Details</p>
-                        <p className="text-sm text-muted-foreground font-normal">Essential information about your project</p>
+                      <div className="space-y-1">
+                        <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Project Details</div>
+                        <p className="text-sm text-muted-foreground font-medium">Essential information about your project</p>
                       </div>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6 p-6">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Project Title</label>
-                      <EnhancedInput value={title} onChange={e => setTitle(e.target.value)} placeholder="My Awesome Project" className="text-lg" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Description</label>
-                      <textarea 
-                        value={description} 
-                        onChange={e => setDescription(e.target.value)} 
-                        placeholder="Describe what makes your project special..." 
-                        className="w-full rounded-lg border border-white/20 bg-background/60 backdrop-blur-sm p-4 min-h-[120px] resize-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors" 
+                  <CardContent className="space-y-8 p-6">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                        <span>Project Title</span>
+                        <span className="text-destructive">*</span>
+                      </label>
+                      <EnhancedInput 
+                        value={title} 
+                        onChange={e => setTitle(e.target.value)} 
+                        placeholder="My Awesome Project" 
+                        className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-primary/30 focus:border-primary/50" 
                       />
                     </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Category</label>
-                      <div className="flex gap-2 mb-2">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                        <span>Description</span>
+                        <span className="text-destructive">*</span>
+                      </label>
+                      <div className="relative group/textarea">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/0 rounded-lg opacity-0 group-hover/textarea:opacity-100 transition-opacity -z-10" />
+                        <textarea 
+                          value={description} 
+                          onChange={e => setDescription(e.target.value)} 
+                          placeholder="Describe what makes your project special..." 
+                          className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-primary/50 focus:ring-2 focus:ring-primary/30 transition-all duration-200 backdrop-blur-sm" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                          <span>Category</span>
+                          <span className="text-destructive">*</span>
+                        </label>
+                        <span className="text-xs text-muted-foreground">{category ? `${category.length}/40` : '0/40'}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
                         {["Roblox", "Roblox Studio", "Web Development", "Mobile Development", "Game Development"].map(cat => (
                           <Badge 
                             key={cat}
-                            variant={category === cat ? "default" : "outline"}
-                            className="cursor-pointer transition-colors hover:bg-primary/20"
+                            variant={category === cat ? "default" : "secondary"}
+                            className={`cursor-pointer transition-all duration-200 border ${
+                              category === cat 
+                                ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/15' 
+                                : 'bg-background/60 hover:bg-accent/50 border-white/10 hover:border-white/20'
+                            }`}
                             onClick={() => setCategory(cat)}
                           >
-                            {(cat === "Roblox" || cat === "Roblox Studio") && <Gamepad2 className="h-3 w-3 mr-1" />}
-                            {cat.includes("Web") && <Globe className="h-3 w-3 mr-1" />}
-                            {cat.includes("Mobile") && <Code className="h-3 w-3 mr-1" />}
+                            {(cat === "Roblox" || cat === "Roblox Studio") && <Gamepad2 className="h-3 w-3 mr-1.5" />}
+                            {cat.includes("Web") && <Globe className="h-3 w-3 mr-1.5" />}
+                            {cat.includes("Mobile") && <Code className="h-3 w-3 mr-1.5" />}
                             {cat}
                           </Badge>
                         ))}
                       </div>
-                      <EnhancedInput value={category} onChange={e => setCategory(e.target.value)} placeholder="Or enter custom category" />
+                      <EnhancedInput 
+                        value={category} 
+                        onChange={e => setCategory(e.target.value.slice(0, 40))} 
+                        placeholder="Or enter custom category" 
+                        className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors"
+                      />
                     </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
-                        <Tag className="h-5 w-5 text-primary" />
+                <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
+                  <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-400/5 border-b border-blue-400/10 p-5">
+                    <CardTitle className="flex items-center gap-4">
+                      <div className="p-2.5 bg-gradient-to-br from-blue-500/20 to-blue-400/10 rounded-xl border border-blue-400/20 shadow-sm group-hover:shadow-blue-400/20 transition-all duration-300">
+                        <Tag className="h-5 w-5 text-blue-400" />
                       </div>
-                      <div>
-                        <p className="text-xl font-bold">Technologies & Tags</p>
-                        <p className="text-sm text-muted-foreground font-normal">Help others discover your project</p>
+                      <div className="space-y-1">
+                        <div className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent">Technologies & Tags</div>
+                        <p className="text-sm text-muted-foreground font-medium">Help others discover your project</p>
                       </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6 p-6">
-                    <div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {tags.map(tag => (
-                          <Badge key={tag} variant="secondary" className="group cursor-pointer">
-                            {tag}
-                            <X className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => removeTag(tag)} />
-                          </Badge>
-                        ))}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Technologies & Tags
+                          <span className="text-destructive ml-1">*</span>
+                        </label>
+                        <span className="text-xs text-muted-foreground">{tags.length} tags</span>
                       </div>
-                      <div className="flex gap-2">
-                        <EnhancedInput 
-                          value={tagInput} 
-                          onChange={e => setTagInput(e.target.value)}
-                          onKeyDown={handleTagKeyPress}
-                          placeholder="Add tags (press Enter or comma)" 
-                          className="flex-1"
-                        />
-                        <Button type="button" variant="outline" className="group relative overflow-hidden bg-gradient-to-r from-background/90 to-background/70 hover:from-primary/10 hover:to-primary/5 border border-primary/20 hover:border-primary/40 shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105" onClick={() => addTag(tagInput.trim())}>
-                          <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-                          <span className="relative z-10">Add</span>
+                      
+                      <div className="relative group/input">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-blue-400/3 rounded-lg opacity-0 group-hover/input:opacity-100 transition-opacity -z-10" />
+                        <div className="flex flex-wrap gap-2 p-2.5 min-h-[44px] rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 transition-colors">
+                          {tags.map(tag => (
+                            <Badge 
+                              key={tag} 
+                              variant="secondary" 
+                              className="group/tag flex items-center gap-1 bg-background/80 hover:bg-background border border-white/10 hover:border-white/20 transition-colors"
+                            >
+                              <span className="text-foreground/90">{tag}</span>
+                              <X 
+                                className="h-3 w-3 text-muted-foreground hover:text-foreground transition-colors" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeTag(tag);
+                                }} 
+                              />
+                            </Badge>
+                          ))}
+                          <input
+                            type="text"
+                            value={tagInput}
+                            onChange={e => setTagInput(e.target.value)}
+                            onKeyDown={handleTagKeyPress}
+                            placeholder={tags.length ? "" : "Add tags (press Enter or comma)"}
+                            className="flex-1 min-w-[150px] bg-transparent outline-none text-sm placeholder:text-muted-foreground/60"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">
+                          {tags.length === 0 ? (
+                            <span className="text-amber-400">Add at least one tag</span>
+                          ) : tags.length < 3 ? (
+                            <span className="text-amber-400">Add {3 - tags.length} more for better visibility</span>
+                          ) : (
+                            <span>Tags help others discover your project</span>
+                          )}
+                        </p>
+                        <Button 
+                          type="button" 
+                          size="sm" 
+                          variant="ghost" 
+                          className="h-7 px-2.5 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors"
+                          onClick={() => addTag(tagInput.trim())}
+                          disabled={!tagInput.trim()}
+                        >
+                          Add Tag
                         </Button>
                       </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">Quick add:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {SUGGESTED_TAGS.filter(tag => !tags.includes(tag)).slice(0, 8).map(tag => (
-                          <Badge key={tag} variant="outline" className="cursor-pointer text-xs hover:bg-primary/10" onClick={() => addTag(tag)}>
-                            + {tag}
-                          </Badge>
-                        ))}
+                    
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">Popular tags:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {SUGGESTED_TAGS
+                          .filter(tag => !tags.includes(tag))
+                          .slice(0, 8)
+                          .map(tag => (
+                            <Badge 
+                              key={tag} 
+                              variant="outline" 
+                              className="cursor-pointer text-xs px-2 py-0.5 h-6 bg-background/60 hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-400/30 transition-colors" 
+                              onClick={() => addTag(tag)}
+                            >
+                              + {tag}
+                            </Badge>
+                          ))
+                        }
                       </div>
                     </div>
                   </CardContent>
@@ -724,56 +918,115 @@ export default function DevProjectsPage() {
               
               
               <TabsContent value="links" className="space-y-6">
-                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
-                        <ExternalLink className="h-5 w-5 text-primary" />
+                <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
+                  <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-400/5 border-b border-green-400/10 p-5">
+                    <CardTitle className="flex items-center gap-4">
+                      <div className="p-2.5 bg-gradient-to-br from-green-500/20 to-green-400/10 rounded-xl border border-green-400/20 shadow-sm group-hover:shadow-green-400/20 transition-all duration-300">
+                        <ExternalLink className="h-5 w-5 text-green-400" />
                       </div>
-                      <div>
-                        <p className="text-xl font-bold">Project Links</p>
-                        <p className="text-sm text-muted-foreground font-normal">Connect your project resources</p>
+                      <div className="space-y-1">
+                        <div className="text-xl font-bold bg-gradient-to-r from-green-400 to-green-300 bg-clip-text text-transparent">Project Links</div>
+                        <p className="text-sm text-muted-foreground font-medium">Connect your project resources</p>
                       </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6 p-6">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">GitHub Repository</label>
-                      <EnhancedInput value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username/repo" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Live Demo</label>
-                      <EnhancedInput value={demoUrl} onChange={e => setDemoUrl(e.target.value)} placeholder="https://your-project.com" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Download Link</label>
-                      <div className="flex gap-2">
-                        <EnhancedInput value={downloadUrl} onChange={e => setDownloadUrl(e.target.value)} placeholder="https://releases.com/download" className="flex-1" />
-                        <input ref={downloadFileInputRef} type="file" onChange={handleDownloadFileSelect} className="hidden" />
-                        <Button type="button" variant="outline" className="group relative overflow-hidden bg-gradient-to-r from-background/90 to-background/70 hover:from-blue-500/10 hover:to-blue-400/5 border border-blue-400/20 hover:border-blue-400/40 shadow-md hover:shadow-lg hover:shadow-blue-400/20 transition-all duration-300 hover:scale-105" onClick={() => downloadFileInputRef.current?.click()} disabled={uploading}>
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-blue-400/5 to-blue-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-                          <span className="relative z-10">{uploading ? "Uploading..." : "Upload File"}</span>
-                        </Button>
+                    <div className="space-y-5">
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                          <Globe className="h-3.5 w-3.5 text-green-400/80" />
+                          <span>GitHub Repository</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg className="h-4 w-4 text-muted-foreground/60" fill="currentColor" viewBox="0 0 24 24">
+                              <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.027 2.747-1.027.546 1.377.202 2.394.1 2.646.64.7 1.028 1.593 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.19 22 16.428 22 12.017 22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <EnhancedInput 
+                            value={githubUrl} 
+                            onChange={e => setGithubUrl(e.target.value)} 
+                            placeholder="https://github.com/username/repo" 
+                            className="pl-9 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">YouTube Demo</label>
-                      <EnhancedInput value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
+                      
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                          <ExternalLink className="h-3.5 w-3.5 text-green-400/80" />
+                          <span>Live Demo</span>
+                        </label>
+                        <EnhancedInput 
+                          value={demoUrl} 
+                          onChange={e => setDemoUrl(e.target.value)} 
+                          placeholder="https://your-project.com" 
+                          className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
+                        />
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                          <Download className="h-3.5 w-3.5 text-green-400/80" />
+                          <span>Download Link</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <EnhancedInput 
+                              value={downloadUrl} 
+                              onChange={e => setDownloadUrl(e.target.value)} 
+                              placeholder="https://releases.com/download" 
+                              className="w-full h-10 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
+                            />
+                          </div>
+                          <input ref={downloadFileInputRef} type="file" onChange={handleDownloadFileSelect} className="hidden" />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm"
+                            className="h-10 px-3.5 whitespace-nowrap bg-background/60 hover:bg-green-500/10 border-green-400/20 text-green-400 hover:text-green-300 hover:border-green-400/40 transition-colors flex-shrink-0" 
+                            onClick={() => downloadFileInputRef.current?.click()} 
+                            disabled={uploading}
+                          >
+                            {uploading ? (
+                              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                            ) : (
+                              <Upload className="h-4 w-4 mr-1.5" />
+                            )}
+                            {uploading ? "Uploading..." : "Upload"}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                          <svg className="h-3.5 w-3.5 text-green-400/80" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                          </svg>
+                          <span>YouTube Demo</span>
+                        </label>
+                        <EnhancedInput 
+                          value={youtubeUrl} 
+                          onChange={e => setYoutubeUrl(e.target.value)} 
+                          placeholder="https://www.youtube.com/watch?v=..." 
+                          className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
               
               <TabsContent value="media" className="space-y-6">
-                <Card className="bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/20">
-                        <ImageIcon className="h-5 w-5 text-primary" />
+                <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
+                  <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-400/5 border-b border-purple-400/10 p-5">
+                    <CardTitle className="flex items-center gap-4">
+                      <div className="p-2.5 bg-gradient-to-br from-purple-500/20 to-purple-400/10 rounded-xl border border-purple-400/20 shadow-sm group-hover:shadow-purple-400/20 transition-all duration-300">
+                        <ImageIcon className="h-5 w-5 text-purple-400" />
                       </div>
-                      <div>
-                        <p className="text-xl font-bold">Project Image</p>
-                        <p className="text-sm text-muted-foreground font-normal">Visual showcase for your project</p>
+                      <div className="space-y-1">
+                        <div className="text-xl font-bold bg-gradient-to-r from-purple-400 to-purple-300 bg-clip-text text-transparent">Project Image</div>
+                        <p className="text-sm text-muted-foreground font-medium">Visual showcase for your project</p>
                       </div>
                     </CardTitle>
                   </CardHeader>
@@ -786,34 +1039,56 @@ export default function DevProjectsPage() {
                       className="hidden"
                     />
                     <div
-                      className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer group ${
-                        dragActive ? "border-primary bg-primary/5" : "border-white/20 hover:border-primary/40 hover:bg-primary/5"
+                      className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group/upload ${
+                        dragActive 
+                          ? "border-primary/60 bg-primary/5" 
+                          : "border-white/10 hover:border-primary/40 hover:bg-primary/5"
                       }`}
                       onDrop={handleDrop}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onClick={() => fileInputRef.current?.click()}
                     >
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-xl opacity-0 group-hover/upload:opacity-100 transition-opacity duration-300 -z-10" />
+                      
                       {image ? (
-                        <div className="relative">
-                          <img src={image} alt="Preview" className="max-w-full max-h-48 mx-auto rounded-lg" />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                            <div className="text-white">
-                              <Upload className="h-8 w-8 mx-auto mb-2" />
-                              <p className="text-sm font-medium">Click to change image</p>
+                        <div className="relative group/image-preview">
+                          <div className="relative overflow-hidden rounded-lg bg-background/20">
+                            <img 
+                              src={image} 
+                              alt="Preview" 
+                              className="w-full max-h-64 object-contain mx-auto rounded-lg transition-all duration-300 group-hover/image-preview:scale-[1.02]" 
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover/image-preview:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                              <div className="text-center space-y-3 transform translate-y-4 group-hover/image-preview:translate-y-0 transition-all duration-300">
+                                <div className="inline-flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-white/10 backdrop-blur-sm border border-white/20 group-hover:bg-white/20 transition-colors">
+                                  <Upload className="h-5 w-5 text-white" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-white">Click to change image</p>
+                                  <p className="text-xs text-white/70 mt-1">or drag and drop a new one</p>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <>
-                          <Upload className="h-12 w-12 mx-auto mb-4 opacity-60 group-hover:opacity-100 transition-opacity" />
-                          <p className="text-lg font-medium mb-2">Click to select or drag an image</p>
-                          <p className="text-sm text-muted-foreground mb-2">Supports JPG, PNG, GIF, WebP</p>
-                          <Button type="button" variant="outline" size="sm" className="group relative overflow-hidden mt-2 bg-gradient-to-r from-background/90 to-background/70 hover:from-green-500/10 hover:to-green-400/5 border border-green-400/20 hover:border-green-400/40 shadow-md hover:shadow-lg hover:shadow-green-400/20 transition-all duration-300 hover:scale-105">
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-400/0 via-green-400/5 to-green-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-                            <span className="relative z-10">Browse Files</span>
-                          </Button>
-                        </>
+                        <div className="py-8 px-4 transition-all duration-300 group-hover/upload:scale-[1.01]">
+                          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/upload:bg-purple-500/20 group-hover/upload:text-purple-300 transition-colors">
+                            <Upload className="h-6 w-6" />
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-base font-medium text-foreground">
+                              {dragActive ? 'Drop image here' : 'Upload project image'}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Drag & drop or <span className="text-primary font-medium">browse files</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground pt-2">
+                              Recommended: 1200×630px • JPG, PNG, WebP (max 5MB)
+                            </p>
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="relative">
@@ -849,7 +1124,7 @@ export default function DevProjectsPage() {
                       </div>
                       <div>
                         <p className="text-xl font-bold">Project Icon</p>
-                        <p className="text-sm text-muted-foreground font-normal">Optional square icon for your project</p>
+                        <p className="text-sm text-muted-foreground font-normal">Square icon that represents your project</p>
                       </div>
                     </CardTitle>
                   </CardHeader>
@@ -862,29 +1137,53 @@ export default function DevProjectsPage() {
                       className="hidden"
                     />
                     <div
-                      className="relative border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer group border-white/20 hover:border-orange-400/40 hover:bg-orange-500/5"
+                      className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group/upload ${
+                        dragActive 
+                          ? "border-orange-400/60 bg-orange-500/5" 
+                          : "border-white/10 hover:border-orange-400/40 hover:bg-orange-500/5"
+                      }`}
+                      onDrop={handleIconDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
                       onClick={() => iconFileInputRef.current?.click()}
                     >
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent rounded-xl opacity-0 group-hover/upload:opacity-100 transition-opacity duration-300 -z-10" />
+                      
                       {icon ? (
-                        <div className="relative">
-                          <img src={icon} alt="Icon Preview" className="w-24 h-24 mx-auto rounded-lg object-cover" />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                            <div className="text-white">
-                              <Upload className="h-6 w-6 mx-auto mb-1" />
-                              <p className="text-xs font-medium">Click to change</p>
+                        <div className="relative group/icon-preview">
+                          <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-xl bg-background/20">
+                            <img 
+                              src={icon} 
+                              alt="Icon Preview" 
+                              className="w-full h-full object-cover transition-all duration-300 group-hover/icon-preview:scale-105" 
+                            />
+                            <div className="absolute inset-0 bg-black/70 opacity-0 group-hover/icon-preview:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                              <div className="text-center space-y-2 transform translate-y-3 group-hover/icon-preview:translate-y-0 transition-all duration-300">
+                                <div className="inline-flex items-center justify-center w-10 h-10 mx-auto rounded-full bg-white/10 backdrop-blur-sm border border-white/20 group-hover/icon-preview:bg-white/20 transition-colors">
+                                  <Upload className="h-4 w-4 text-white" />
+                                </div>
+                                <p className="text-xs font-medium text-white">Click to change icon</p>
+                              </div>
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <>
-                          <Upload className="h-8 w-8 mx-auto mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
-                          <p className="text-base font-medium mb-1">Click to select an icon</p>
-                          <p className="text-xs text-muted-foreground mb-2">Square format recommended</p>
-                          <Button type="button" variant="outline" size="sm" className="group relative overflow-hidden mt-2 bg-gradient-to-r from-background/90 to-background/70 hover:from-orange-500/10 hover:to-orange-400/5 border border-orange-400/20 hover:border-orange-400/40 shadow-md hover:shadow-lg hover:shadow-orange-400/20 transition-all duration-300 hover:scale-105">
-                            <div className="absolute inset-0 bg-gradient-to-r from-orange-400/0 via-orange-400/5 to-orange-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-                            <span className="relative z-10">Browse Files</span>
-                          </Button>
-                        </>
+                        <div className="py-8 px-4 transition-all duration-300 group-hover/upload:scale-[1.01]">
+                          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover/upload:bg-orange-500/20 group-hover/upload:text-orange-300 transition-colors">
+                            <ImageIcon className="h-6 w-6" />
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-base font-medium text-foreground">
+                              {dragActive ? 'Drop icon here' : 'Upload project icon'}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Drag & drop or <span className="text-orange-400 font-medium">browse files</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground pt-2">
+                              Recommended: 512×512px • PNG with transparency
+                            </p>
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="relative">
@@ -944,32 +1243,50 @@ Instructions for contributors...`}
               </TabsContent>
               
               <TabsContent value="style" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Palette className="h-5 w-5" />
-                      Project Styling
-                    </CardTitle>
-                    <CardDescription>Customize how your project looks</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
+                <Card className="border-white/10 bg-gradient-to-br from-background/80 to-background/50 backdrop-blur-sm">
+                  <CardHeader className="border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-indigo-400/10 rounded-xl border border-indigo-400/20">
+                        <Palette className="h-5 w-5 text-indigo-400" />
+                      </div>
                       <div>
-                        <label className="text-sm font-medium">Use Custom Styling</label>
-                        <p className="text-xs text-muted-foreground">Override default card appearance</p>
+                        <p className="text-xl font-bold">Project Styling</p>
+                        <p className="text-sm text-muted-foreground font-normal">Customize the card appearance</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 p-6">
+                    <div className="flex items-center justify-between p-4 bg-background/50 rounded-lg border border-white/10">
+                      <div>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <span>Custom Styling</span>
+                          <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
+                            BETA
+                          </span>
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1">Enable to customize the card appearance</p>
                       </div>
                       <Switch 
                         checked={useCustomStyle}
                         onCheckedChange={setUseCustomStyle}
+                        className="data-[state=checked]:bg-indigo-600 data-[state=unchecked]:bg-white/10"
                       />
                     </div>
                     
                     {useCustomStyle && (
                       <>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">Background Gradient</label>
-                          <div className="space-y-2">
-                            <div className="grid grid-cols-4 gap-2">
+                        <div className="space-y-4 p-4 bg-background/30 rounded-lg border border-white/10">
+                          <div>
+                            <h4 className="text-sm font-medium flex items-center gap-2">
+                              <span>Background</span>
+                              <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
+                GRADIENT
+              </span>
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-1">Choose a gradient or solid color for the card background</p>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-4 gap-3">
                               {[
                                 "bg-gradient-to-br from-blue-600 to-purple-700",
                                 "bg-gradient-to-br from-emerald-500 to-blue-600",
@@ -1004,33 +1321,50 @@ Instructions for contributors...`}
                                 "bg-gradient-to-br from-emerald-700 to-cyan-700",
                                 "bg-gradient-to-br from-violet-700 to-fuchsia-700"
                               ].map(gradient => (
-                                <button
-                                  key={gradient}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault()
-                                    setCardGradient(gradient)
-                                  }}
-                                  className={`h-12 rounded-lg ${gradient} ${cardGradient === gradient ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''} hover:scale-105 transition-transform`}
-                                />
+                                <div key={gradient} className="relative group">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      setCardGradient(gradient)
+                                      setCardColor("")
+                                    }}
+                                    className={`w-full aspect-square rounded-lg ${gradient} ${cardGradient === gradient ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-background' : 'ring-1 ring-white/10 hover:ring-white/20'} transition-all hover:scale-105`}
+                                    title={gradient.replace('bg-', '').replace(/-/g, ' ')}
+                                  />
+                                  {cardGradient === gradient && (
+                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-500 rounded-full flex items-center justify-center">
+                                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                    </div>
+                                  )}
+                                </div>
                               ))}
                             </div>
-                            <EnhancedInput 
-                              value={cardGradient}
-                              onChange={e => setCardGradient(e.target.value)}
-                              placeholder="Custom gradient class (e.g., bg-gradient-to-r from-red-500 to-blue-500)"
-                            />
-                            <GradientPicker 
-                              value={cardGradient}
-                              onChange={setCardGradient}
-                            />
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <label className="text-xs font-medium text-muted-foreground">Custom Gradient</label>
+                                <GradientPicker 
+                                  value={cardGradient}
+                                  onChange={setCardGradient}
+                                />
+                              </div>
+                              <EnhancedInput 
+                                value={cardGradient}
+                                onChange={e => setCardGradient(e.target.value)}
+                                placeholder="bg-gradient-to-r from-indigo-500 to-purple-600"
+                                className="font-mono text-xs"
+                              />
+                            </div>
                           </div>
                         </div>
                         
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">Solid Color</label>
-                          <div className="space-y-2">
-                            <div className="grid grid-cols-6 gap-2">
+                        <div className="space-y-4 p-4 bg-background/30 rounded-lg border border-white/10">
+                          <div>
+                            <h4 className="text-sm font-medium">Solid Color</h4>
+                            <p className="text-xs text-muted-foreground mt-1">Choose a solid color for the card background</p>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-8 gap-2">
                               {[
                                 "bg-red-500",
                                 "bg-blue-500",
@@ -1051,16 +1385,23 @@ Instructions for contributors...`}
                                 "bg-slate-800",
                                 "bg-gray-800"
                               ].map(color => (
-                                <button
-                                  key={color}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault()
-                                    setCardColor(color)
-                                    setCardGradient("")
-                                  }}
-                                  className={`h-12 rounded-lg ${color} ${cardColor === color && !cardGradient ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
-                                />
+                                <div key={color} className="relative group">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      setCardColor(color)
+                                      setCardGradient("")
+                                    }}
+                                    className={`w-full aspect-square rounded-lg ${color} ${cardColor === color && !cardGradient ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-background' : 'ring-1 ring-white/10 hover:ring-white/20'} transition-all hover:scale-105`}
+                                    title={color.replace('bg-', '').replace(/-/g, ' ')}
+                                  />
+                                  {cardColor === color && !cardGradient && (
+                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-500 rounded-full flex items-center justify-center">
+                                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                    </div>
+                                  )}
+                                </div>
                               ))}
                             </div>
                             <EnhancedInput 
@@ -1086,7 +1427,10 @@ Instructions for contributors...`}
                             className="group relative overflow-hidden w-full bg-gradient-to-r from-background/90 to-background/70 hover:from-red-500/10 hover:to-red-400/5 border border-red-400/20 hover:border-red-400/40 shadow-md hover:shadow-lg hover:shadow-red-400/20 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-                            <span className="relative z-10">Reset to Default</span>
+                            <span className="relative z-10 flex items-center gap-2">
+                              <Trash2 className="h-4 w-4" />
+                              Reset to Default
+                            </span>
                           </Button>
                         </div>
                       </>
@@ -1094,23 +1438,33 @@ Instructions for contributors...`}
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Palette className="h-5 w-5" />
-                      Title Styling
-                    </CardTitle>
-                    <CardDescription>Customize the project title appearance</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
+                <Card className="border-white/10 bg-gradient-to-br from-background/80 to-background/50 backdrop-blur-sm">
+                  <CardHeader className="border-b border-white/10">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-amber-500/20 to-amber-400/10 rounded-xl border border-amber-400/20">
+                        <Type className="h-5 w-5 text-amber-400" />
+                      </div>
                       <div>
-                        <label className="text-sm font-medium">Use Custom Title Style</label>
-                        <p className="text-xs text-muted-foreground">Override default title styling</p>
+                        <p className="text-xl font-bold">Title Styling</p>
+                        <p className="text-sm text-muted-foreground font-normal">Customize the title appearance</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 p-6">
+                    <div className="flex items-center justify-between p-4 bg-background/50 rounded-lg border border-white/10">
+                      <div>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <span>Custom Title Styling</span>
+                          <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-500/20">
+                            BETA
+                          </span>
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1">Enable to customize the title appearance</p>
                       </div>
                       <Switch 
                         checked={useTitleCustomStyle}
                         onCheckedChange={setUseTitleCustomStyle}
+                        className="data-[state=checked]:bg-amber-600 data-[state=unchecked]:bg-white/10"
                       />
                     </div>
                     
@@ -1252,103 +1606,144 @@ Instructions for contributors...`}
                 </Card>
               </TabsContent>
               
-              <TabsContent value="templates" className="space-y-6">
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle>Save as Custom Template</CardTitle>
-                    <CardDescription>Save your current project configuration as a reusable template</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2">
-                      <EnhancedInput 
-                        value={templateName}
-                        onChange={e => setTemplateName(e.target.value)}
-                        placeholder="Enter template name..."
-                        className="flex-1"
-                      />
-                      <Button 
-                        type="button" 
-                        onClick={() => {
-                          if (templateName.trim() && title && description && category) {
-                            const newTemplate: CustomTemplate = { 
-                              title, 
-                              description, 
-                              category, 
-                              tags,
-                              ...(useCustomStyle && cardGradient && { cardGradient }),
-                              ...(useCustomStyle && cardColor && { cardColor })
-                            }
-                            const updated = { ...customTemplates, [templateName]: newTemplate }
-                            setCustomTemplates(updated)
-                            localStorage.setItem('customTemplates', JSON.stringify(updated))
-                            setTemplateName("")
-                            setResult("Template saved successfully!")
-                          }
-                        }}
-                        disabled={!templateName.trim() || !title || !description || !category}
-                        className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary/95 to-primary/90 hover:from-primary/95 hover:via-primary hover:to-primary text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30 border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                        <span className="relative z-10">Save Template</span>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {Object.keys(customTemplates).length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3">Your Custom Templates</h3>
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {Object.entries(customTemplates).map(([key, template]) => (
-                        <Card key={key} className="group relative cursor-pointer hover:shadow-md transition-shadow" onClick={() => applyTemplate(template)}>
-                          <button
-                            type="button"
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              const updated = { ...customTemplates }
-                              delete updated[key]
+              <TabsContent value="templates" className="space-y-8">
+                <div className="grid gap-6">
+                  <Card className="bg-gradient-to-br from-orange-500/5 to-orange-400/3 border-orange-500/10 group">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-400/5 border border-orange-500/10">
+                          <Sparkles className="h-5 w-5 text-orange-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl font-bold bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">Save as Template</CardTitle>
+                          <CardDescription>Save your current project configuration as a reusable template</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex-1 relative">
+                          <EnhancedInput 
+                            value={templateName}
+                            onChange={e => setTemplateName(e.target.value)}
+                            placeholder="Enter a name for your template..."
+                            className="w-full bg-background/50 backdrop-blur-sm border-white/10 focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20"
+                          />
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span className="text-xs text-muted-foreground">{templateName.length}/40</span>
+                          </div>
+                        </div>
+                        <Button 
+                          type="button" 
+                          onClick={() => {
+                            if (templateName.trim() && title && description && category) {
+                              const newTemplate: CustomTemplate = { 
+                                title, 
+                                description, 
+                                category, 
+                                tags: [...tags],
+                                ...(useCustomStyle && cardGradient && { cardGradient }),
+                                ...(useCustomStyle && cardColor && { cardColor })
+                              }
+                              const updated = { ...customTemplates, [templateName]: newTemplate }
                               setCustomTemplates(updated)
                               localStorage.setItem('customTemplates', JSON.stringify(updated))
-                            }}
-                          >
-                            <X className="h-4 w-4 text-red-400" />
-                          </button>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">{key}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground mb-3">{template.description.substring(0, 80)}...</p>
-                            <Badge variant="outline" className="text-xs">{template.category}</Badge>
-                          </CardContent>
-                        </Card>
-                      ))}
+                              setTemplateName("")
+                              setResult({
+                                type: "success",
+                                message: `Template "${templateName}" saved successfully!`
+                              })
+                            }
+                          }}
+                          disabled={!templateName.trim() || templateName.length > 40 || !title || !description || !category}
+                          className="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-500/90 hover:to-orange-400/90 text-white shadow-lg hover:shadow-xl hover:shadow-orange-500/20 border border-orange-500/20 hover:border-orange-400/40 transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-white/10 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-full group-hover:translate-x-full" />
+                          <span className="relative z-10 flex items-center">
+                            <Sparkles className="h-4 w-4 mr-1.5" />
+                            Save Template
+                          </span>
+                        </Button>
+                      </div>
+                      {templateName.length > 35 && (
+                        <p className="mt-1.5 text-xs text-amber-500 flex items-center">
+                          <span className="w-4 h-4 mr-1">⚠️</span>
+                          Keep template names under 40 characters
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-foreground/90 flex items-center gap-2">
+                      <span className="w-1 h-5 rounded-full bg-orange-400"></span>
+                      Available Templates
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground bg-background/50 px-2 py-1 rounded-full border border-white/5">
+                        {Object.keys({...DEFAULT_TEMPLATES, ...customTemplates}).length} templates
+                      </span>
+                      <div className="h-8 w-px bg-white/10 mx-1"></div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-white/5"
+                        onClick={() => document.getElementById('default-templates')?.scrollIntoView({ behavior: 'smooth' })}
+                      >
+                        <LayoutGrid className="h-3.5 w-3.5 mr-1.5" />
+                        Default Templates
+                      </Button>
                     </div>
                   </div>
-                )}
-                
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Default Templates</h3>
-                  <div className="grid gap-4 md:grid-cols-3">
+
+                  {Object.keys(customTemplates).length > 0 ? (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {Object.entries(customTemplates).map(([key, template]) => (
+                        <TemplateCard 
+                          key={key}
+                          template={template}
+                          onApply={() => applyTemplate(template)}
+                          onDelete={() => {
+                            const { [key]: _, ...rest } = customTemplates
+                            setCustomTemplates(rest)
+                            localStorage.setItem('customTemplates', JSON.stringify(rest))
+                            setResult({
+                              type: "success",
+                              message: `Template "${template.title}" deleted`
+                            })
+                          }}
+                          isCustom={true}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border-2 border-dashed border-white/10 p-8 text-center">
+                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-orange-500/10 mb-3">
+                        <Sparkles className="h-5 w-5 text-orange-400" />
+                      </div>
+                      <h4 className="text-sm font-medium text-foreground/90 mb-1">No custom templates yet</h4>
+                      <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                        Save your project configuration as a template to quickly apply it to future projects.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div id="default-templates" className="space-y-4 pt-4">
+                  <h3 className="text-lg font-semibold text-foreground/90 flex items-center gap-2">
+                    <span className="w-1 h-5 rounded-full bg-blue-400"></span>
+                    Default Templates
+                  </h3>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {Object.entries(DEFAULT_TEMPLATES).map(([key, template]) => (
-                    <Card key={key} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => applyTemplate(template)}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-2">
-                          {(key === "roblox" || key.startsWith("roblox")) && <Gamepad2 className="h-5 w-5 text-primary" />}
-                          {key === "web" && <Globe className="h-5 w-5 text-primary" />}
-                          {key === "mobile" && <Code className="h-5 w-5 text-primary" />}
-                          <CardTitle className="text-lg">{template.title}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-3">{template.description.substring(0, 80)}...</p>
-                        <div className="flex flex-wrap gap-1">
-                          {template.tags.slice(0, 3).map(tag => (
-                            <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
+                      <TemplateCard 
+                        key={key}
+                        template={template}
+                        onApply={() => applyTemplate(template)}
+                        isCustom={false}
+                      />
                     ))}
                   </div>
                 </div>
@@ -1356,22 +1751,26 @@ Instructions for contributors...`}
               
               <div className="flex items-center justify-between pt-6 border-t">
                 <div className="flex items-center gap-3">
-                  {autoSaveStatus && (
-                    <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                      {autoSaveStatus}
-                    </span>
-                  )}
                   {result && (
                     <span className={`text-sm font-medium ${
                       result.includes("success") ? "text-green-400" : "text-red-400"
                     }`}>{result}</span>
                   )}
                   {editingProject && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary">
-                        Editing: {editingProject.title}
-                      </span>
+                    <div className="flex items-center">
+                      <div className="relative inline-flex items-center gap-2 px-4 py-1.5 pr-5 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 text-primary group w-[390px]">
+                        <div className="h-2 w-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
+                        <span className="font-medium text-sm">Editing:</span>
+                        <span className="truncate text-sm">
+                          {editingProject.title}
+                        </span>
+                        {autoSaveStatus && (
+                          <span className="ml-auto text-xs text-foreground/60">
+                            {autoSaveStatus}
+                          </span>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
                     </div>
                   )}
                 </div>
