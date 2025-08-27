@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2 } from "lucide-react"
+import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 import { MarkdownEditorEnhanced } from "@/components/markdown-editor-enhanced"
@@ -706,7 +706,7 @@ export default function DevProjectsPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Tabs defaultValue="basic" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-6 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/10 p-1.5 rounded-xl shadow-lg">
+            <TabsList className="grid w-full grid-cols-7 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/10 p-1.5 rounded-xl shadow-lg">
               <TabsTrigger value="basic" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary/15 data-[state=active]:to-primary/8 data-[state=active]:text-primary rounded-lg transition-all duration-300 hover:scale-105">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
                 <Sparkles className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-primary" />
@@ -736,6 +736,11 @@ export default function DevProjectsPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-400/0 via-orange-400/5 to-orange-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
                 <Sparkles className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-orange-400" />
                 <span className="relative z-10">Templates</span>
+              </TabsTrigger>
+              <TabsTrigger value="debug" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-red-500/15 data-[state=active]:to-red-400/8 data-[state=active]:text-red-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <Bug className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-red-400" />
+                <span className="relative z-10">Debug</span>
               </TabsTrigger>
             </TabsList>
             
@@ -1741,6 +1746,130 @@ Instructions for contributors...`}
                     ))}
                   </div>
                 </div>
+              </TabsContent>
+              
+              <TabsContent value="debug" className="space-y-6">
+                <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
+                  <CardHeader className="bg-gradient-to-r from-red-500/10 to-red-400/5 border-b border-red-400/10 p-5">
+                    <CardTitle className="flex items-center gap-4">
+                      <div className="p-2.5 bg-gradient-to-br from-red-500/20 to-red-400/10 rounded-xl border border-red-400/20 shadow-sm group-hover:shadow-red-400/20 transition-all duration-300">
+                        <Bug className="h-5 w-5 text-red-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xl font-bold bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">Debug Tools</div>
+                        <p className="text-sm text-muted-foreground font-medium">Reset project statistics and data</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 p-6">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/projects/reset-downloads', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' }
+                            })
+                            if (response.ok) {
+                              setResult("Download counts reset successfully!")
+                            } else {
+                              setResult("Failed to reset download counts")
+                            }
+                          } catch (error) {
+                            setResult("Error resetting download counts")
+                          }
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                        <Download className="h-4 w-4 mr-2" />
+                        <span className="relative z-10">Reset Downloads</span>
+                      </Button>
+
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/projects/reset-views', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' }
+                            })
+                            if (response.ok) {
+                              setResult("View counts reset successfully!")
+                            } else {
+                              setResult("Failed to reset view counts")
+                            }
+                          } catch (error) {
+                            setResult("Error resetting view counts")
+                          }
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                        <Eye className="h-4 w-4 mr-2" />
+                        <span className="relative z-10">Reset Views</span>
+                      </Button>
+
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
+                        onClick={() => {
+                          localStorage.removeItem('projectDraft')
+                          localStorage.removeItem('customTemplates')
+                          setCustomTemplates({})
+                          setResult("Local storage cleared successfully!")
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                        <Database className="h-4 w-4 mr-2" />
+                        <span className="relative z-10">Clear Storage</span>
+                      </Button>
+
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/projects/reset-all', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' }
+                            })
+                            if (response.ok) {
+                              setResult("All project data reset successfully!")
+                            } else {
+                              setResult("Failed to reset project data")
+                            }
+                          } catch (error) {
+                            setResult("Error resetting project data")
+                          }
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        <span className="relative z-10">Reset All Data</span>
+                      </Button>
+                    </div>
+
+                    <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center mt-0.5">
+                          <span className="text-amber-400 text-xs font-bold">!</span>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-amber-400">Warning</p>
+                          <p className="text-xs text-amber-300/80">
+                            These actions are irreversible. Use with caution as they will permanently reset project statistics and data.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
               
               <div className="flex items-center justify-between pt-6 border-t">
