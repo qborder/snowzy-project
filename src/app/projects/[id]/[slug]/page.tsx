@@ -314,146 +314,54 @@ export default function ProjectViewPage() {
 
           <div className="lg:col-span-1 space-y-6">
             <div className="sticky top-8 space-y-6">
-              {project.downloadUrl && (() => {
-                const fileInfo = getFileTypeInfo(project.downloadUrl);
-                const IconComponent = fileInfo.icon;
-                
-                return (
-                  <Card className="relative bg-background/95 backdrop-blur-sm border border-border/50 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <CardHeader className="pb-3 pt-5 px-5 relative z-10">
-                      <div className="flex items-start gap-3">
-                        <div className="relative">
-                          <div className={`p-2.5 rounded-lg border ${fileInfo.borderColor} bg-background shadow-sm group-hover:shadow transition-all duration-200`}>
-                            <IconComponent className={`h-4 w-4 ${fileInfo.textColor} transition-transform group-hover:scale-110 duration-200`} />
+              {project.downloadUrl && (
+                <Card className="bg-gradient-to-br from-background/80 via-background/90 to-primary/5 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
+                  
+                  <CardContent className="p-6 relative z-10">
+                    <div className="space-y-5">
+                      <div className="text-center">
+                        <div className="relative mb-4">
+                          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/15 rounded-xl border border-primary/20 shadow-lg">
+                            <Download className="h-7 w-7 text-primary" />
                           </div>
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-primary to-purple-500 rounded-full animate-pulse"></div>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <h3 className="text-base font-semibold text-foreground">{fileInfo.title}</h3>
-                            <Badge variant="secondary" className="bg-primary/5 text-primary/90 border-border text-[11px] px-1.5 py-0 h-5">
-                              Download
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground mb-2">{fileInfo.description}</p>
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <div className={`flex items-center gap-1 px-2 py-0.5 bg-${fileInfo.color}-50 dark:bg-${fileInfo.color}-900/20 rounded text-xs font-medium text-foreground/90 border border-${fileInfo.color}-200 dark:border-${fileInfo.color}-800/30`}>
-                              <div className={`w-1.5 h-1.5 bg-${fileInfo.color}-500 rounded-full`}></div>
-                              <span>
-                                {fileInfo.type === 'archive' && 'Compressed'}
-                                {fileInfo.type === 'roblox' && 'Roblox Studio'}
-                                {fileInfo.type === 'executable' && 'Executable'}
-                                {fileInfo.type === 'file' && 'Ready to use'}
-                              </span>
-                            </div>
-                            {project.downloads !== undefined && (
-                              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 rounded text-xs font-medium text-foreground/90 border border-emerald-200 dark:border-emerald-800/30">
-                                <ArrowDown className="h-2.5 w-2.5 text-emerald-600" />
-                                <span>{project.downloads.toLocaleString()}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent mb-2">Download Project</h3>
+                        <p className="text-sm text-muted-foreground font-medium">Get the complete project files instantly</p>
                       </div>
-                    </CardHeader>
                       
-                    <CardContent className="px-5 pb-5 pt-0 relative z-10 space-y-4">
+                      {project.downloads !== undefined && (
+                        <div className="flex items-center justify-center gap-2 text-sm bg-background/50 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm">
+                          <ArrowDown className="h-3 w-3 text-emerald-500" />
+                          <span className="font-medium">{project.downloads.toLocaleString()} downloads</span>
+                        </div>
+                      )}
+                      
                       <Button 
                         onClick={handleDownload}
                         disabled={isDownloading}
-                        className={`w-full h-11 bg-gradient-to-br from-emerald-600 to-emerald-500 text-white rounded-lg font-medium transition-all duration-300 ease-out disabled:opacity-60 hover:shadow-lg group/btn relative overflow-hidden border border-emerald-300/20 hover:border-emerald-200/30`}
+                        className="w-full h-12 bg-gradient-to-br from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary/80 hover:to-primary/70 text-primary-foreground font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-primary/20 hover:border-primary/30 relative overflow-hidden group/btn"
                         size="lg"
                       >
                         <span className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
-                        <span className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-lg transition-all duration-300"></span>
                         {isDownloading ? (
                           <div className="flex items-center gap-2 relative z-10">
-                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                            <span>Preparing files...</span>
+                            <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                            <span>Preparing download...</span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2 relative z-10">
-                            <Download className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-y-[-1px]" />
-                            <span className="relative flex items-center gap-2">
-                              <span className="relative font-medium">
-                                {fileInfo.type === 'archive' && 'Download Archive (.zip/.rar)'}
-                                {fileInfo.type === 'roblox' && 'Open in Studio'}
-                                {fileInfo.type === 'executable' && 'Download & Run'}
-                                {fileInfo.type === 'file' && 'Download File'}
-                                <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-white/80 scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left"></span>
-                              </span>
-                              <ArrowDownRight className="h-3.5 w-3.5 text-white/90 -translate-x-1 group-hover/btn:translate-x-0.5 group-hover/btn:opacity-100 opacity-0 transition-all duration-300 ease-out" />
-                            </span>
+                            <Download className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-y-[-1px]" />
+                            <span>Download Now</span>
                           </div>
                         )}
                       </Button>
-                      
-                      <div className="bg-background/50 dark:bg-foreground/5 rounded-lg p-3 border border-border/50 mt-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className={`w-1.5 h-1.5 bg-${fileInfo.color}-500 rounded-full`}></div>
-                          <span className="text-xs font-medium text-foreground/80 tracking-wide">
-                            {fileInfo.type === 'archive' && 'Archive Contents'}
-                            {fileInfo.type === 'roblox' && 'Roblox File'}
-                            {fileInfo.type === 'executable' && 'Application'}
-                            {fileInfo.type === 'file' && 'File Details'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          {fileInfo.details}
-                        </p>
-                        
-                        {fileInfo.type === 'archive' && (
-                          <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/30">
-                            <div className="flex items-center gap-4 text-xs">
-                              <div className="flex items-center gap-1">
-                                <Package className="h-3 w-3 text-amber-500" />
-                                <span className="text-slate-500 dark:text-slate-400">Multiple files</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Archive className="h-3 w-3 text-amber-500" />
-                                <span className="text-slate-500 dark:text-slate-400">Compressed</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {fileInfo.type === 'roblox' && (
-                          <div className="mt-3 pt-3 border-t border-border/50">
-                            <div className="flex flex-wrap gap-3 text-xs">
-                              <div className="flex items-center gap-1.5">
-                                <Gamepad2 className="h-3 w-3 text-emerald-500 opacity-80" />
-                                <span className="text-muted-foreground">Roblox Studio</span>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Monitor className="h-3 w-3 text-emerald-500 opacity-80" />
-                                <span className="text-muted-foreground">
-                                  {project.downloadUrl?.toLowerCase().includes('.rbxl') ? 'Place file' : 'Model file'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {fileInfo.type === 'executable' && (
-                          <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/30">
-                            <div className="flex items-center gap-4 text-xs">
-                              <div className="flex items-center gap-1">
-                                <Zap className="h-3 w-3 text-red-500" />
-                                <span className="text-slate-500 dark:text-slate-400">Executable</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Monitor className="h-3 w-3 text-red-500" />
-                                <span className="text-slate-500 dark:text-slate-400">Ready to run</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })()}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {project.tags && project.tags.length > 0 && (
                 <Card className="bg-gradient-to-br from-background/80 via-background/90 to-primary/5 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl">
