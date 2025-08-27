@@ -1649,10 +1649,7 @@ Instructions for contributors...`}
                               setCustomTemplates(updated)
                               localStorage.setItem('customTemplates', JSON.stringify(updated))
                               setTemplateName("")
-                              setResult({
-                                type: "success",
-                                message: `Template "${templateName}" saved successfully!`
-                              })
+                              setResult(`Template "${templateName}" saved successfully!`)
                             }
                           }}
                           disabled={!templateName.trim() || templateName.length > 40 || !title || !description || !category}
