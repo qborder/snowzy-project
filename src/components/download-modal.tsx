@@ -70,9 +70,9 @@ export function DownloadModal({ isOpen, onClose, project, onDownloadComplete }: 
         } else {
           console.error('Download counter API failed:', response.status)
         }
-      } catch (fetchError: any) {
+      } catch (fetchError) {
         clearTimeout(timeoutId)
-        if (fetchError.name === 'AbortError') {
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
           console.log('Download counter request timed out, continuing with download')
         } else {
           console.error('Download counter API error:', fetchError)
