@@ -111,22 +111,47 @@ export async function getFileById(id: string): Promise<FileData | null> {
 }
 
 export async function getFileByName(displayName: string): Promise<FileData | null> {
+  console.log(`[Storage] Looking up file by name: ${displayName}`)
+  
   if (isVercelEnvironment()) {
     try {
+      console.log(`[Storage] Using KV storage for lookup`)
       const id = await kv.get(`name:${displayName}`)
+      console.log(`[Storage] KV lookup result for ${displayName}:`, id)
+      
       if (id && typeof id === 'string') {
-        return await getFileById(id)
+        const fileData = await getFileById(id)
+        console.log(`[Storage] Found file data via KV:`, fileData ? 'Yes' : 'No')
+        return fileData
+      }
+      
+      // Fallback: try to find by scanning all files if direct lookup fails
+      console.log(`[Storage] Direct KV lookup failed, scanning all files`)
+      const keys = await kv.keys('file:*')
+      for (const key of keys) {
+        const fileId = key.replace('file:', '')
+        const fileData = await getFileById(fileId)
+        if (fileData && fileData.displayName === displayName) {
+          console.log(`[Storage] Found file by scanning: ${fileId}`)
+          // Repair the name index
+          await kv.set(`name:${displayName}`, fileId)
+          return fileData
+        }
       }
     } catch (error) {
-      console.warn('KV storage failed, falling back to memory:', error)
+      console.warn('[Storage] KV storage failed, falling back to memory:', error)
     }
   }
   
+  console.log(`[Storage] Using memory storage for lookup`)
   const id = localNameIndex.get(displayName)
   if (id) {
-    return localStore.get(id) || null
+    const fileData = localStore.get(id) || null
+    console.log(`[Storage] Memory lookup result:`, fileData ? 'Found' : 'Not found')
+    return fileData
   }
   
+  console.log(`[Storage] File not found anywhere: ${displayName}`)
   return null
 }
 
