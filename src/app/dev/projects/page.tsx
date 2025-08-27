@@ -1706,10 +1706,7 @@ Instructions for contributors...`}
                             const { [key]: _, ...rest } = customTemplates
                             setCustomTemplates(rest)
                             localStorage.setItem('customTemplates', JSON.stringify(rest))
-                            setResult({
-                              type: "success",
-                              message: `Template "${template.title}" deleted`
-                            })
+                            setResult(`Template "${template.title}" deleted`)
                           }}
                           isCustom={true}
                         />
