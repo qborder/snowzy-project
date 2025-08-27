@@ -271,9 +271,12 @@ export default function ProjectViewPage() {
                   {project.title}
                 </h1>
                 
-                <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap max-w-4xl font-light">
-                  {project.description}
-                </p>
+                <div className="space-y-6">
+                  <p className="text-foreground/90 text-lg leading-relaxed max-w-4xl font-normal">
+                    {project.description}
+                  </p>
+                  <div className="h-[1px] w-full bg-gradient-to-r from-foreground/5 via-foreground/20 to-foreground/5"></div>
+                </div>
                 
                 
               </div>
