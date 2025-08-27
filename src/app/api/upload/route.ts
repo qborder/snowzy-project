@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     }
     
     console.log(`[Upload] Starting upload for file: ${filename}`)
+    console.log(`[Upload] File type from Content-Type header: ${request.headers.get('content-type')}`)
     console.log(`[Upload] Environment check - VERCEL: ${!!process.env.VERCEL}, KV_REST_API_URL: ${!!process.env.KV_REST_API_URL}`)
     
     const fileBuffer = Buffer.from(await request.arrayBuffer())

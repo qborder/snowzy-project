@@ -392,16 +392,16 @@ export default function DevProjectsPage() {
     e.preventDefault()
     setDragActive(false)
     const files = Array.from(e.dataTransfer.files)
-    const imageFile = files.find(file => file.type.startsWith('image/'))
-    if (!imageFile) return
+    const file = files[0]
+    if (!file) return
     try {
       setUploading(true)
       setResult("")
-      const res = await fetch(`/api/upload?filename=icon_${Date.now()}_${encodeURIComponent(imageFile.name)}`, { 
+      const res = await fetch(`/api/upload?filename=icon_${Date.now()}_${encodeURIComponent(file.name)}`, { 
         method: 'POST',
-        body: imageFile,
+        body: file,
         headers: {
-          'Content-Type': imageFile.type
+          'Content-Type': file.type
         }
       })
       const data = await res.json()
