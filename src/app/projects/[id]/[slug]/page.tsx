@@ -6,9 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Star, Users, Activity } from "lucide-react"
+import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
-import { DownloadModal } from "@/components/download-modal"
 
 type Project = {
   id?: string
@@ -38,7 +37,6 @@ export default function ProjectViewPage() {
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [isDownloading, setIsDownloading] = useState(false)
-  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
 
   useEffect(() => {
     async function loadProject() {
@@ -80,12 +78,99 @@ export default function ProjectViewPage() {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null
   }
 
-  function handleDownloadClick() {
-    setIsDownloadModalOpen(true)
+  function getFileTypeInfo(url: string) {
+    const fileName = url.split('/').pop()?.toLowerCase() || ''
+    const extension = fileName.split('.').pop() || ''
+    
+    if (['zip', 'rar', '7z', '7zip'].includes(extension)) {
+      return {
+        type: 'archive',
+        icon: Archive,
+        title: 'Compressed Archive',
+        description: 'Complete package with all files',
+        details: 'Extract to access all project files and assets',
+        color: 'amber',
+        bgGradient: 'from-amber-500/15 via-amber-400/10 to-orange-500/10',
+        borderColor: 'border-amber-300/30 dark:border-amber-600/30',
+        textColor: 'text-amber-600 dark:text-amber-400',
+        buttonGradient: 'from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-600 dark:hover:to-amber-700'
+      }
+    }
+    
+    if (['rbxl', 'rbxlx', 'rbxm', 'rbxml', 'rbxmlx'].includes(extension)) {
+      return {
+        type: 'roblox',
+        icon: Gamepad2,
+        title: 'Roblox Studio File',
+        description: 'Ready for Roblox Studio',
+        details: 'Open directly in Roblox Studio to start building',
+        color: 'emerald',
+        bgGradient: 'from-emerald-500/15 via-emerald-400/10 to-green-500/10',
+        borderColor: 'border-emerald-300/30 dark:border-emerald-600/30',
+        textColor: 'text-emerald-600 dark:text-emerald-400',
+        buttonGradient: 'from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 dark:from-emerald-500 dark:to-emerald-600 dark:hover:from-emerald-600 dark:hover:to-emerald-700'
+      }
+    }
+    
+    if (['exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm'].includes(extension)) {
+      return {
+        type: 'executable',
+        icon: Zap,
+        title: 'Executable File',
+        description: 'Ready to install & run',
+        details: 'Double-click to install or run the application',
+        color: 'red',
+        bgGradient: 'from-red-500/15 via-red-400/10 to-rose-500/10',
+        borderColor: 'border-red-300/30 dark:border-red-600/30',
+        textColor: 'text-red-600 dark:text-red-400',
+        buttonGradient: 'from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 dark:from-red-500 dark:to-red-600 dark:hover:from-red-600 dark:hover:to-red-700'
+      }
+    }
+    
+    return {
+      type: 'file',
+      icon: FileCode,
+      title: 'Project Files',
+      description: 'Source code & assets',
+      details: 'Contains all necessary project files',
+      color: 'purple',
+      bgGradient: 'from-purple-500/15 via-purple-400/10 to-blue-500/10',
+      borderColor: 'border-purple-300/30 dark:border-purple-600/30',
+      textColor: 'text-purple-600 dark:text-purple-400',
+      buttonGradient: 'from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 dark:from-purple-500 dark:to-purple-600 dark:hover:from-purple-600 dark:hover:to-purple-700'
+    }
   }
 
-  function handleDownloadComplete(newDownloadCount: number) {
-    setProject(prev => prev ? { ...prev, downloads: newDownloadCount } : null)
+  async function handleDownload() {
+    if (!project?.downloadUrl || !project?.id) return
+    
+    setIsDownloading(true)
+    
+    try {
+      // Increment download counter
+      const response = await fetch(`/api/projects/${project.id}/downloads`, {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setProject(prev => prev ? { ...prev, downloads: data.downloads } : null)
+      }
+      
+      // Start download
+      const link = document.createElement('a')
+      link.href = project.downloadUrl
+      link.download = ''
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+    } catch (error) {
+      console.error('Download failed:', error)
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   if (loading) {
@@ -226,63 +311,146 @@ export default function ProjectViewPage() {
 
           <div className="lg:col-span-1 space-y-6">
             <div className="sticky top-8 space-y-6">
-              {project.downloadUrl && (
-                <Card className="bg-gradient-to-br from-blue-50/80 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 border border-blue-200/60 dark:border-blue-800/40 rounded-2xl shadow-sm hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 ease-out group relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <CardHeader className="pb-3 relative z-10">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 bg-gradient-to-br from-blue-600/20 to-blue-500/10 rounded-xl group-hover:from-blue-600/25 group-hover:to-blue-500/15 transition-all duration-300 ease-out border border-blue-500/20">
-                        <Download className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300 ease-out" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-blue-300 bg-clip-text text-transparent">Download Project</h3>
-                        <p className="text-sm text-blue-600/70 dark:text-blue-400/70 font-medium">Get the complete source code</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4 relative z-10">
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                      <div className="text-center p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                        <Star className="h-4 w-4 text-blue-600 mx-auto mb-1" />
-                        <div className="text-xs font-semibold text-blue-700 dark:text-blue-300">Premium</div>
-                        <div className="text-xs text-blue-600/70 dark:text-blue-400/70">Quality</div>
-                      </div>
-                      <div className="text-center p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                        <Users className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
-                        <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{project.downloads?.toLocaleString() || 0}</div>
-                        <div className="text-xs text-emerald-600/70 dark:text-emerald-400/70">Downloads</div>
-                      </div>
-                      <div className="text-center p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                        <Activity className="h-4 w-4 text-purple-600 mx-auto mb-1" />
-                        <div className="text-xs font-semibold text-purple-700 dark:text-purple-300">Active</div>
-                        <div className="text-xs text-purple-600/70 dark:text-purple-400/70">Project</div>
-                      </div>
-                    </div>
+              {project.downloadUrl && (() => {
+                const fileInfo = getFileTypeInfo(project.downloadUrl);
+                const IconComponent = fileInfo.icon;
+                
+                return (
+                  <Card className="relative bg-background/95 backdrop-blur-sm border border-border/50 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    <Button 
-                      onClick={handleDownloadClick}
-                      className="w-full h-12 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white rounded-xl font-bold transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/25 border-0 shadow-md"
-                      size="lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-white/20 rounded-lg">
-                          <Download className="h-4 w-4" />
+                    <CardHeader className="pb-3 pt-5 px-5 relative z-10">
+                      <div className="flex items-start gap-3">
+                        <div className="relative">
+                          <div className={`p-2.5 rounded-lg border ${fileInfo.borderColor} bg-background shadow-sm group-hover:shadow transition-all duration-200`}>
+                            <IconComponent className={`h-4 w-4 ${fileInfo.textColor} transition-transform group-hover:scale-110 duration-200`} />
+                          </div>
                         </div>
-                        <div className="text-left">
-                          <div className="font-bold text-sm leading-tight">Download Now</div>
-                          <div className="text-xs opacity-90 font-normal leading-tight">Get full access</div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h3 className="text-base font-semibold text-foreground">{fileInfo.title}</h3>
+                            <Badge variant="secondary" className="bg-primary/5 text-primary/90 border-border text-[11px] px-1.5 py-0 h-5">
+                              Download
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mb-2">{fileInfo.description}</p>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <div className={`flex items-center gap-1 px-2 py-0.5 bg-${fileInfo.color}-50 dark:bg-${fileInfo.color}-900/20 rounded text-xs font-medium text-foreground/90 border border-${fileInfo.color}-200 dark:border-${fileInfo.color}-800/30`}>
+                              <div className={`w-1.5 h-1.5 bg-${fileInfo.color}-500 rounded-full`}></div>
+                              <span>
+                                {fileInfo.type === 'archive' && 'Compressed'}
+                                {fileInfo.type === 'roblox' && 'Roblox Studio'}
+                                {fileInfo.type === 'executable' && 'Executable'}
+                                {fileInfo.type === 'file' && 'Ready to use'}
+                              </span>
+                            </div>
+                            {project.downloads !== undefined && (
+                              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 rounded text-xs font-medium text-foreground/90 border border-emerald-200 dark:border-emerald-800/30">
+                                <ArrowDown className="h-2.5 w-2.5 text-emerald-600" />
+                                <span>{project.downloads.toLocaleString()}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </Button>
-                    
-                    <div className="text-center">
-                      <p className="text-xs text-blue-600/60 dark:text-blue-400/60 font-medium">
-                        ✨ Includes source code, assets & documentation
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    </CardHeader>
+                      
+                    <CardContent className="px-5 pb-5 pt-0 relative z-10 space-y-4">
+                      <Button 
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className={`w-full h-11 bg-gradient-to-br from-emerald-600 to-emerald-500 text-white rounded-lg font-medium transition-all duration-300 ease-out disabled:opacity-60 hover:shadow-lg group/btn relative overflow-hidden border border-emerald-300/20 hover:border-emerald-200/30`}
+                        size="lg"
+                      >
+                        <span className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
+                        <span className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-lg transition-all duration-300"></span>
+                        {isDownloading ? (
+                          <div className="flex items-center gap-2 relative z-10">
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                            <span>Preparing files...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 relative z-10">
+                            <Download className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-y-[-1px]" />
+                            <span className="relative flex items-center gap-2">
+                              <span className="relative font-medium">
+                                {fileInfo.type === 'archive' && 'Download Archive (.zip/.rar)'}
+                                {fileInfo.type === 'roblox' && 'Open in Studio'}
+                                {fileInfo.type === 'executable' && 'Download & Run'}
+                                {fileInfo.type === 'file' && 'Download File'}
+                                <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-white/80 scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left"></span>
+                              </span>
+                              <ArrowDownRight className="h-3.5 w-3.5 text-white/90 -translate-x-1 group-hover/btn:translate-x-0.5 group-hover/btn:opacity-100 opacity-0 transition-all duration-300 ease-out" />
+                            </span>
+                          </div>
+                        )}
+                      </Button>
+                      
+                      <div className="bg-background/50 dark:bg-foreground/5 rounded-lg p-3 border border-border/50 mt-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-1.5 h-1.5 bg-${fileInfo.color}-500 rounded-full`}></div>
+                          <span className="text-xs font-medium text-foreground/80 tracking-wide">
+                            {fileInfo.type === 'archive' && 'Archive Contents'}
+                            {fileInfo.type === 'roblox' && 'Roblox File'}
+                            {fileInfo.type === 'executable' && 'Application'}
+                            {fileInfo.type === 'file' && 'File Details'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {fileInfo.details}
+                        </p>
+                        
+                        {fileInfo.type === 'archive' && (
+                          <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/30">
+                            <div className="flex items-center gap-4 text-xs">
+                              <div className="flex items-center gap-1">
+                                <Package className="h-3 w-3 text-amber-500" />
+                                <span className="text-slate-500 dark:text-slate-400">Multiple files</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Archive className="h-3 w-3 text-amber-500" />
+                                <span className="text-slate-500 dark:text-slate-400">Compressed</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {fileInfo.type === 'roblox' && (
+                          <div className="mt-3 pt-3 border-t border-border/50">
+                            <div className="flex flex-wrap gap-3 text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <Gamepad2 className="h-3 w-3 text-emerald-500 opacity-80" />
+                                <span className="text-muted-foreground">Roblox Studio</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Monitor className="h-3 w-3 text-emerald-500 opacity-80" />
+                                <span className="text-muted-foreground">
+                                  {project.downloadUrl?.toLowerCase().includes('.rbxl') ? 'Place file' : 'Model file'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {fileInfo.type === 'executable' && (
+                          <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/30">
+                            <div className="flex items-center gap-4 text-xs">
+                              <div className="flex items-center gap-1">
+                                <Zap className="h-3 w-3 text-red-500" />
+                                <span className="text-slate-500 dark:text-slate-400">Executable</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Monitor className="h-3 w-3 text-red-500" />
+                                <span className="text-slate-500 dark:text-slate-400">Ready to run</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {project.tags && project.tags.length > 0 && (
                 <Card className="bg-gradient-to-br from-background/80 via-background/90 to-primary/5 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl">
@@ -411,15 +579,6 @@ export default function ProjectViewPage() {
           </div>
         </div>
       </div>
-      
-      {project && (
-        <DownloadModal
-          isOpen={isDownloadModalOpen}
-          onClose={() => setIsDownloadModalOpen(false)}
-          project={project}
-          onDownloadComplete={handleDownloadComplete}
-        />
-      )}
     </div>
   )
 }
