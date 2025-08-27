@@ -6,8 +6,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp } from "lucide-react"
+import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Star, Users, Activity } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
+import { DownloadModal } from "@/components/download-modal"
 
 type Project = {
   id?: string
@@ -37,6 +38,7 @@ export default function ProjectViewPage() {
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false)
 
   useEffect(() => {
     async function loadProject() {
@@ -78,36 +80,12 @@ export default function ProjectViewPage() {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null
   }
 
-  async function handleDownload() {
-    if (!project?.downloadUrl || !project?.id) return
-    
-    setIsDownloading(true)
-    
-    try {
-      // Increment download counter
-      const response = await fetch(`/api/projects/${project.id}/downloads`, {
-        method: 'POST',
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setProject(prev => prev ? { ...prev, downloads: data.downloads } : null)
-      }
-      
-      // Start download
-      const link = document.createElement('a')
-      link.href = project.downloadUrl
-      link.download = ''
-      link.target = '_blank'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
-    } catch (error) {
-      console.error('Download failed:', error)
-    } finally {
-      setIsDownloading(false)
-    }
+  function handleDownloadClick() {
+    setIsDownloadModalOpen(true)
+  }
+
+  function handleDownloadComplete(newDownloadCount: number) {
+    setProject(prev => prev ? { ...prev, downloads: newDownloadCount } : null)
   }
 
   if (loading) {
@@ -249,47 +227,59 @@ export default function ProjectViewPage() {
           <div className="lg:col-span-1 space-y-6">
             <div className="sticky top-8 space-y-6">
               {project.downloadUrl && (
-                <Card className="bg-gradient-to-br from-blue-50/80 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 border border-blue-200/60 dark:border-blue-800/40 rounded-2xl shadow-sm hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 ease-out group">
-                  <CardHeader className="pb-3">
+                <Card className="bg-gradient-to-br from-blue-50/80 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 border border-blue-200/60 dark:border-blue-800/40 rounded-2xl shadow-sm hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 ease-out group relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <CardHeader className="pb-3 relative z-10">
                     <div className="flex items-center gap-3">
-                      <div className="p-3 bg-blue-600/10 dark:bg-blue-500/20 rounded-xl group-hover:bg-blue-600/15 dark:group-hover:bg-blue-500/25 transition-colors duration-300 ease-out">
+                      <div className="p-3 bg-gradient-to-br from-blue-600/20 to-blue-500/10 rounded-xl group-hover:from-blue-600/25 group-hover:to-blue-500/15 transition-all duration-300 ease-out border border-blue-500/20">
                         <Download className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300 ease-out" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">Download Files</h3>
-                        <p className="text-sm text-blue-600/70 dark:text-blue-400/70">Source code and assets</p>
+                        <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-blue-300 bg-clip-text text-transparent">Download Project</h3>
+                        <p className="text-sm text-blue-600/70 dark:text-blue-400/70 font-medium">Get the complete source code</p>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 relative z-10">
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <div className="text-center p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                        <Star className="h-4 w-4 text-blue-600 mx-auto mb-1" />
+                        <div className="text-xs font-semibold text-blue-700 dark:text-blue-300">Premium</div>
+                        <div className="text-xs text-blue-600/70 dark:text-blue-400/70">Quality</div>
+                      </div>
+                      <div className="text-center p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                        <Users className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
+                        <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{project.downloads?.toLocaleString() || 0}</div>
+                        <div className="text-xs text-emerald-600/70 dark:text-emerald-400/70">Downloads</div>
+                      </div>
+                      <div className="text-center p-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                        <Activity className="h-4 w-4 text-purple-600 mx-auto mb-1" />
+                        <div className="text-xs font-semibold text-purple-700 dark:text-purple-300">Active</div>
+                        <div className="text-xs text-purple-600/70 dark:text-purple-400/70">Project</div>
+                      </div>
+                    </div>
+                    
                     <Button 
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-300 ease-out disabled:opacity-50 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/25"
+                      onClick={handleDownloadClick}
+                      className="w-full h-12 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white rounded-xl font-bold transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/25 border-0 shadow-md"
                       size="lg"
                     >
-                      {isDownloading ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                          <span>Downloading...</span>
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-white/20 rounded-lg">
+                          <Download className="h-4 w-4" />
                         </div>
-                      ) : (
-                        <div className="flex items-center gap-2 group-hover:gap-3 transition-all duration-300 ease-out">
-                          <Download className="h-4 w-4 group-hover:scale-110 transition-transform duration-300 ease-out" />
-                          <span>Download Project</span>
+                        <div className="text-left">
+                          <div className="font-bold text-sm leading-tight">Download Now</div>
+                          <div className="text-xs opacity-90 font-normal leading-tight">Get full access</div>
                         </div>
-                      )}
+                      </div>
                     </Button>
                     
-                    <p className="text-xs text-blue-600/60 dark:text-blue-400/60 text-center">
-                      {(() => {
-                        const url = project.downloadUrl?.toLowerCase() || '';
-                        const isArchive = url.includes('.zip') || url.includes('.rar') || url.includes('.7z') || url.includes('.7zip');
-                        return isArchive 
-                          ? 'ZIP file includes all source files and documentation'
-                          : 'Download includes project files and resources';
-                      })()}
-                    </p>
+                    <div className="text-center">
+                      <p className="text-xs text-blue-600/60 dark:text-blue-400/60 font-medium">
+                        ✨ Includes source code, assets & documentation
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -421,6 +411,15 @@ export default function ProjectViewPage() {
           </div>
         </div>
       </div>
+      
+      {project && (
+        <DownloadModal
+          isOpen={isDownloadModalOpen}
+          onClose={() => setIsDownloadModalOpen(false)}
+          project={project}
+          onDownloadComplete={handleDownloadComplete}
+        />
+      )}
     </div>
   )
 }
