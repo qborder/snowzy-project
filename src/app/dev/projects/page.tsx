@@ -979,7 +979,7 @@ export default function DevProjectsPage() {
                               className="w-full h-10 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
                             />
                           </div>
-                          <input ref={downloadFileInputRef} type="file" onChange={handleDownloadFileSelect} className="hidden" />
+                          <input ref={downloadFileInputRef} type="file" accept="*/*" onChange={handleDownloadFileSelect} className="hidden" />
                           <Button 
                             type="button" 
                             variant="outline" 
