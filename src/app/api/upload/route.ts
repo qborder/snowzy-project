@@ -14,22 +14,32 @@ export async function POST(request: Request) {
     }
     
     console.log(`[Upload] Starting upload for file: ${filename}`)
+    console.log(`[Upload] File extension: ${filename.split('.').pop()}`)
     console.log(`[Upload] File type from Content-Type header: ${request.headers.get('content-type')}`)
     console.log(`[Upload] Environment check - VERCEL: ${!!process.env.VERCEL}, KV_REST_API_URL: ${!!process.env.KV_REST_API_URL}`)
+    
+    // Special handling for .rbxm files
+    const fileExtension = filename.split('.').pop()?.toLowerCase()
+    let mimeType = request.headers.get('content-type')
+    if (fileExtension === 'rbxm' || fileExtension === 'rbxmx') {
+      mimeType = 'application/octet-stream'
+      console.log(`[Upload] Detected Roblox model file, setting MIME type to: ${mimeType}`)
+    }
     
     const fileBuffer = Buffer.from(await request.arrayBuffer())
     console.log(`[Upload] File buffer size: ${fileBuffer.length} bytes`)
     
     const blob = await put(filename, fileBuffer, {
       access: "public",
-      addRandomSuffix: true
+      addRandomSuffix: true,
+      contentType: mimeType || 'application/octet-stream'
     })
     console.log(`[Upload] Blob upload successful: ${blob.url}`)
     
     const result = await storeFile({
       filename,
       blobUrl: blob.url,
-      mimeType: request.headers.get('content-type') || undefined,
+      mimeType: mimeType || undefined,
       fileSize: fileBuffer.length,
       content: fileBuffer
     })
