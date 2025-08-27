@@ -423,32 +423,8 @@ export default function DevProjectsPage() {
     e.preventDefault()
     setDragActive(false)
     const files = Array.from(e.dataTransfer.files)
-    const imageFile = files.find(file => file.type.startsWith('image/'))
-    if (!imageFile) return
-    try {
-      setUploading(true)
-      setResult("")
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(imageFile.name)}`, { 
-        method: "POST", 
-        body: imageFile 
-      })
-      const data = await res.json()
-      if (!res.ok || !data?.url) {
-        throw new Error(data?.error || "Upload failed")
-      }
-      setImage(data.url)
-      setResult("Image uploaded successfully")
-    } catch (err: unknown) {
-      const error = err as Error
-      setResult(error.message || "Upload error")
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !file.type.startsWith('image/')) return
+    const file = files[0]
+    if (!file) return
     try {
       setUploading(true)
       setResult("")
@@ -461,7 +437,31 @@ export default function DevProjectsPage() {
         throw new Error(data?.error || "Upload failed")
       }
       setImage(data.url)
-      setResult("Image uploaded successfully")
+      setResult("File uploaded successfully")
+    } catch (err: unknown) {
+      const error = err as Error
+      setResult(error.message || "Upload error")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      setUploading(true)
+      setResult("")
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
+        method: "POST", 
+        body: file 
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Upload failed")
+      }
+      setImage(data.url)
+      setResult("File uploaded successfully")
     } catch (err: unknown) {
       const error = err as Error
       setResult(error.message || "Upload error")
@@ -473,7 +473,7 @@ export default function DevProjectsPage() {
 
   async function handleIconFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file || !file.type.startsWith('image/')) return
+    if (!file) return
     try {
       setUploading(true)
       setResult("")
