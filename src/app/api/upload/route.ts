@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       success: true,
       id: result.id,
       filename: result.displayName,
-      url: `${baseUrl}${result.downloadUrl}`,
+      url: `${baseUrl}/api/files/${encodeURIComponent(result.displayName)}`,
       size: fileBuffer.length,
       uploadedAt: new Date().toISOString()
     })

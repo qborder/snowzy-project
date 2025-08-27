@@ -1034,7 +1034,7 @@ export default function DevProjectsPage() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept="*/*"
                       onChange={handleFileSelect}
                       className="hidden"
                     />
@@ -1132,7 +1132,7 @@ export default function DevProjectsPage() {
                     <input
                       ref={iconFileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept="*/*"
                       onChange={handleIconFileSelect}
                       className="hidden"
                     />

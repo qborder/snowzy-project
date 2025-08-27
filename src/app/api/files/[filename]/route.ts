@@ -6,8 +6,10 @@ export async function GET(
   { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
-    const { filename } = await params
-    console.log(`[File Retrieval] Requesting file: ${filename}`)
+    const { filename: rawFilename } = await params
+    const filename = decodeURIComponent(rawFilename)
+    console.log(`[File Retrieval] Raw filename: ${rawFilename}`)
+    console.log(`[File Retrieval] Decoded filename: ${filename}`)
     console.log(`[File Retrieval] Environment check - VERCEL: ${!!process.env.VERCEL}, KV_REST_API_URL: ${!!process.env.KV_REST_API_URL}`)
     
     const fileData = await getFileByName(filename)
