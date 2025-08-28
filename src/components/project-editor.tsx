@@ -9,32 +9,7 @@ import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Edit, Search, Eye, Download, ExternalLink, Trash2, Github, Calendar, Tag, Filter, SortAsc, SortDesc, Sparkles, Clock } from "lucide-react"
 import Link from "next/link"
-
-type Project = {
-  id?: string
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  image?: string
-  icon?: string
-  tags: string[]
-  createdAt?: string
-  titleColor?: string
-  titleGradient?: {
-    from: string
-    to: string
-    via?: string
-  }
-}
-
-type ProjectEditorProps = {
-  onEditProject?: (projectId: string, project: Project) => void
-  handleEditProject?: (project: Project) => void
-}
+import { Project, ProjectEditorProps } from "@/types/project"
 
 export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEditorProps = {}) {
   const [projects, setProjects] = useState<Project[]>([])

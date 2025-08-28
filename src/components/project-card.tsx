@@ -4,37 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Download, Github, Youtube, BookOpen, Eye, ArrowDown } from "lucide-react"
+import { ProjectCardProps } from "@/types/project"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
 import { generateSlug } from "@/lib/project-utils"
 
-interface ProjectCardProps {
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  tags: string[]
-  image?: string
-  icon?: string
-  reduce?: boolean
-  projectIndex?: number
-  projectId?: string
-  cardGradient?: string
-  cardColor?: string
-  titleColor?: string
-  titleGradient?: {
-    from: string
-    to: string
-    via?: string
-  }
-  views?: number
-  downloads?: number
-}
 
 export function ProjectCard({
   title,

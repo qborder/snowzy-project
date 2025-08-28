@@ -157,7 +157,7 @@ export default function ProjectsPage() {
               </h2>
               {(q || category !== "all" || selectedTags.length > 0) && (
                 <p className="text-muted-foreground">
-                  {q && <span>matching "{q}"</span>}
+                  {q && <span>matching &ldquo;{q}&rdquo;</span>}
                   {category !== "all" && <span> in {category}</span>}
                   {selectedTags.length > 0 && <span> with {selectedTags.join(", ")}</span>}
                 </p>
@@ -426,7 +426,7 @@ export default function ProjectsPage() {
             </h2>
             {(q || category !== "all" || selectedTags.length > 0) && (
               <p className="text-muted-foreground">
-                {q && <span>matching "{q}"</span>}
+                {q && <span>matching &ldquo;{q}&rdquo;</span>}
                 {category !== "all" && <span> in {category}</span>}
                 {selectedTags.length > 0 && <span> with {selectedTags.join(", ")}</span>}
               </p>

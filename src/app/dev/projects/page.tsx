@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
+import { Project } from "@/types/project"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
@@ -54,32 +55,11 @@ const SUGGESTED_TAGS = [
   "React", "Next.js", "TypeScript", "JavaScript", "Tailwind CSS", "Node.js", "Express",
   "3D Modeling", "Animation", "VFX", "Particles", "Lighting", "Terrain",
   "Mobile", "React Native", "Flutter", "Swift", "Kotlin", "Cross-platform",
-  "UI/UX", "Design", "Figma", "Responsive", "Accessibility", "SEO"
+  "UI/UX", "Design", "Figma", "Responsive", "Accessibility", "SEO",
+  "Web Development", "Full Stack", "Frontend", "Backend", "Database", "API",
+  "Cloud", "DevOps", "Cybersecurity", "Artificial Intelligence", "Machine Learning"
 ]
 
-type Project = {
-  id?: string
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  image?: string
-  icon?: string
-  tags: string[]
-  createdAt?: string
-  cardGradient?: string
-  cardColor?: string
-  content?: string
-  titleColor?: string
-  titleGradient?: {
-    from: string
-    to: string
-    via?: string
-  }
-}
 
 type CustomTemplate = {
   title: string

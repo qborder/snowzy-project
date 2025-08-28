@@ -39,6 +39,15 @@ export interface ProjectCardProps {
   projectId?: string
   views?: number
   downloads?: number
+  projectIndex?: number
+  cardGradient?: string
+  cardColor?: string
+  titleColor?: string
+  titleGradient?: {
+    from: string
+    to: string
+    via?: string
+  }
 }
 
 export interface ProjectEditorProps {
