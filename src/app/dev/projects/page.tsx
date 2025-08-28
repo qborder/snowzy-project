@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Project } from "@/types/project"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ProjectCard } from "@/components/project-card"
