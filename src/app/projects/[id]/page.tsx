@@ -7,19 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag } from "lucide-react"
-
-type Project = {
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  image?: string
-  tags?: string[]
-  createdAt?: string
-}
+import { Project } from "@/types/project"
 
 export default function ProjectViewPage() {
   const params = useParams()

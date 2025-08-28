@@ -1,16 +1,7 @@
 import { NextResponse } from "next/server"
 import { kv } from "@vercel/kv"
 import fallbackProjects from "@/data/projects.json"
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  category: string
-  views?: number
-  downloads?: number
-  [key: string]: unknown
-}
+import { Project } from "@/types/project"
 
 export async function POST() {
   try {

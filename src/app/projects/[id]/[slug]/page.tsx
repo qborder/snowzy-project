@@ -8,29 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
+import { Project } from "@/types/project"
 
-type Project = {
-  id?: string
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  image?: string
-  tags?: string[]
-  createdAt?: string
-  content?: string
-  titleColor?: string
-  titleGradient?: {
-    from: string
-    to: string
-    via?: string
-  }
-  views?: number
-  downloads?: number
-}
 
 export default function ProjectViewPage() {
   const params = useParams()

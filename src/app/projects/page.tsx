@@ -9,25 +9,7 @@ import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Search, Filter, Grid3x3, Columns3, Clock, Sparkles, Gamepad2, Code, X, TrendingUp, Calendar, Star, ChevronDown, LayoutGrid } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import fallbackProjects from "@/data/projects.json"
-
-type Project = {
-  id?: string
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  image?: string
-  icon?: string
-  tags: string[]
-  createdAt?: string
-  cardGradient?: string
-  cardColor?: string
-  views?: number
-  downloads?: number
-}
+import { Project } from "@/types/project"
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -140,22 +122,51 @@ export default function ProjectsPage() {
   if (loading) {
     return (
       <div className="min-h-screen">
-        <div className="relative pt-16 pb-8 md:pt-24 md:pb-12">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(600px_400px_at_50%_0%,hsl(var(--primary)/0.08),transparent_70%)]" />
+        <div className="relative pt-16 pb-12 md:pt-20 md:pb-16">
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_800px_400px_at_50%_0%,hsl(var(--primary)/0.03),transparent)]" />
           <div className="container mx-auto">
-            <div className="mx-auto max-w-4xl text-center mb-4">
-              <div className="h-16 bg-background/40 rounded-2xl animate-pulse mb-6" />
-              <div className="h-8 bg-background/40 rounded-xl animate-pulse mx-auto max-w-2xl" />
+            <div className="mx-auto max-w-5xl text-center mb-8">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="h-7 w-24 bg-muted/30 rounded-full animate-pulse" />
+                <div className="h-7 w-28 bg-muted/30 rounded-full animate-pulse" />
+              </div>
+              <div className="h-20 bg-muted/20 rounded-3xl animate-pulse mb-8 mx-auto max-w-4xl" />
+              <div className="h-12 bg-muted/20 rounded-2xl animate-pulse mx-auto max-w-3xl mb-4" />
+              <div className="h-6 bg-muted/20 rounded-xl animate-pulse mx-auto max-w-lg" />
             </div>
-            <div className="mb-6">
-              <div className="h-32 bg-background/40 rounded-2xl animate-pulse" />
+            <div className="mb-8">
+              <div className="h-48 bg-muted/20 rounded-2xl animate-pulse" />
             </div>
           </div>
         </div>
-        <div className="container mx-auto pb-16">
-          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-64 bg-background/40 rounded-2xl animate-pulse" />
+        <div className="container mx-auto pb-20">
+          <div className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="text-center"
+            >
+              <h2 className="text-2xl font-semibold mb-2">
+                {filtered.length > 0 ? (
+                  <span>Showing {filtered.length} project{filtered.length !== 1 ? 's' : ''}</span>
+                ) : (
+                  <span>No projects found</span>
+                )}
+              </h2>
+              {(q || category !== "all" || selectedTags.length > 0) && (
+                <p className="text-muted-foreground">
+                  {q && <span>matching "{q}"</span>}
+                  {category !== "all" && <span> in {category}</span>}
+                  {selectedTags.length > 0 && <span> with {selectedTags.join(", ")}</span>}
+                </p>
+              )}
+            </motion.div>
+          </div>
+          <div className={gridClass}>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="h-80 bg-muted/20 rounded-2xl animate-pulse" />
             ))}
           </div>
         </div>
@@ -165,8 +176,9 @@ export default function ProjectsPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="relative pt-16 pb-8 md:pt-24 md:pb-12">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(600px_400px_at_50%_0%,hsl(var(--primary)/0.08),transparent_70%)]" />
+      <div className="relative pt-16 pb-12 md:pt-20 md:pb-16">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_800px_400px_at_50%_0%,hsl(var(--primary)/0.03),transparent)]" />
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -174,28 +186,28 @@ export default function ProjectsPage() {
           transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
           className="container mx-auto"
         >
-          <div className="mx-auto max-w-4xl text-center mb-4">
+          <div className="mx-auto max-w-5xl text-center mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-4"
+              className="mb-6"
             >
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Badge variant="secondary" className="px-3 py-1">
-                  <Star className="h-3 w-3 mr-1" />
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Badge variant="secondary" className="px-4 py-1.5 text-sm font-medium">
+                  <Star className="h-3.5 w-3.5 mr-1.5" />
                   {projects.length} Projects
                 </Badge>
-                <Badge variant="outline" className="px-3 py-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
+                <Badge variant="outline" className="px-4 py-1.5 text-sm font-medium">
+                  <TrendingUp className="h-3.5 w-3.5 mr-1.5" />
                   Updated Daily
                 </Badge>
               </div>
-              <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl mb-6">
-                <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <h1 className="font-mono text-5xl md:text-7xl lg:text-8xl mb-8 tracking-tight font-bold">
+                <span className="bg-gradient-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent">
                   Project
                 </span>{" "}
-                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">
                   Downloads
                 </span>
               </h1>
@@ -204,10 +216,10 @@ export default function ProjectsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+              className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
             >
               Production-ready code and complete project files. Zero setup, maximum impact.
-              <span className="block text-sm mt-2 opacity-80">Browse {categories.length - 1} categories • {allTags.length} technologies</span>
+              <span className="block text-base mt-3 opacity-70 font-medium">Browse {categories.length - 1} categories • {allTags.length} technologies</span>
             </motion.p>
           </div>
 
@@ -217,13 +229,11 @@ export default function ProjectsPage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mb-6"
           >
-            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-background/60 backdrop-blur-2xl p-8 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-primary/10" />
-              <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_50%_0%,rgba(255,255,255,0.05),transparent_70%)]" />
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-500/20 to-transparent rounded-full blur-xl"></div>
+            <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-background/80 backdrop-blur-xl p-6 shadow-sm transition-all hover:shadow-md">
+              <div className="absolute inset-0 bg-gradient-to-br from-background/90 to-background/70" />
+              <div className="absolute inset-0 border-b border-white/5" />
               
-              <div className="relative space-y-4">
+              <div className="relative space-y-5">
                 <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
                   <div className="flex-1">
                     <div className="relative group">
@@ -232,13 +242,13 @@ export default function ProjectsPage() {
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder="Search projects, technologies, categories..."
-                        className="pl-12 h-12 bg-background/60 border-white/20 text-base placeholder:text-muted-foreground/60 focus:border-primary/30 focus:bg-background/80"
+                        className="pl-12 h-12 bg-background/80 border-border/50 text-base placeholder:text-muted-foreground/60 focus:border-primary/40 focus:bg-background/90 transition-colors"
                       />
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 p-1 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg">
+                    <div className="flex items-center gap-1 p-1 bg-background/80 backdrop-blur-sm border border-border/30 rounded-xl shadow-sm">
                       <Button
                         variant={layout === "gallery" ? "gradient" : "ghost"}
                         size="sm"
@@ -272,6 +282,7 @@ export default function ProjectsPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-sm font-medium text-foreground/90">Filters:</span>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-foreground">
                         {filtered.length}
@@ -287,9 +298,8 @@ export default function ProjectsPage() {
                       </Badge>
                     )}
                   </div>
-                  
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-muted-foreground">Sort by:</span>
+                    <span className="text-xs font-medium text-foreground/80">Sort by:</span>
                     <div className="relative">
                       <Button 
                         variant="ghost" 
@@ -312,7 +322,7 @@ export default function ProjectsPage() {
 
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-foreground">Categories:</span>
+                    <span className="text-sm font-medium text-foreground/90">Categories:</span>
                     <div className="flex flex-wrap gap-2">
                       <Button
                         variant={category === "all" ? "gradient" : "glass"}
@@ -365,8 +375,8 @@ export default function ProjectsPage() {
                       transition={{ duration: 0.3, ease: "easeOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="pt-3 border-t border-white/10">
-                        <span className="text-xs font-medium text-muted-foreground mb-2 block">
+                      <div className="pt-3 border-t border-border/30">
+                        <span className="text-xs font-medium text-foreground/80 mb-2 block">
                           Technologies ({allTags.length}):
                         </span>
                         <div className="flex flex-wrap gap-1">
@@ -399,7 +409,31 @@ export default function ProjectsPage() {
         </motion.div>
       </div>
 
-      <div className="container mx-auto pb-16">
+      <div className="container mx-auto pb-20">
+        <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="text-center"
+          >
+            <h2 className="text-2xl font-semibold mb-2">
+              {filtered.length > 0 ? (
+                <span>Showing {filtered.length} project{filtered.length !== 1 ? 's' : ''}</span>
+              ) : (
+                <span>No projects found</span>
+              )}
+            </h2>
+            {(q || category !== "all" || selectedTags.length > 0) && (
+              <p className="text-muted-foreground">
+                {q && <span>matching "{q}"</span>}
+                {category !== "all" && <span> in {category}</span>}
+                {selectedTags.length > 0 && <span> with {selectedTags.join(", ")}</span>}
+              </p>
+            )}
+          </motion.div>
+        </div>
+        
         <AnimatePresence mode="wait">
           <motion.div
             key={`${layout}-${q}-${category}-${selectedTags.join(',')}`}
@@ -459,14 +493,14 @@ export default function ProjectsPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mx-auto max-w-lg text-center py-16"
+            className="mx-auto max-w-2xl text-center py-20"
           >
-            <div className="relative mb-4">
-              <div className="mx-auto h-24 w-24 rounded-full bg-muted/20 flex items-center justify-center">
-                <Search className="h-12 w-12 text-muted-foreground/50" />
+            <div className="relative mb-6">
+              <div className="mx-auto h-32 w-32 rounded-full bg-muted/10 flex items-center justify-center">
+                <Search className="h-16 w-16 text-muted-foreground/40" />
               </div>
-              <div className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-background border border-white/10 flex items-center justify-center">
-                <X className="h-4 w-4 text-muted-foreground" />
+              <div className="absolute -top-2 -right-2 h-10 w-10 rounded-full bg-background border border-border/50 flex items-center justify-center shadow-sm">
+                <X className="h-5 w-5 text-muted-foreground" />
               </div>
             </div>
             

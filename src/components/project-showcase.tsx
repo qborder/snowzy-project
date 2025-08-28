@@ -6,19 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Download, Github, ExternalLink } from "lucide-react"
 import Link from "next/link"
-
-type Project = {
-  title: string
-  description: string
-  category: string
-  downloadUrl?: string
-  githubUrl?: string
-  demoUrl?: string
-  youtubeUrl?: string
-  image?: string
-  icon?: string
-  tags: string[]
-}
+import { Project } from "@/types/project"
 
 const gradients = [
   "from-red-500/20 to-orange-500/20",

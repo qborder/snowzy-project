@@ -1,18 +1,8 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { kv } from "@vercel/kv"
 import { generateProjectId } from "@/lib/project-utils"
 import fallbackProjects from "@/data/projects.json"
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  category: string
-  views?: number
-  downloads?: number
-  icon?: string
-  [key: string]: unknown
-}
+import { Project } from "@/types/project"
 
 export async function GET() {
   try {
