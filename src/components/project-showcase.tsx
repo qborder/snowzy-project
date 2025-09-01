@@ -29,7 +29,16 @@ export function ProjectShowcase() {
         const res = await fetch('/api/projects')
         if (!res.ok) throw new Error('Failed to fetch projects')
         const data = await res.json()
-        setProjects(data.slice(0, 6))
+        // Filter out hidden projects and prioritize pinned ones
+        const visibleProjects = data
+          .filter((project: Project) => !project.hidden)
+          .sort((a: Project, b: Project) => {
+            // Sort pinned projects to the top
+            if (a.pinned && !b.pinned) return -1
+            if (!a.pinned && b.pinned) return 1
+            return 0
+          })
+        setProjects(visibleProjects.slice(0, 6))
       } catch (error) {
         console.error('Error fetching projects:', error)
       } finally {

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Download, Github, Youtube, BookOpen, Eye, ArrowDown } from "lucide-react"
+import { ExternalLink, Download, Github, Youtube, BookOpen, Eye, ArrowDown, Pin } from "lucide-react"
 import { ProjectCardProps } from "@/types/project"
 import Link from "next/link"
 import Image from "next/image"
@@ -32,6 +32,8 @@ export function ProjectCard({
   titleGradient,
   views = 0,
   downloads = 0,
+  pinned = false,
+  hidden = false,
 }: ProjectCardProps) {
   const prefersReducedMotion = useReducedMotion()
   
@@ -276,6 +278,14 @@ export function ProjectCard({
               <Badge variant="secondary" className={`text-xs font-medium px-3 py-1 transition-all duration-300 group-hover:translate-y-[-2px] group-hover:scale-[1.05] hover:shadow-md ${
                 cardGradient || cardColor ? 'bg-black/20 text-white border-white/20' : ''
               }`}>{category}</Badge>
+              {pinned && (
+                <Badge variant="outline" className={`text-xs font-medium px-2 py-1 transition-all duration-300 group-hover:translate-y-[-2px] group-hover:scale-[1.05] hover:shadow-md ${
+                  cardGradient || cardColor ? 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30' : 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                }`}>
+                  <Pin className="h-3 w-3 mr-1" />
+                  Pinned
+                </Badge>
+              )}
               {(views !== undefined || downloads !== undefined) && (
                 <div className="flex items-center gap-2">
                   {views !== undefined && (

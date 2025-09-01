@@ -198,6 +198,8 @@ export default function DevProjectsPage() {
   const [autoSaveStatus, setAutoSaveStatus] = useState("")
   const [previewReduce, setPreviewReduce] = useState(true)
   const [previewSize, setPreviewSize] = useState<"sm" | "md" | "lg">("md")
+  const [pinned, setPinned] = useState(false)
+  const [hidden, setHidden] = useState(false)
 
   // Auto-save functionality - saves EVERYTHING
   useEffect(() => {
@@ -207,7 +209,7 @@ export default function DevProjectsPage() {
     
     const draft = {
       // Form fields
-      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content,
+      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden,
       // Styling
       cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle,
       // UI State
@@ -223,7 +225,7 @@ export default function DevProjectsPage() {
     
     const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
     return () => clearTimeout(timer)
-  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize])
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -258,6 +260,8 @@ export default function DevProjectsPage() {
     setTitleGradientTo(project.titleGradient?.to || "")
     setTitleGradientVia(project.titleGradient?.via || "")
     setUseTitleCustomStyle(!!(project.titleColor || project.titleGradient))
+    setPinned(project.pinned || false)
+    setHidden(project.hidden || false)
     setActiveTab('creator')
     const url = new URL(window.location.href)
     url.searchParams.delete('tab')
@@ -284,6 +288,8 @@ export default function DevProjectsPage() {
         setIcon(parsed.icon || "")
         setTags(parsed.tags || [])
         setContent(parsed.content || "")
+        setPinned(parsed.pinned || false)
+        setHidden(parsed.hidden || false)
         
         // Styling
         setCardGradient(parsed.cardGradient || "")
@@ -529,7 +535,7 @@ export default function DevProjectsPage() {
       setResult(`Missing required fields: ${missing.join(", ")}`)
       return
     }
-    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content }
+    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
@@ -596,6 +602,8 @@ export default function DevProjectsPage() {
         setTitleGradientTo("")
         setTitleGradientVia("")
         setUseTitleCustomStyle(false)
+        setPinned(false)
+        setHidden(false)
       }
     } catch (err: unknown) {
       const error = err as Error
@@ -667,6 +675,8 @@ export default function DevProjectsPage() {
                       setTitleGradientTo("")
                       setTitleGradientVia("")
                       setUseTitleCustomStyle(false)
+                      setPinned(false)
+                      setHidden(false)
                       setPreviewReduce(true)
                       setPreviewSize('md')
                       setEditingProject(null)
@@ -799,6 +809,34 @@ export default function DevProjectsPage() {
                         placeholder="Or enter custom category" 
                         className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors"
                       />
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-muted-foreground">Project Settings</label>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
+                          <div className="space-y-0.5">
+                            <div className="text-sm font-medium">Pinned</div>
+                            <div className="text-xs text-muted-foreground">Pin this project to the top of the list</div>
+                          </div>
+                          <Switch
+                            checked={pinned}
+                            onCheckedChange={setPinned}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
+                          <div className="space-y-0.5">
+                            <div className="text-sm font-medium">Hidden</div>
+                            <div className="text-xs text-muted-foreground">Hide this project from public view</div>
+                          </div>
+                          <Switch
+                            checked={hidden}
+                            onCheckedChange={setHidden}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

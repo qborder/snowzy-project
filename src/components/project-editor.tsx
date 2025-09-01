@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Search, Eye, Download, ExternalLink, Trash2, Github, Calendar, Tag, Filter, SortAsc, SortDesc, Sparkles, Clock } from "lucide-react"
+import { Edit, Search, Eye, Download, ExternalLink, Trash2, Github, Calendar, Tag, Filter, SortAsc, SortDesc, Sparkles, Clock, Pin, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { Project, ProjectEditorProps } from "@/types/project"
 
@@ -48,6 +49,10 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
       return matchesSearch && matchesCategory
     })
     .sort((a, b) => {
+      // Sort pinned projects to the top first
+      if (a.pinned && !b.pinned) return -1
+      if (!a.pinned && b.pinned) return 1
+      
       let comparison = 0
       switch (sortBy) {
         case 'title':
@@ -300,6 +305,18 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
                             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                               {project.category}
                             </Badge>
+                            {project.pinned && (
+                              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+                                <Pin className="h-3 w-3 mr-1" />
+                                Pinned
+                              </Badge>
+                            )}
+                            {project.hidden && (
+                              <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
+                                <EyeOff className="h-3 w-3 mr-1" />
+                                Hidden
+                              </Badge>
+                            )}
                             {project.createdAt && (
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <Clock className="h-3 w-3" />
@@ -465,6 +482,32 @@ export function ProjectEditor({ onEditProject, handleEditProject }: ProjectEdito
                 onChange={e => setEditForm({...editForm, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean)})}
                 placeholder="tag1, tag2, tag3"
               />
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-sm font-medium">Project Settings</label>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-background/30">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium">Pinned</div>
+                    <div className="text-xs text-muted-foreground">Pin this project to the top of the list</div>
+                  </div>
+                  <Switch
+                    checked={editForm.pinned || false}
+                    onCheckedChange={(checked) => setEditForm({...editForm, pinned: checked})}
+                  />
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-background/30">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium">Hidden</div>
+                    <div className="text-xs text-muted-foreground">Hide this project from public view</div>
+                  </div>
+                  <Switch
+                    checked={editForm.hidden || false}
+                    onCheckedChange={(checked) => setEditForm({...editForm, hidden: checked})}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-2 justify-end">

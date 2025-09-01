@@ -45,19 +45,22 @@ export default function ProjectsPage() {
 
   const categories = useMemo(() => {
     const set = new Set<string>(["all"]) 
-    projects.forEach(p => set.add(p.category))
+    projects.filter(p => !p.hidden).forEach(p => set.add(p.category))
     return Array.from(set)
   }, [projects])
 
   const baseForCounts = useMemo(() => {
     return projects.filter(p => {
+      // Filter out hidden projects
+      if (p.hidden) return false
+      
       const matchQ = q.trim().length === 0 ||
         p.title.toLowerCase().includes(q.toLowerCase()) ||
         p.description.toLowerCase().includes(q.toLowerCase())
       const matchCat = category === "all" || p.category === category
       return matchQ && matchCat
     })
-  }, [q, category])
+  }, [projects, q, category])
 
   const allTags = useMemo(() => {
     const map = new Map<string, number>()
@@ -66,16 +69,39 @@ export default function ProjectsPage() {
   }, [baseForCounts])
 
   const filtered = useMemo(() => {
-    return projects.filter(p => {
-      const matchQ = q.trim().length === 0 ||
-        p.title.toLowerCase().includes(q.toLowerCase()) ||
-        p.description.toLowerCase().includes(q.toLowerCase()) ||
-        p.tags.some(t => t.toLowerCase().includes(q.toLowerCase()))
-      const matchCat = category === "all" || p.category === category
-      const matchTags = selectedTags.length === 0 || selectedTags.every(t => p.tags.includes(t))
-      return matchQ && matchCat && matchTags
-    })
-  }, [projects, q, category, selectedTags])
+    return projects
+      .filter(p => {
+        // Filter out hidden projects
+        if (p.hidden) return false
+        
+        const matchQ = q.trim().length === 0 ||
+          p.title.toLowerCase().includes(q.toLowerCase()) ||
+          p.description.toLowerCase().includes(q.toLowerCase()) ||
+          p.tags.some(t => t.toLowerCase().includes(q.toLowerCase()))
+        const matchCat = category === "all" || p.category === category
+        const matchTags = selectedTags.length === 0 || selectedTags.every(t => p.tags.includes(t))
+        return matchQ && matchCat && matchTags
+      })
+      .sort((a, b) => {
+        // Sort pinned projects to the top
+        if (a.pinned && !b.pinned) return -1
+        if (!a.pinned && b.pinned) return 1
+        
+        // Then sort by the selected sort order
+        if (sortBy === "latest") {
+          const aDate = new Date(a.createdAt || 0).getTime()
+          const bDate = new Date(b.createdAt || 0).getTime()
+          return bDate - aDate
+        } else if (sortBy === "popular") {
+          const aViews = a.views || 0
+          const bViews = b.views || 0
+          return bViews - aViews
+        } else if (sortBy === "name") {
+          return a.title.localeCompare(b.title)
+        }
+        return 0
+      })
+  }, [projects, q, category, selectedTags, sortBy])
 
   useEffect(() => {
     const spQ = searchParams.get("q") || searchParams.get("search") || ""
@@ -172,7 +198,7 @@ export default function ProjectsPage() {
         </div>
       </div>
     )
-  }
+  }         
 
   return (
     <div className="min-h-screen">
@@ -196,7 +222,7 @@ export default function ProjectsPage() {
               <div className="flex items-center justify-center gap-3 mb-6">
                 <Badge variant="secondary" className="px-4 py-1.5 text-sm font-medium">
                   <Star className="h-3.5 w-3.5 mr-1.5" />
-                  {projects.length} Projects
+                  {projects.filter(p => !p.hidden).length} Projects
                 </Badge>
                 <Badge variant="outline" className="px-4 py-1.5 text-sm font-medium">
                   <TrendingUp className="h-3.5 w-3.5 mr-1.5" />
@@ -331,10 +357,10 @@ export default function ProjectsPage() {
                         className="h-9 px-4 text-xs font-medium rounded-xl"
                       >
                         <Sparkles className="h-3 w-3 mr-1.5" />
-                        All ({projects.length})
+                        All ({projects.filter(p => !p.hidden).length})
                       </Button>
                       {categories.filter(cat => cat !== "all").map(cat => {
-                        const count = projects.filter(p => p.category === cat).length
+                        const count = projects.filter(p => p.category === cat && !p.hidden).length
                         const icon = cat.toLowerCase().includes('roblox') ? Gamepad2 : Code
                         const IconComponent = icon
                         return (
@@ -481,6 +507,8 @@ export default function ProjectsPage() {
                     projectId={project.id}
                     views={project.views}
                     downloads={project.downloads}
+                    pinned={project.pinned}
+                    hidden={project.hidden}
                   />
                 </motion.div>
               )

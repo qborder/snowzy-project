@@ -22,6 +22,8 @@ export interface Project {
     to: string
     via?: string
   }
+  pinned?: boolean
+  hidden?: boolean
 }
 
 export interface ProjectCardProps {
@@ -48,6 +50,8 @@ export interface ProjectCardProps {
     to: string
     via?: string
   }
+  pinned?: boolean
+  hidden?: boolean
 }
 
 export interface ProjectEditorProps {
