@@ -42,8 +42,16 @@ export default function ProjectViewPage() {
               if (fileInfoRes.ok) {
                 const fileInfo = await fileInfoRes.json()
                 if (fileInfo.fileSize) {
-                  const sizeInMB = (fileInfo.fileSize / (1024 * 1024)).toFixed(1)
-                  setFileSize(`${sizeInMB} MB`)
+                  const sizeInBytes = fileInfo.fileSize
+                  if (sizeInBytes < 1024) {
+                    setFileSize(`${sizeInBytes} B`)
+                  } else if (sizeInBytes < 1024 * 1024) {
+                    const sizeInKB = (sizeInBytes / 1024).toFixed(1)
+                    setFileSize(`${sizeInKB} KB`)
+                  } else {
+                    const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(1)
+                    setFileSize(`${sizeInMB} MB`)
+                  }
                 }
               }
             }

@@ -46,7 +46,7 @@ export async function GET(
         'Content-Type': contentType,
         'Content-Length': arrayBuffer.byteLength.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable',
-        'Content-Disposition': `inline; filename="${fileData.originalName}"`
+        'Content-Disposition': `attachment; filename="${fileData.originalName}"`
       }
     })
   } catch (error) {
