@@ -48,7 +48,7 @@ export function HeroSection() {
   const heroStats = [
     { label: "Projects", value: stats.projectCount !== null ? `${stats.projectCount}` : "...", icon: FolderOpen },
     { label: "Downloads", value: stats.totalDownloads !== null ? `${stats.totalDownloads.toLocaleString()}` : "...", icon: Download },
-    { label: "Stars", value: "NIL", icon: Star }
+    { label: "GitHub Stars", value: "Coming Soon", icon: Star }
   ]
 
   return (
@@ -163,8 +163,14 @@ export function HeroSection() {
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 1.2 }}
-                  className="absolute -bottom-2 left-0 h-1 w-full bg-gradient-to-r from-primary to-primary/50 origin-left"
+                  transition={{ duration: 1, delay: 1.2, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute -bottom-3 left-0 h-1.5 w-full bg-gradient-to-r from-primary via-primary/90 to-primary/60 origin-left rounded-full shadow-lg shadow-primary/30"
+                />
+                <motion.div
+                  initial={{ scaleX: 0, opacity: 0 }}
+                  animate={{ scaleX: 1, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 1.4, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute -bottom-3 left-0 h-1.5 w-full bg-gradient-to-r from-white/40 via-white/20 to-transparent origin-left rounded-full blur-sm"
                 />
               </motion.span>
             </motion.h1>
@@ -225,14 +231,20 @@ export function HeroSection() {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-primary/30 hover:border-primary/50 hover:bg-primary/10 backdrop-blur-sm transition-all duration-300" 
+                className="border-white/20 hover:border-white/40 hover:bg-white/5 backdrop-blur-sm transition-all duration-300 group relative overflow-hidden" 
                 asChild
               >
-                <Link href="https://youtube.com/@snowzy" target="_blank" className="flex items-center gap-2">
-                  <div className="flex h-5 w-5 items-center justify-center rounded bg-red-500">
-                    <div className="h-2 w-2 bg-white" style={{ clipPath: 'polygon(20% 0%, 0% 50%, 20% 100%)' }} />
-                  </div>
+                <Link href="https://youtube.com/@snowzy" target="_blank" className="flex items-center gap-2 relative z-10">
+                  <svg 
+                    className="h-5 w-5 text-red-500" 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor"
+                  >
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
                   Watch Tutorials
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+                  <div className="absolute inset-0 border border-white/0 group-hover:border-white/20 rounded-lg transition-all duration-300" />
                 </Link>
               </Button>
             </motion.div>
@@ -347,20 +359,20 @@ export function FeaturesSection() {
     {
       icon: <GamepadIcon className="h-6 w-6" />,
       title: "Roblox Scripts",
-      description: "Combat systems, admin tools, and UI frameworks ready to drop into Studio.",
+      description: "Combat systems, admin panels, UI kits. The stuff that takes forever to build right.",
       highlight: "Lua + GUI"
     },
     {
       icon: <Code2 className="h-6 w-6" />,
       title: "Web Apps",
-      description: "Full-stack projects with Next.js, React, and modern tooling.",
+      description: "Complete apps with auth, databases, APIs. Modern stack, zero setup time.",
       highlight: "TypeScript"
     },
     {
       icon: <Download className="h-6 w-6" />,
-      title: "Complete Files",
-      description: "Source code, assets, and setup guides — everything to get running fast.",
-      highlight: "No Setup"
+      title: "Everything Included",
+      description: "Source code, assets, docs. Download, run, customize. That's it.",
+      highlight: "Plug & Play"
     },
   ]
 
