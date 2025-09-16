@@ -2,10 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Code2, GamepadIcon, Download, Star, Users, FolderOpen, Sparkles } from "lucide-react"
+import { ArrowRight, Code2, GamepadIcon, Download, Star, Users, FolderOpen, Sparkles, Heart } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { getFavorites } from "@/lib/favorites"
 
 export function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -13,6 +14,7 @@ export function HeroSection() {
     projectCount: null as number | null,
     totalDownloads: null as number | null
   })
+  const [favorites, setFavorites] = useState<string[]>([])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -45,10 +47,25 @@ export function HeroSection() {
     fetchStats()
   }, [])
 
+  useEffect(() => {
+    // Initialize favorites
+    setFavorites(getFavorites())
+
+    // Listen for favorite changes
+    const handleFavoritesChanged = () => {
+      setFavorites(getFavorites())
+    }
+
+    window.addEventListener('favoritesChanged', handleFavoritesChanged)
+    return () => {
+      window.removeEventListener('favoritesChanged', handleFavoritesChanged)
+    }
+  }, [])
+
   const heroStats = [
     { label: "Projects", value: stats.projectCount !== null ? `${stats.projectCount}` : "...", icon: FolderOpen },
     { label: "Downloads", value: stats.totalDownloads !== null ? `${stats.totalDownloads.toLocaleString()}` : "...", icon: Download },
-    { label: "GitHub Stars", value: "Coming Soon", icon: Star }
+    { label: "Favorites", value: `${favorites.length}`, icon: Heart }
   ]
 
   return (

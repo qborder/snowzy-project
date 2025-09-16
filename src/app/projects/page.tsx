@@ -6,10 +6,11 @@ import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EnhancedInput } from "@/components/ui/enhanced-input"
-import { Search, Filter, Grid3x3, Columns3, Clock, Sparkles, Gamepad2, Code, X, TrendingUp, Calendar, Star, ChevronDown, LayoutGrid } from "lucide-react"
+import { Search, Filter, Grid3x3, Columns3, Clock, Sparkles, Gamepad2, Code, X, TrendingUp, Calendar, Star, ChevronDown, LayoutGrid, Heart } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import fallbackProjects from "@/data/projects.json"
 import { Project } from "@/types/project"
+import { getFavorites } from "@/lib/favorites"
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -19,6 +20,8 @@ export default function ProjectsPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [layout, setLayout] = useState<"gallery" | "masonry" | "compact">("gallery")
   const [sortBy, setSortBy] = useState<"latest" | "popular" | "name">("latest")
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+  const [favorites, setFavorites] = useState<string[]>([])
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -43,6 +46,21 @@ export default function ProjectsPage() {
     fetchProjects()
   }, [])
 
+  useEffect(() => {
+    // Initialize favorites
+    setFavorites(getFavorites())
+
+    // Listen for favorite changes
+    const handleFavoritesChanged = () => {
+      setFavorites(getFavorites())
+    }
+
+    window.addEventListener('favoritesChanged', handleFavoritesChanged)
+    return () => {
+      window.removeEventListener('favoritesChanged', handleFavoritesChanged)
+    }
+  }, [])
+
   const categories = useMemo(() => {
     const set = new Set<string>(["all"]) 
     projects.filter(p => !p.hidden).forEach(p => set.add(p.category))
@@ -58,9 +76,10 @@ export default function ProjectsPage() {
         p.title.toLowerCase().includes(q.toLowerCase()) ||
         p.description.toLowerCase().includes(q.toLowerCase())
       const matchCat = category === "all" || p.category === category
-      return matchQ && matchCat
+      const matchFav = !showFavoritesOnly || favorites.includes(p.id || '')
+      return matchQ && matchCat && matchFav
     })
-  }, [projects, q, category])
+  }, [projects, q, category, showFavoritesOnly, favorites])
 
   const allTags = useMemo(() => {
     const map = new Map<string, number>()
@@ -80,7 +99,8 @@ export default function ProjectsPage() {
           p.tags.some(t => t.toLowerCase().includes(q.toLowerCase()))
         const matchCat = category === "all" || p.category === category
         const matchTags = selectedTags.length === 0 || selectedTags.every(t => p.tags.includes(t))
-        return matchQ && matchCat && matchTags
+        const matchFav = !showFavoritesOnly || favorites.includes(p.id || '')
+        return matchQ && matchCat && matchTags && matchFav
       })
       .sort((a, b) => {
         // Sort pinned projects to the top
@@ -309,6 +329,15 @@ export default function ProjectsPage() {
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="text-sm font-medium text-foreground/90">Filters:</span>
+                    <Button
+                      variant={showFavoritesOnly ? "gradient" : "outline"}
+                      size="sm"
+                      onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                      className="h-7 px-3 text-xs font-medium"
+                    >
+                      <Heart className={`h-3 w-3 mr-1.5 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                      Favorites {showFavoritesOnly ? `(${favorites.length})` : ''}
+                    </Button>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-foreground">
                         {filtered.length}
@@ -317,7 +346,7 @@ export default function ProjectsPage() {
                         project{filtered.length !== 1 ? 's' : ''} found
                       </span>
                     </div>
-                    {(q || category !== "all" || selectedTags.length > 0) && (
+                    {(q || category !== "all" || selectedTags.length > 0 || showFavoritesOnly) && (
                       <Badge variant="secondary" className="h-6 text-xs px-2">
                         <Filter className="h-3 w-3 mr-1" />
                         Active Filters

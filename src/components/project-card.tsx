@@ -3,13 +3,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Download, Github, Youtube, BookOpen, Eye, ArrowDown, Pin } from "lucide-react"
+import { ExternalLink, Download, Github, Youtube, BookOpen, Eye, ArrowDown, Pin, Heart } from "lucide-react"
 import { ProjectCardProps } from "@/types/project"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
 import { generateSlug } from "@/lib/project-utils"
+import { isFavorite, toggleFavorite } from "@/lib/favorites"
 
 
 export function ProjectCard({
@@ -48,6 +49,15 @@ export function ProjectCard({
       }
     }
   }
+
+  const handleFavoriteToggle = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (projectId) {
+      const newFavoriteStatus = toggleFavorite(projectId)
+      setFavoriteStatus(newFavoriteStatus)
+    }
+  }
   
   const ytId = youtubeUrl
     ? (() => {
@@ -65,9 +75,31 @@ export function ProjectCard({
   const [imgOk, setImgOk] = useState(true)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
+  const [favoriteStatus, setFavoriteStatus] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number>(0)
   const isValidSrc = (s?: string) => !!s && (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/"))
+
+  useEffect(() => {
+    // Initialize favorite status
+    if (projectId) {
+      setFavoriteStatus(isFavorite(projectId))
+    }
+
+    // Listen for favorite changes
+    const handleFavoritesChanged = (event: CustomEvent) => {
+      if (projectId && event.detail.projectId === projectId) {
+        setFavoriteStatus(event.detail.action === 'add')
+      } else if (event.detail.action === 'clear') {
+        setFavoriteStatus(false)
+      }
+    }
+
+    window.addEventListener('favoritesChanged', handleFavoritesChanged as EventListener)
+    return () => {
+      window.removeEventListener('favoritesChanged', handleFavoritesChanged as EventListener)
+    }
+  }, [projectId])
 
   useEffect(() => {
     const updateTransform = (x: number, y: number, rect: DOMRect) => {
@@ -206,6 +238,18 @@ export function ProjectCard({
               </div>
             )}
             <div className="absolute top-2 right-2 flex gap-1.5 items-center">
+              <Button 
+                onClick={handleFavoriteToggle}
+                variant="ghost" 
+                size="sm" 
+                className={`group/fav h-8 w-8 p-0 rounded-lg border border-white/20 transition-all duration-300 hover:scale-110 hover:shadow-lg focus-visible:ring-2 backdrop-blur-sm ${
+                  favoriteStatus 
+                    ? 'bg-gradient-to-br from-red-500/40 to-pink-500/30 hover:from-red-500/50 hover:to-pink-500/40 hover:border-red-400/50 hover:shadow-red-400/25 focus-visible:ring-red-400/50' 
+                    : 'bg-gradient-to-br from-black/30 to-black/20 hover:from-red-500/30 hover:to-pink-500/20 hover:border-red-400/40 hover:shadow-red-400/20 focus-visible:ring-red-400/40'
+                }`}
+              >
+                <Heart className={`h-4 w-4 text-white transition-all duration-200 group-hover/fav:scale-110 ${favoriteStatus ? 'fill-current' : ''}`} />
+              </Button>
               {githubUrl && (
                 <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-black/30 to-black/20 hover:from-primary/40 hover:to-primary/30 border border-white/20 hover:border-primary/50 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50 backdrop-blur-sm" asChild>
                   <Link href={githubUrl} target="_blank">
@@ -245,6 +289,18 @@ export function ProjectCard({
               </div>
             )}
             <div className="absolute top-2 right-2 flex gap-1.5 items-center">
+              <Button 
+                onClick={handleFavoriteToggle}
+                variant="ghost" 
+                size="sm" 
+                className={`group/fav h-8 w-8 p-0 rounded-lg border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-lg focus-visible:ring-2 ${
+                  favoriteStatus 
+                    ? 'bg-gradient-to-br from-red-500/30 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/30 hover:border-red-400/40 hover:shadow-red-400/20 focus-visible:ring-red-400/40' 
+                    : 'bg-gradient-to-br from-muted/40 to-muted/20 hover:from-red-500/20 hover:to-pink-500/15 hover:border-red-400/30 hover:shadow-red-400/15 focus-visible:ring-red-400/30'
+                }`}
+              >
+                <Heart className={`h-4 w-4 transition-all duration-200 group-hover/fav:scale-110 ${favoriteStatus ? 'fill-current text-red-500' : 'text-muted-foreground group-hover/fav:text-red-500'}`} />
+              </Button>
               {githubUrl && (
                 <Button variant="ghost" size="sm" className="group/btn h-8 w-8 p-0 rounded-lg bg-gradient-to-br from-muted/40 to-muted/20 hover:from-primary/30 hover:to-primary/20 border border-white/10 hover:border-primary/40 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary/50" asChild>
                   <Link href={githubUrl} target="_blank">

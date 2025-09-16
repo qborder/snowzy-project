@@ -6,9 +6,10 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight } from "lucide-react"
+import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight, Heart } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
 import { Project } from "@/types/project"
+import { isFavorite, toggleFavorite } from "@/lib/favorites"
 
 
 export default function ProjectViewPage() {
@@ -17,6 +18,7 @@ export default function ProjectViewPage() {
   const [loading, setLoading] = useState(true)
   const [isDownloading, setIsDownloading] = useState(false)
   const [fileSize, setFileSize] = useState<string | null>(null)
+  const [favoriteStatus, setFavoriteStatus] = useState(false)
 
   useEffect(() => {
     async function loadProject() {
@@ -32,6 +34,9 @@ export default function ProjectViewPage() {
           notFound()
         }
         setProject(foundProject)
+        
+        // Set initial favorite status
+        setFavoriteStatus(isFavorite(projectId))
         
         // Fetch file size if download URL exists
         if (foundProject.downloadUrl) {
@@ -78,6 +83,13 @@ export default function ProjectViewPage() {
     }
     loadProject()
   }, [params.id])
+
+  const handleFavoriteToggle = () => {
+    if (project) {
+      const newFavoriteStatus = toggleFavorite(project.id)
+      setFavoriteStatus(newFavoriteStatus)
+    }
+  }
 
   function getYoutubeEmbedUrl(url: string): string | null {
     const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
@@ -239,6 +251,26 @@ export default function ProjectViewPage() {
                     {project.category}
                   </Badge>
                   <div className="flex items-center gap-3 flex-wrap">
+                    <Button
+                      onClick={handleFavoriteToggle}
+                      variant="outline"
+                      size="sm"
+                      className={`group/fav relative overflow-hidden transition-all duration-300 hover:scale-105 ${
+                        favoriteStatus 
+                          ? 'bg-gradient-to-r from-red-500/15 to-pink-500/10 border-red-500/30 text-red-500 hover:from-red-500/25 hover:to-pink-500/15 hover:border-red-500/50' 
+                          : 'bg-background/60 border-white/25 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-500'
+                      } backdrop-blur-sm shadow-sm hover:shadow-lg`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover/fav:opacity-100 transition-opacity duration-300" />
+                      <Heart 
+                        className={`h-4 w-4 mr-2 transition-all duration-300 group-hover/fav:scale-110 relative z-10 ${
+                          favoriteStatus ? 'fill-current text-red-500' : ''
+                        }`} 
+                      />
+                      <span className="font-semibold relative z-10">
+                        {favoriteStatus ? 'Favorited' : 'Add to Favorites'}
+                      </span>
+                    </Button>
                     {project.createdAt && (
                       <div className="flex items-center gap-2 text-sm bg-background/60 px-4 py-2 rounded-xl border border-white/25 backdrop-blur-sm shadow-sm">
                         <Clock className="h-4 w-4 text-muted-foreground" />
