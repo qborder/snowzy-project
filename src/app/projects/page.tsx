@@ -122,7 +122,7 @@ export default function ProjectsPage() {
         }
         return 0
       })
-  }, [projects, q, category, selectedTags, sortBy])
+  }, [projects, q, category, selectedTags, sortBy, showFavoritesOnly, favorites])
 
   useEffect(() => {
     const spQ = searchParams.get("q") || searchParams.get("search") || ""
@@ -158,6 +158,7 @@ export default function ProjectsPage() {
     setQ("")
     setCategory("all")
     setSelectedTags([])
+    setShowFavoritesOnly(false)
   }
 
   const gridClass = layout === "compact"

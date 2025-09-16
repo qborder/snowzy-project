@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Project } from "@/types/project"
+import { Project, ProjectVersion } from "@/types/project"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ProjectCard } from "@/components/project-card"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database } from "lucide-react"
+import { Upload, Sparkles, Plus, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database, Package } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 import { MarkdownEditorEnhanced } from "@/components/markdown-editor-enhanced"
@@ -201,6 +201,135 @@ export default function DevProjectsPage() {
   const [pinned, setPinned] = useState(false)
   const [hidden, setHidden] = useState(false)
 
+  // Version management state
+  const [versionTag, setVersionTag] = useState("")
+  const [versionTitle, setVersionTitle] = useState("")
+  const [versionDescription, setVersionDescription] = useState("")
+  const [versionType, setVersionType] = useState<"stable" | "beta" | "alpha" | "preview" | "hotfix">("stable")
+  const [versionAssets, setVersionAssets] = useState<Array<{id: string, name: string, url: string}>>([])
+  const [versionAssetInput, setVersionAssetInput] = useState("")
+  const [isPrerelease, setIsPrerelease] = useState(false)
+  const [projectVersions, setProjectVersions] = useState<ProjectVersion[]>([])
+  const [creatingVersion, setCreatingVersion] = useState(false)
+
+  // Load project versions when editing a project
+  useEffect(() => {
+    if (editingProjectId) {
+      fetchProjectVersions(editingProjectId)
+    }
+  }, [editingProjectId])
+
+  async function fetchProjectVersions(projectId: string) {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/versions`)
+      if (response.ok) {
+        const versions = await response.json()
+        setProjectVersions(versions)
+      }
+    } catch (error) {
+      console.error('Failed to fetch versions:', error)
+    }
+  }
+
+  async function handleVersionAssetUpload() {
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.accept = '*/*'
+    fileInput.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      
+      try {
+        setUploading(true)
+        const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+          method: 'POST',
+          body: file
+        })
+        const data = await res.json()
+        if (data.url && data.id) {
+          const newAsset = {
+            id: data.id,
+            name: data.displayName || file.name,
+            url: data.url
+          }
+          setVersionAssets(prev => [...prev, newAsset])
+          setResult(`Asset "${file.name}" uploaded successfully!`)
+        }
+      } catch (error) {
+        setResult(`Failed to upload asset: ${error}`)
+      } finally {
+        setUploading(false)
+      }
+    }
+    fileInput.click()
+  }
+
+  function addVersionAssetUrl() {
+    if (versionAssetInput.trim()) {
+      const newAsset = {
+        id: crypto.randomUUID(),
+        name: versionAssetInput.split('/').pop() || 'Asset',
+        url: versionAssetInput
+      }
+      setVersionAssets(prev => [...prev, newAsset])
+      setVersionAssetInput("")
+    }
+  }
+
+  function removeVersionAsset(assetId: string) {
+    setVersionAssets(prev => prev.filter(asset => asset.id !== assetId))
+  }
+
+  async function handleCreateVersion() {
+    if (!versionTag || !versionTitle || !editingProjectId) {
+      setResult("Please fill in version tag and title")
+      return
+    }
+
+    try {
+      setCreatingVersion(true)
+      const response = await fetch(`/api/projects/${editingProjectId}/versions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tag: versionTag,
+          title: versionTitle,
+          description: versionDescription,
+          type: versionType,
+          assets: versionAssets.map(asset => ({
+            id: asset.id,
+            name: asset.name,
+            downloadUrl: asset.url,
+            fileSize: 0 // Could be enhanced to track actual file sizes
+          })),
+          isPrerelease
+        })
+      })
+
+      if (response.ok) {
+        const { version } = await response.json()
+        setProjectVersions(prev => [version, ...prev])
+        
+        // Clear form
+        setVersionTag("")
+        setVersionTitle("")
+        setVersionDescription("")
+        setVersionType("stable")
+        setVersionAssets([])
+        setIsPrerelease(false)
+        
+        setResult(`Version ${version.tag} created successfully!`)
+      } else {
+        const error = await response.text()
+        setResult(`Failed to create version: ${error}`)
+      }
+    } catch (error) {
+      setResult(`Error creating version: ${error}`)
+    } finally {
+      setCreatingVersion(false)
+    }
+  }
+
   // Auto-save functionality - saves EVERYTHING
   useEffect(() => {
     if (!title && !description && !category && !content && tags.length === 0 && !image && !icon && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl && !editingProject) {
@@ -216,6 +345,8 @@ export default function DevProjectsPage() {
       activeTab, editingProjectId, editingProject, templateName, tagInput,
       // Preview
       previewReduce, previewSize,
+      // Version fields
+      versionTag, versionTitle, versionDescription, versionType, versionAssets, versionAssetInput, isPrerelease,
       // Timestamp
       timestamp: Date.now()
     }
@@ -225,7 +356,7 @@ export default function DevProjectsPage() {
     
     const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
     return () => clearTimeout(timer)
-  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize])
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize, versionTag, versionTitle, versionDescription, versionType, versionAssets, versionAssetInput, isPrerelease])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -1792,6 +1923,8 @@ Instructions for contributors...`}
                           <span className="text-destructive">*</span>
                         </label>
                         <EnhancedInput 
+                          value={versionTag}
+                          onChange={(e) => setVersionTag(e.target.value)}
                           placeholder="v1.0.0" 
                           className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50" 
                         />
@@ -1803,6 +1936,8 @@ Instructions for contributors...`}
                           <span className="text-destructive">*</span>
                         </label>
                         <EnhancedInput 
+                          value={versionTitle}
+                          onChange={(e) => setVersionTitle(e.target.value)}
                           placeholder="Major Update - New Features & Bug Fixes" 
                           className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50" 
                         />
@@ -1815,6 +1950,8 @@ Instructions for contributors...`}
                         <div className="relative group/textarea">
                           <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-cyan-400/0 rounded-lg opacity-0 group-hover/textarea:opacity-100 transition-opacity -z-10" />
                           <textarea 
+                            value={versionDescription}
+                            onChange={(e) => setVersionDescription(e.target.value)}
                             placeholder="What's new in this version?&#10;- Added new feature X&#10;- Fixed bug Y&#10;- Improved performance"
                             className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/30 transition-all duration-200 backdrop-blur-sm" 
                           />
@@ -1834,7 +1971,10 @@ Instructions for contributors...`}
                             <Badge 
                               key={type}
                               variant="outline"
+                              onClick={() => setVersionType(type as any)}
                               className={`cursor-pointer transition-all duration-200 border hover:scale-105 ${
+                                versionType === type ? 'ring-2 ring-cyan-400/50 ' : ''
+                              }${
                                 color === 'green' ? 'bg-green-500/10 hover:bg-green-500/15 text-green-400 border-green-400/20 hover:border-green-400/30' :
                                 color === 'blue' ? 'bg-blue-500/10 hover:bg-blue-500/15 text-blue-400 border-blue-400/20 hover:border-blue-400/30' :
                                 color === 'yellow' ? 'bg-yellow-500/10 hover:bg-yellow-500/15 text-yellow-400 border-yellow-400/20 hover:border-yellow-400/30' :
@@ -1851,30 +1991,62 @@ Instructions for contributors...`}
                       
                       <div className="space-y-3">
                         <label className="text-sm font-medium text-muted-foreground">Download Assets</label>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <EnhancedInput 
+                              value={versionAssetInput}
+                              onChange={(e) => setVersionAssetInput(e.target.value)}
                               placeholder="https://releases.com/asset.zip or upload file" 
                               className="flex-1 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50 transition-colors"
+                              onKeyPress={(e) => e.key === 'Enter' && addVersionAssetUrl()}
                             />
                             <Button 
                               type="button" 
                               variant="outline" 
                               size="sm"
+                              onClick={addVersionAssetUrl}
+                              disabled={!versionAssetInput.trim()}
+                              className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors disabled:opacity-50" 
+                            >
+                              Add URL
+                            </Button>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              onClick={handleVersionAssetUpload}
+                              disabled={uploading}
                               className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors" 
                             >
                               <Upload className="h-4 w-4 mr-1.5" />
-                              Upload
+                              {uploading ? "Uploading..." : "Upload"}
                             </Button>
                           </div>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm"
-                            className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
-                          >
-                            + Add Another Asset
-                          </Button>
+                          
+                          {versionAssets.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-xs text-muted-foreground">Assets ({versionAssets.length}):</p>
+                              <div className="space-y-1.5">
+                                {versionAssets.map((asset) => (
+                                  <div key={asset.id} className="flex items-center justify-between p-2 rounded-lg bg-background/30 border border-white/10">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <Download className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />
+                                      <span className="text-sm truncate">{asset.name}</span>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeVersionAsset(asset.id)}
+                                      className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       
@@ -1883,6 +2055,8 @@ Instructions for contributors...`}
                           <input 
                             type="checkbox" 
                             id="prerelease" 
+                            checked={isPrerelease}
+                            onChange={(e) => setIsPrerelease(e.target.checked)}
                             className="rounded border-gray-300 text-cyan-400 focus:ring-cyan-400/30"
                           />
                           <label htmlFor="prerelease" className="text-sm text-muted-foreground">
@@ -1891,10 +2065,12 @@ Instructions for contributors...`}
                         </div>
                         <Button 
                           type="button"
-                          className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-500/90 hover:to-cyan-400/90 text-white shadow-lg hover:shadow-xl hover:shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 hover:scale-105"
+                          onClick={handleCreateVersion}
+                          disabled={creatingVersion || !versionTag || !versionTitle || !editingProjectId}
+                          className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-500/90 hover:to-cyan-400/90 text-white shadow-lg hover:shadow-xl hover:shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
-                          <Database className="h-4 w-4 mr-1.5" />
-                          Create Release
+                          <Plus className="h-4 w-4 mr-2" />
+                          {creatingVersion ? "Creating..." : "Create Version"}
                         </Button>
                       </div>
                     </div>
@@ -1906,58 +2082,85 @@ Instructions for contributors...`}
                       </h3>
                       
                       <div className="space-y-3">
-                        {/* Example version entries */}
-                        <div className="p-4 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <Badge className="bg-green-500/10 text-green-400 border-green-400/20">
-                                <span className="mr-1">✅</span>
-                                stable
-                              </Badge>
-                              <span className="font-mono text-sm font-medium">v1.2.1</span>
+                        {projectVersions.length > 0 ? (
+                          projectVersions.map((version) => {
+                            const versionTypeInfo = {
+                              stable: { color: "green", icon: "✅" },
+                              beta: { color: "blue", icon: "🚧" },
+                              alpha: { color: "yellow", icon: "⚠️" },
+                              preview: { color: "purple", icon: "👀" },
+                              hotfix: { color: "red", icon: "🔥" }
+                            }[version.type] || { color: "gray", icon: "📦" }
+
+                            return (
+                              <div key={version.id} className="p-4 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-3">
+                                    <Badge className={`${
+                                      versionTypeInfo.color === 'green' ? 'bg-green-500/10 text-green-400 border-green-400/20' :
+                                      versionTypeInfo.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-400/20' :
+                                      versionTypeInfo.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-400/20' :
+                                      versionTypeInfo.color === 'purple' ? 'bg-purple-500/10 text-purple-400 border-purple-400/20' :
+                                      versionTypeInfo.color === 'red' ? 'bg-red-500/10 text-red-400 border-red-400/20' :
+                                      'bg-gray-500/10 text-gray-400 border-gray-400/20'
+                                    }`}>
+                                      <span className="mr-1">{versionTypeInfo.icon}</span>
+                                      {version.type}
+                                    </Badge>
+                                    <span className="font-mono text-sm font-medium">{version.tag}</span>
+                                    {version.isPrerelease && (
+                                      <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-400 border-orange-400/20">
+                                        Pre-release
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(version.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <h4 className="font-medium text-sm mb-1">{version.title}</h4>
+                                {version.description && (
+                                  <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                                    {version.description}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-2 mt-3">
+                                  {version.assets && version.assets.length > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      {version.assets.map((asset) => (
+                                        <Button 
+                                          key={asset.id}
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="h-7 px-2 text-xs hover:bg-cyan-500/10"
+                                          onClick={async () => {
+                                            window.open(`/api/projects/${editingProjectId}/versions/${version.id}/download?assetId=${asset.id}`, '_blank')
+                                          }}
+                                        >
+                                          <Download className="h-3 w-3 mr-1" />
+                                          {asset.name}
+                                        </Button>
+                                      ))}
+                                    </div>
+                                  )}
+                                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                                    {version.downloads} downloads
+                                  </Button>
+                                </div>
+                              </div>
+                            )
+                          })
+                        ) : (
+                          <div className="text-center py-8">
+                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted/50 mb-3">
+                              <Package className="h-5 w-5 text-muted-foreground" />
                             </div>
-                            <span className="text-xs text-muted-foreground">2 days ago</span>
+                            <h4 className="text-sm font-medium text-foreground/90 mb-1">No versions yet</h4>
+                            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                              {editingProjectId ? "Create your first version using the form above." : "Select a project to view and manage its versions."}
+                            </p>
                           </div>
-                          <h4 className="font-medium text-sm mb-1">Security Update & Bug Fixes</h4>
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            Fixed critical security vulnerability in authentication system. Improved error handling and performance optimizations.
-                          </p>
-                          <div className="flex items-center gap-2 mt-3">
-                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                              <Download className="h-3 w-3 mr-1" />
-                              57 downloads
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="p-4 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <Badge className="bg-blue-500/10 text-blue-400 border-blue-400/20">
-                                <span className="mr-1">🚧</span>
-                                beta
-                              </Badge>
-                              <span className="font-mono text-sm font-medium">v1.3.0-beta.2</span>
-                            </div>
-                            <span className="text-xs text-muted-foreground">1 week ago</span>
-                          </div>
-                          <h4 className="font-medium text-sm mb-1">New UI Components & Dark Mode</h4>
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            Added new dashboard components, dark mode support, and improved accessibility features. Please test and report any issues.
-                          </p>
-                          <div className="flex items-center gap-2 mt-3">
-                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                              <Download className="h-3 w-3 mr-1" />
-                              23 downloads
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight, Heart, Database, Info } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
-import { Project } from "@/types/project"
+import { Project, ProjectVersion } from "@/types/project"
 import { isFavorite, toggleFavorite } from "@/lib/favorites"
 
 
@@ -20,6 +20,8 @@ export default function ProjectViewPage() {
   const [isDownloading, setIsDownloading] = useState(false)
   const [fileSize, setFileSize] = useState<string | null>(null)
   const [favoriteStatus, setFavoriteStatus] = useState(false)
+  const [projectVersions, setProjectVersions] = useState<ProjectVersion[]>([])
+  const [versionsLoading, setVersionsLoading] = useState(false)
 
   useEffect(() => {
     async function loadProject() {
@@ -74,6 +76,9 @@ export default function ProjectViewPage() {
         } catch (error) {
           console.error('Failed to increment view count:', error)
         }
+
+        // Load project versions
+        loadProjectVersions(projectId)
         
       } catch (err) {
         console.error("Error loading project:", err)
@@ -84,6 +89,21 @@ export default function ProjectViewPage() {
     }
     loadProject()
   }, [params.id])
+
+  async function loadProjectVersions(projectId: string) {
+    try {
+      setVersionsLoading(true)
+      const response = await fetch(`/api/projects/${projectId}/versions`)
+      if (response.ok) {
+        const versions = await response.json()
+        setProjectVersions(versions)
+      }
+    } catch (error) {
+      console.error('Failed to fetch versions:', error)
+    } finally {
+      setVersionsLoading(false)
+    }
+  }
 
   const handleFavoriteToggle = () => {
     if (project && project.id) {
@@ -389,143 +409,118 @@ export default function ProjectViewPage() {
                   </CardHeader>
                   <CardContent className="p-8">
                     <div className="space-y-6">
-                      {/* Version entries */}
-                      <div className="space-y-4">
-                        <div className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                              <Badge className="bg-green-500/10 text-green-400 border-green-400/20 px-3 py-1">
-                                <span className="mr-1">✅</span>
-                                stable
-                              </Badge>
-                              <div>
-                                <h3 className="font-mono text-lg font-bold text-foreground">v1.2.1</h3>
-                                <p className="text-sm text-muted-foreground">Latest Release</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm text-muted-foreground">2 days ago</p>
-                              <p className="text-xs text-muted-foreground/80">March 14, 2024</p>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg text-foreground">Security Update & Bug Fixes</h4>
-                            <div className="prose prose-sm max-w-none text-muted-foreground">
-                              <p>This release focuses on security improvements and critical bug fixes:</p>
-                              <ul className="list-disc list-inside space-y-1 mt-2">
-                                <li>Fixed critical security vulnerability in authentication system</li>
-                                <li>Improved error handling throughout the application</li>
-                                <li>Enhanced performance optimizations for large datasets</li>
-                                <li>Updated dependencies to latest secure versions</li>
-                              </ul>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Download className="h-4 w-4 text-emerald-500" />
-                              <span className="font-medium text-emerald-600 dark:text-emerald-400">157 downloads</span>
-                            </div>
-                            <Button variant="outline" size="sm" className="ml-auto">
-                              <Download className="h-3 w-3 mr-1.5" />
-                              Download
-                            </Button>
+                      {versionsLoading ? (
+                        <div className="flex items-center justify-center py-12">
+                          <div className="text-center space-y-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+                            <p className="text-sm text-muted-foreground">Loading versions...</p>
                           </div>
                         </div>
-                        
-                        <div className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                              <Badge className="bg-blue-500/10 text-blue-400 border-blue-400/20 px-3 py-1">
-                                <span className="mr-1">🚧</span>
-                                beta
-                              </Badge>
-                              <div>
-                                <h3 className="font-mono text-lg font-bold text-foreground">v1.3.0-beta.2</h3>
-                                <p className="text-sm text-muted-foreground">Pre-release</p>
+                      ) : projectVersions.length > 0 ? (
+                        <div className="space-y-4">
+                          {projectVersions.map((version, index) => {
+                            const versionTypeInfo = {
+                              stable: { color: "green", icon: "✅" },
+                              beta: { color: "blue", icon: "🚧" },
+                              alpha: { color: "yellow", icon: "⚠️" },
+                              preview: { color: "purple", icon: "👀" },
+                              hotfix: { color: "red", icon: "🔥" }
+                            }[version.type] || { color: "gray", icon: "📦" }
+
+                            return (
+                              <div key={version.id} className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
+                                <div className="flex items-start justify-between mb-4">
+                                  <div className="flex items-center gap-4">
+                                    <Badge className={`px-3 py-1 ${
+                                      versionTypeInfo.color === 'green' ? 'bg-green-500/10 text-green-400 border-green-400/20' :
+                                      versionTypeInfo.color === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-400/20' :
+                                      versionTypeInfo.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-400/20' :
+                                      versionTypeInfo.color === 'purple' ? 'bg-purple-500/10 text-purple-400 border-purple-400/20' :
+                                      versionTypeInfo.color === 'red' ? 'bg-red-500/10 text-red-400 border-red-400/20' :
+                                      'bg-gray-500/10 text-gray-400 border-gray-400/20'
+                                    }`}>
+                                      <span className="mr-1">{versionTypeInfo.icon}</span>
+                                      {version.type}
+                                    </Badge>
+                                    <div>
+                                      <h3 className="font-mono text-lg font-bold text-foreground">{version.tag}</h3>
+                                      <p className="text-sm text-muted-foreground">
+                                        {index === 0 ? 'Latest Release' : version.isPrerelease ? 'Pre-release' : 'Release'}
+                                      </p>
+                                    </div>
+                                    {version.isPrerelease && (
+                                      <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-400 border-orange-400/20">
+                                        Pre-release
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-sm text-muted-foreground">
+                                      {new Date(version.createdAt).toLocaleDateString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        year: 'numeric' 
+                                      })}
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                <div className="space-y-3">
+                                  <h4 className="font-semibold text-lg text-foreground">{version.title}</h4>
+                                  {version.description && (
+                                    <div className="prose prose-sm max-w-none text-muted-foreground">
+                                      <p>{version.description}</p>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <Download className="h-4 w-4 text-emerald-500" />
+                                    <span className="font-medium text-emerald-600 dark:text-emerald-400">{version.downloads} downloads</span>
+                                  </div>
+                                  <div className="ml-auto flex items-center gap-2">
+                                    {version.assets && version.assets.length > 0 && (
+                                      version.assets.map((asset) => (
+                                        <Button 
+                                          key={asset.id}
+                                          variant="outline" 
+                                          size="sm"
+                                          onClick={() => {
+                                            window.open(`/api/projects/${project?.id}/versions/${version.id}/download?assetId=${asset.id}`, '_blank')
+                                          }}
+                                        >
+                                          <Download className="h-3 w-3 mr-1.5" />
+                                          {asset.name}
+                                        </Button>
+                                      ))
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm text-muted-foreground">1 week ago</p>
-                              <p className="text-xs text-muted-foreground/80">March 7, 2024</p>
-                            </div>
-                          </div>
+                            )
+                          })}
                           
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg text-foreground">New UI Components & Dark Mode</h4>
-                            <div className="prose prose-sm max-w-none text-muted-foreground">
-                              <p>Major UI overhaul with new features and improvements:</p>
-                              <ul className="list-disc list-inside space-y-1 mt-2">
-                                <li>Complete dark mode implementation with theme switching</li>
-                                <li>New dashboard components and layouts</li>
-                                <li>Improved accessibility features and keyboard navigation</li>
-                                <li>Enhanced mobile responsiveness</li>
-                              </ul>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Download className="h-4 w-4 text-emerald-500" />
-                              <span className="font-medium text-emerald-600 dark:text-emerald-400">43 downloads</span>
-                            </div>
-                            <Button variant="outline" size="sm" className="ml-auto">
-                              <Download className="h-3 w-3 mr-1.5" />
-                              Download
-                            </Button>
+                          <div className="text-center pt-4">
+                            <p className="text-sm text-muted-foreground">
+                              Total versions: <span className="font-semibold text-foreground">{projectVersions.length}</span> • 
+                              Total downloads: <span className="font-semibold text-foreground">
+                                {projectVersions.reduce((sum, v) => sum + v.downloads, 0).toLocaleString()}
+                              </span>
+                            </p>
                           </div>
                         </div>
-                        
-                        <div className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                              <Badge className="bg-green-500/10 text-green-400 border-green-400/20 px-3 py-1">
-                                <span className="mr-1">✅</span>
-                                stable
-                              </Badge>
-                              <div>
-                                <h3 className="font-mono text-lg font-bold text-foreground">v1.2.0</h3>
-                                <p className="text-sm text-muted-foreground">Major Release</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm text-muted-foreground">3 weeks ago</p>
-                              <p className="text-xs text-muted-foreground/80">February 22, 2024</p>
-                            </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted/50 mb-4">
+                            <Package className="h-8 w-8 text-muted-foreground" />
                           </div>
-                          
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg text-foreground">Feature-Rich Update</h4>
-                            <div className="prose prose-sm max-w-none text-muted-foreground">
-                              <p>Introducing powerful new features and improvements:</p>
-                              <ul className="list-disc list-inside space-y-1 mt-2">
-                                <li>Advanced search and filtering capabilities</li>
-                                <li>Real-time collaboration features</li>
-                                <li>Export functionality for multiple formats</li>
-                                <li>Performance improvements and bug fixes</li>
-                              </ul>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Download className="h-4 w-4 text-emerald-500" />
-                              <span className="font-medium text-emerald-600 dark:text-emerald-400">289 downloads</span>
-                            </div>
-                            <Button variant="outline" size="sm" className="ml-auto">
-                              <Download className="h-3 w-3 mr-1.5" />
-                              Download
-                            </Button>
-                          </div>
+                          <h4 className="text-lg font-medium text-foreground/90 mb-2">No versions available</h4>
+                          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                            This project doesn't have any published versions yet. Check back later for updates and releases.
+                          </p>
                         </div>
-                      </div>
-                      
-                      <div className="text-center pt-4">
-                        <p className="text-sm text-muted-foreground">
-                          More versions available • Total downloads: <span className="font-semibold text-foreground">489</span>
-                        </p>
-                      </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

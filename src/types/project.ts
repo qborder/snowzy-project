@@ -1,3 +1,21 @@
+export interface ProjectVersion {
+  id: string
+  projectId: string
+  tag: string
+  title: string
+  description: string
+  type: "stable" | "beta" | "alpha" | "preview" | "hotfix"
+  assets: Array<{
+    id: string
+    name: string
+    downloadUrl: string
+    fileSize?: number
+  }>
+  isPrerelease: boolean
+  downloads: number
+  createdAt: string
+}
+
 export interface Project {
   id?: string
   title: string
@@ -24,6 +42,7 @@ export interface Project {
   }
   pinned?: boolean
   hidden?: boolean
+  versions?: ProjectVersion[]
 }
 
 export interface ProjectCardProps {
