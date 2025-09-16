@@ -517,7 +517,7 @@ export default function ProjectViewPage() {
                           </div>
                           <h4 className="text-lg font-medium text-foreground/90 mb-2">No versions available</h4>
                           <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                            This project doesn't have any published versions yet. Check back later for updates and releases.
+                            This project doesn&apos;t have any published versions yet. Check back later for updates and releases.
                           </p>
                         </div>
                       )}

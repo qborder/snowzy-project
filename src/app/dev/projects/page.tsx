@@ -1971,7 +1971,7 @@ Instructions for contributors...`}
                             <Badge 
                               key={type}
                               variant="outline"
-                              onClick={() => setVersionType(type as any)}
+                              onClick={() => setVersionType(type as "stable" | "beta" | "alpha" | "preview" | "hotfix")}
                               className={`cursor-pointer transition-all duration-200 border hover:scale-105 ${
                                 versionType === type ? 'ring-2 ring-cyan-400/50 ' : ''
                               }${
