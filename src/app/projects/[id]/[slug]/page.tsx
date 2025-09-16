@@ -85,7 +85,7 @@ export default function ProjectViewPage() {
   }, [params.id])
 
   const handleFavoriteToggle = () => {
-    if (project) {
+    if (project && project.id) {
       const newFavoriteStatus = toggleFavorite(project.id)
       setFavoriteStatus(newFavoriteStatus)
     }
