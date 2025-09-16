@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getVersionById, updateVersionDownloads } from "@/lib/version-storage"
+import { getFileById } from "@/lib/file-storage"
 
 export async function GET(
   request: NextRequest,
@@ -26,11 +27,17 @@ export async function GET(
       return NextResponse.json({ error: 'Asset not found' }, { status: 404 })
     }
 
+    // Get file data to find the display name
+    const fileData = await getFileById(assetId)
+    if (!fileData) {
+      return NextResponse.json({ error: 'File not found' }, { status: 404 })
+    }
+
     // Update download count
     await updateVersionDownloads(resolvedParams.id, resolvedParams.versionId)
 
-    // Redirect to existing download endpoint that handles filename properly
-    return NextResponse.redirect(`${new URL(request.url).origin}/api/download/${assetId}`)
+    // Redirect to the proper file download URL that handles filenames correctly
+    return NextResponse.redirect(`${new URL(request.url).origin}/api/files/${encodeURIComponent(fileData.displayName)}`)
   } catch (error) {
     console.error('Failed to process download:', error)
     return NextResponse.json({ error: 'Download failed' }, { status: 500 })
