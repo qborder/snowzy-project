@@ -4,18 +4,19 @@ import { getFileById } from "@/lib/file-storage"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } }
+  { params }: { params: Promise<{ id: string; versionId: string }> }
 ) {
   try {
-    const { id: projectId, versionId } = params
-    const assetId = request.nextUrl.searchParams.get('assetId')
+    const resolvedParams = await params
+    const { searchParams } = new URL(request.url)
+    const assetId = searchParams.get('assetId')
     
     if (!assetId) {
-      return NextResponse.json({ error: 'Asset ID required' }, { status: 400 })
+      return NextResponse.json({ error: 'Asset ID is required' }, { status: 400 })
     }
 
-    // Get the version to verify it exists and get asset info
-    const version = await getVersionById(projectId, versionId)
+    // Get the version to find the asset
+    const version = await getVersionById(resolvedParams.id, resolvedParams.versionId)
     if (!version) {
       return NextResponse.json({ error: 'Version not found' }, { status: 404 })
     }
@@ -33,7 +34,7 @@ export async function GET(
     }
 
     // Update download count
-    await updateVersionDownloads(projectId, versionId)
+    await updateVersionDownloads(resolvedParams.id, resolvedParams.versionId)
 
     // Redirect to the blob URL for download
     return NextResponse.redirect(fileData.blobUrl)

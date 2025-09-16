@@ -4,12 +4,11 @@ import { ProjectVersion } from "@/types/project"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id
-    const versions = await getVersionsByProjectId(projectId)
-    
+    const resolvedParams = await params
+    const versions = await getVersionsByProjectId(resolvedParams.id)
     return NextResponse.json(versions)
   } catch (error) {
     console.error('Failed to fetch versions:', error)
@@ -19,31 +18,28 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = params.id
+    const resolvedParams = await params
     const body = await request.json()
-    
     const { tag, title, description, type, assets, isPrerelease } = body
     
-    if (!tag || !title || !description || !type) {
-      return NextResponse.json(
-        { error: 'Missing required fields: tag, title, description, type' },
-        { status: 400 }
-      )
+    if (!tag || !title) {
+      return NextResponse.json({ error: 'Tag and title are required' }, { status: 400 })
     }
 
-    const version = await createVersion(projectId, {
+    const versionData = {
       tag,
       title,
-      description,
-      type: type as ProjectVersion['type'],
+      description: description || '',
+      type: type || 'stable',
       assets: assets || [],
       isPrerelease: isPrerelease || false
-    })
+    }
 
-    return NextResponse.json({ success: true, version })
+    const version = await createVersion(resolvedParams.id, versionData)
+    return NextResponse.json({ version }, { status: 201 })
   } catch (error) {
     console.error('Failed to create version:', error)
     return NextResponse.json({ error: 'Failed to create version' }, { status: 500 })
