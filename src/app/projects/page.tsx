@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import fallbackProjects from "@/data/projects.json"
 import { Project } from "@/types/project"
 import { getFavorites } from "@/lib/favorites"
+import { ProjectsPageSkeleton } from "@/components/projects-page-skeleton"
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -166,58 +167,7 @@ export default function ProjectsPage() {
     : "mx-auto grid justify-center gap-5 sm:grid-cols-2 md:max-w-[90rem] md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 
   if (loading) {
-    return (
-      <div className="min-h-screen">
-        <div className="relative pt-16 pb-12 md:pt-20 md:pb-16">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_800px_400px_at_50%_0%,hsl(var(--primary)/0.03),transparent)]" />
-          <div className="container mx-auto">
-            <div className="mx-auto max-w-5xl text-center mb-8">
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="h-7 w-24 bg-muted/30 rounded-full animate-pulse" />
-                <div className="h-7 w-28 bg-muted/30 rounded-full animate-pulse" />
-              </div>
-              <div className="h-20 bg-muted/20 rounded-3xl animate-pulse mb-8 mx-auto max-w-4xl" />
-              <div className="h-12 bg-muted/20 rounded-2xl animate-pulse mx-auto max-w-3xl mb-4" />
-              <div className="h-6 bg-muted/20 rounded-xl animate-pulse mx-auto max-w-lg" />
-            </div>
-            <div className="mb-8">
-              <div className="h-48 bg-muted/20 rounded-2xl animate-pulse" />
-            </div>
-          </div>
-        </div>
-        <div className="container mx-auto pb-20">
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              className="text-center"
-            >
-              <h2 className="text-2xl font-semibold mb-2">
-                {filtered.length > 0 ? (
-                  <span>Showing {filtered.length} project{filtered.length !== 1 ? 's' : ''}</span>
-                ) : (
-                  <span>No projects found</span>
-                )}
-              </h2>
-              {(q || category !== "all" || selectedTags.length > 0) && (
-                <p className="text-muted-foreground">
-                  {q && <span>matching &ldquo;{q}&rdquo;</span>}
-                  {category !== "all" && <span> in {category}</span>}
-                  {selectedTags.length > 0 && <span> with {selectedTags.join(", ")}</span>}
-                </p>
-              )}
-            </motion.div>
-          </div>
-          <div className={gridClass}>
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="h-80 bg-muted/20 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+    return <ProjectsPageSkeleton />
   }         
 
   return (

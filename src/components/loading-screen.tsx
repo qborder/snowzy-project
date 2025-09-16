@@ -154,6 +154,28 @@ export default function LoadingScreen() {
                 {loadingStates[currentStateIndex]}
               </motion.p>
 
+              <div className="relative w-16 h-16 mx-auto mb-6">
+                {/* Outer ring */}
+                <div className="absolute inset-0 border-4 border-transparent border-t-primary/60 rounded-full animate-spin">
+                  <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-primary rounded-full" />
+                </div>
+                
+                {/* Middle ring */}
+                <div className="absolute inset-2 border-2 border-transparent border-r-primary/40 rounded-full animate-spin-reverse">
+                  <div className="absolute -right-0.5 top-1/2 -translate-y-1/2 w-1 h-1 bg-primary/60 rounded-full" />
+                </div>
+                
+                {/* Inner ring */}
+                <div className="absolute inset-4 border-2 border-transparent border-b-primary/30 rounded-full animate-spin">
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary/40 rounded-full" />
+                </div>
+                
+                {/* Center dot */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                </div>
+              </div>
+
               <div className="w-64 mx-auto space-y-2">
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Loading</span>

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag } from "lucide-react"
 import { Project } from "@/types/project"
+import { ProjectDetailSkeleton } from "@/components/project-detail-skeleton"
 
 export default function ProjectViewPage() {
   const params = useParams()
@@ -42,15 +43,7 @@ export default function ProjectViewPage() {
   }
 
   if (loading) {
-    return (
-      <div className="container mx-auto max-w-6xl py-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-white/10 rounded w-1/3"></div>
-          <div className="h-64 bg-white/10 rounded"></div>
-          <div className="h-32 bg-white/10 rounded"></div>
-        </div>
-      </div>
-    )
+    return <ProjectDetailSkeleton />
   }
 
   if (!project) return notFound()

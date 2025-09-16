@@ -138,36 +138,65 @@ export function HeroSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-              className="relative mb-2"
+              className="relative mb-4"
             >
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 backdrop-blur-sm px-4 py-2 text-sm font-medium text-primary">
-                <Sparkles className="h-4 w-4" />
-                Professional Downloads
-              </div>
+              <motion.div 
+                animate={{ 
+                  boxShadow: [
+                    "0 0 0 0px hsl(var(--primary)/0.4)",
+                    "0 0 0 10px hsl(var(--primary)/0.1)",
+                    "0 0 0 20px hsl(var(--primary)/0)"
+                  ]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/10 to-primary/5 backdrop-blur-md px-5 py-2.5 text-sm font-semibold text-primary hover:scale-105 transition-transform cursor-pointer"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                >
+                  <Sparkles className="h-4 w-4" />
+                </motion.div>
+                <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  Premium Developer Tools
+                </span>
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-2 h-2 rounded-full bg-green-500"
+                />
+              </motion.div>
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1], delay: 0.1 }}
-              className="font-heading text-4xl font-bold tracking-tight leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl"
+              className="font-heading text-4xl font-bold tracking-tight leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
             >
               <motion.span
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="inline-block"
+                className="inline-block relative"
               >
-                Ship faster
+                Build
+                <motion.div
+                  animate={{ 
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                  className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 bg-[length:200%_100%] blur-lg opacity-60"
+                />
               </motion.span>
-              <br />
+              {" "}
               <motion.span
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, rotateY: 90 }}
+                animate={{ opacity: 1, rotateY: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="inline-block bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent"
+                className="inline-block bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent font-black"
               >
-                with premium
+                legendary
               </motion.span>
               <br />
               <motion.span
@@ -176,18 +205,26 @@ export function HeroSection() {
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="inline-block relative"
               >
-                ready-to-use code
+                <span className="relative z-10">applications</span>
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: 1, delay: 1.2, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute -bottom-3 left-0 h-1.5 w-full bg-gradient-to-r from-primary via-primary/90 to-primary/60 origin-left rounded-full shadow-lg shadow-primary/30"
+                  transition={{ duration: 1.2, delay: 1.2, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute -bottom-4 left-0 h-2 w-full bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40 origin-left rounded-full shadow-xl shadow-primary/40"
                 />
                 <motion.div
                   initial={{ scaleX: 0, opacity: 0 }}
                   animate={{ scaleX: 1, opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 1.4, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute -bottom-3 left-0 h-1.5 w-full bg-gradient-to-r from-white/40 via-white/20 to-transparent origin-left rounded-full blur-sm"
+                  transition={{ duration: 0.8, delay: 1.6, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute -bottom-4 left-0 h-2 w-full bg-gradient-to-r from-white/60 via-white/30 to-transparent origin-left rounded-full blur-md"
+                />
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    opacity: [0.5, 0.8, 0.5]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                  className="absolute -inset-2 bg-gradient-to-r from-primary/10 via-primary/20 to-primary/10 rounded-lg blur-xl"
                 />
               </motion.span>
             </motion.h1>
@@ -195,11 +232,29 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.4, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-              className="max-w-2xl text-balance leading-relaxed text-muted-foreground text-lg sm:text-xl sm:leading-8"
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+              className="max-w-2xl text-balance leading-relaxed text-muted-foreground text-lg sm:text-xl sm:leading-9"
             >
-              Skip the setup. Skip the bugs. Get professional Roblox scripts and web applications 
-              that work out of the box. <span className="text-foreground font-medium">Built by developers, for developers.</span>
+              Skip months of development. Get{" "}
+              <motion.span 
+                animate={{ 
+                  backgroundPosition: ["0%", "100%", "0%"]
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="font-semibold bg-gradient-to-r from-primary via-foreground to-primary bg-[length:200%_100%] bg-clip-text text-transparent"
+              >
+                production-ready
+              </motion.span>
+              {" "}Roblox scripts and modern web applications that scale.
+              <br />
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="text-foreground font-semibold mt-2 block"
+              >
+                ⚡ Zero setup • 🛡️ Battle-tested • 🚀 Deploy instantly
+              </motion.span>
             </motion.p>
             
             <motion.div
@@ -232,56 +287,121 @@ export function HeroSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.4, delay: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-              className="flex flex-wrap items-center gap-4 pt-4"
+              className="flex flex-wrap items-center gap-4 pt-6"
             >
-              <Button 
-                size="lg" 
-                className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 group" 
-                asChild
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
               >
-                <Link href="/projects" className="relative z-10">
-                  <span className="relative z-10">Browse Projects</span>
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-white/20 hover:border-white/40 hover:bg-white/5 backdrop-blur-sm transition-all duration-300 group relative overflow-hidden" 
-                asChild
+                <Button 
+                  size="lg" 
+                  className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary/80 hover:from-primary/95 hover:to-primary/75 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-500 group px-8 py-3 text-base font-semibold" 
+                  asChild
+                >
+                  <Link href="/projects" className="relative z-10 flex items-center gap-2">
+                    <span className="relative z-10">Explore Projects</span>
+                    <motion.div
+                      animate={{ x: [0, 3, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
+                    </motion.div>
+                    
+                    {/* Shimmer effect */}
+                    <motion.div
+                      animate={{ x: ["-100%", "100%"] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 1 }}
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12"
+                    />
+                    
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </Link>
+                </Button>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.02, rotate: [0, -1, 1, 0] }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3 }}
               >
-                <Link href="https://youtube.com/@snowzy" target="_blank" className="flex items-center gap-2 relative z-10">
-                  <svg 
-                    className="h-5 w-5 text-red-500" 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor"
-                  >
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                  Watch Tutorials
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
-                  <div className="absolute inset-0 border border-white/0 group-hover:border-white/20 rounded-lg transition-all duration-300" />
-                </Link>
-              </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-white/30 hover:border-red-500/50 hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-600/5 backdrop-blur-md transition-all duration-300 group relative overflow-hidden px-6 py-3 text-base" 
+                  asChild
+                >
+                  <Link href="https://youtube.com/@snowzy" target="_blank" className="flex items-center gap-3 relative z-10">
+                    <motion.div
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, -5, 0]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <svg 
+                        className="h-5 w-5 text-red-500 group-hover:text-red-400 transition-colors" 
+                        viewBox="0 0 24 24" 
+                        fill="currentColor"
+                      >
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                    </motion.div>
+                    <span className="font-medium">Watch Tutorials</span>
+                    
+                    {/* Hover border effect */}
+                    <div className="absolute inset-0 border border-red-500/0 group-hover:border-red-500/30 rounded-lg transition-all duration-300" />
+                    
+                    {/* Background glow on hover */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileHover={{ opacity: 1, scale: 1 }}
+                      className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent rounded-lg"
+                    />
+                  </Link>
+                </Button>
+              </motion.div>
             </motion.div>
           </div>
         <div className="relative hidden md:block overflow-visible">
           <motion.div
             animate={{
-              y: [0, -10, 0],
-              rotate: [0, 1, 0]
+              y: [0, -15, 0],
+              rotate: [0, 2, -1, 0]
             }}
             transition={{
               repeat: Infinity,
-              duration: 8,
+              duration: 12,
               ease: "easeInOut"
             }}
             className="relative"
           >
-            <div aria-hidden className="absolute -inset-12 rounded-[2.5rem] bg-gradient-to-br from-primary/25 via-primary/15 to-transparent blur-3xl" />
-            <div className="relative aspect-[4/3] w-full rounded-3xl border border-white/20 bg-background/40 backdrop-blur-2xl overflow-hidden shadow-2xl shadow-primary/10">
-              <div className="absolute inset-0 bg-[radial-gradient(transparent_1px,hsl(var(--background)/0.8))_1px)] [background-size:20px_20px]" />
+            <motion.div 
+              animate={{
+                scale: [1, 1.02, 1],
+                opacity: [0.8, 1, 0.8]
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              aria-hidden 
+              className="absolute -inset-16 rounded-[3rem] bg-gradient-to-br from-primary/30 via-primary/20 to-primary/5 blur-3xl" 
+            />
+            <div className="relative aspect-[4/3] w-full rounded-3xl border-2 border-white/25 bg-gradient-to-br from-background/50 via-background/40 to-background/30 backdrop-blur-3xl overflow-hidden shadow-3xl shadow-primary/20">
+              <motion.div 
+                animate={{
+                  backgroundPosition: ["0px 0px", "40px 40px"]
+                }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_1px,hsl(var(--background)/0.9)_1px)] [background-size:20px_20px]" 
+              />
               
               <motion.div
                 animate={{ rotate: 360 }}
