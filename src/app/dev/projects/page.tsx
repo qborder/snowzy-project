@@ -696,7 +696,7 @@ export default function DevProjectsPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Tabs defaultValue="basic" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-7 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/10 p-1.5 rounded-xl shadow-lg">
+            <TabsList className="grid w-full grid-cols-8 bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/10 p-1.5 rounded-xl shadow-lg">
               <TabsTrigger value="basic" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary/15 data-[state=active]:to-primary/8 data-[state=active]:text-primary rounded-lg transition-all duration-300 hover:scale-105">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
                 <Sparkles className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-primary" />
@@ -726,6 +726,11 @@ export default function DevProjectsPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-400/0 via-orange-400/5 to-orange-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
                 <Sparkles className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-orange-400" />
                 <span className="relative z-10">Templates</span>
+              </TabsTrigger>
+              <TabsTrigger value="versions" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-cyan-500/15 data-[state=active]:to-cyan-400/8 data-[state=active]:text-cyan-400 rounded-lg transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
+                <Database className="h-4 w-4 mr-1 transition-all duration-200 group-hover:scale-110 group-data-[state=active]:text-cyan-400" />
+                <span className="relative z-10">Versions</span>
               </TabsTrigger>
               <TabsTrigger value="debug" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-br data-[state=active]:from-red-500/15 data-[state=active]:to-red-400/8 data-[state=active]:text-red-400 rounded-lg transition-all duration-300 hover:scale-105">
                 <div className="absolute inset-0 bg-gradient-to-br from-red-400/0 via-red-400/5 to-red-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-500" />
@@ -1764,6 +1769,199 @@ Instructions for contributors...`}
                     ))}
                   </div>
                 </div>
+              </TabsContent>
+              
+              <TabsContent value="versions" className="space-y-6">
+                <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
+                  <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-cyan-400/5 border-b border-cyan-400/10 p-5">
+                    <CardTitle className="flex items-center gap-4">
+                      <div className="p-2.5 bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 rounded-xl border border-cyan-400/20 shadow-sm group-hover:shadow-cyan-400/20 transition-all duration-300">
+                        <Database className="h-5 w-5 text-cyan-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 bg-clip-text text-transparent">Version Management</div>
+                        <p className="text-sm text-muted-foreground font-medium">Manage releases and versions like GitHub</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-8 p-6">
+                    <div className="space-y-6">
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                          <span>Version Tag</span>
+                          <span className="text-destructive">*</span>
+                        </label>
+                        <EnhancedInput 
+                          placeholder="v1.0.0" 
+                          className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50" 
+                        />
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                          <span>Release Title</span>
+                          <span className="text-destructive">*</span>
+                        </label>
+                        <EnhancedInput 
+                          placeholder="Major Update - New Features & Bug Fixes" 
+                          className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50" 
+                        />
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Release Notes
+                        </label>
+                        <div className="relative group/textarea">
+                          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-cyan-400/0 rounded-lg opacity-0 group-hover/textarea:opacity-100 transition-opacity -z-10" />
+                          <textarea 
+                            placeholder="What's new in this version?&#10;- Added new feature X&#10;- Fixed bug Y&#10;- Improved performance"
+                            className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/30 transition-all duration-200 backdrop-blur-sm" 
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <label className="text-sm font-medium text-muted-foreground">Version Type</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { type: "stable", color: "green", icon: "✅" },
+                            { type: "beta", color: "blue", icon: "🚧" },
+                            { type: "alpha", color: "yellow", icon: "⚠️" },
+                            { type: "preview", color: "purple", icon: "👀" },
+                            { type: "hotfix", color: "red", icon: "🔥" }
+                          ].map(({ type, color, icon }) => (
+                            <Badge 
+                              key={type}
+                              variant="outline"
+                              className={`cursor-pointer transition-all duration-200 border hover:scale-105 ${
+                                color === 'green' ? 'bg-green-500/10 hover:bg-green-500/15 text-green-400 border-green-400/20 hover:border-green-400/30' :
+                                color === 'blue' ? 'bg-blue-500/10 hover:bg-blue-500/15 text-blue-400 border-blue-400/20 hover:border-blue-400/30' :
+                                color === 'yellow' ? 'bg-yellow-500/10 hover:bg-yellow-500/15 text-yellow-400 border-yellow-400/20 hover:border-yellow-400/30' :
+                                color === 'purple' ? 'bg-purple-500/10 hover:bg-purple-500/15 text-purple-400 border-purple-400/20 hover:border-purple-400/30' :
+                                'bg-red-500/10 hover:bg-red-500/15 text-red-400 border-red-400/20 hover:border-red-400/30'
+                              }`}
+                            >
+                              <span className="mr-1">{icon}</span>
+                              {type}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <label className="text-sm font-medium text-muted-foreground">Download Assets</label>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <EnhancedInput 
+                              placeholder="https://releases.com/asset.zip or upload file" 
+                              className="flex-1 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50 transition-colors"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors" 
+                            >
+                              <Upload className="h-4 w-4 mr-1.5" />
+                              Upload
+                            </Button>
+                          </div>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm"
+                            className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
+                          >
+                            + Add Another Asset
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            id="prerelease" 
+                            className="rounded border-gray-300 text-cyan-400 focus:ring-cyan-400/30"
+                          />
+                          <label htmlFor="prerelease" className="text-sm text-muted-foreground">
+                            Mark as pre-release
+                          </label>
+                        </div>
+                        <Button 
+                          type="button"
+                          className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-500/90 hover:to-cyan-400/90 text-white shadow-lg hover:shadow-xl hover:shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 hover:scale-105"
+                        >
+                          <Database className="h-4 w-4 mr-1.5" />
+                          Create Release
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4 pt-6 border-t border-white/10">
+                      <h3 className="text-lg font-semibold text-foreground/90 flex items-center gap-2">
+                        <span className="w-1 h-5 rounded-full bg-cyan-400"></span>
+                        Version History
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        {/* Example version entries */}
+                        <div className="p-4 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-3">
+                              <Badge className="bg-green-500/10 text-green-400 border-green-400/20">
+                                <span className="mr-1">✅</span>
+                                stable
+                              </Badge>
+                              <span className="font-mono text-sm font-medium">v1.2.1</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">2 days ago</span>
+                          </div>
+                          <h4 className="font-medium text-sm mb-1">Security Update & Bug Fixes</h4>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            Fixed critical security vulnerability in authentication system. Improved error handling and performance optimizations.
+                          </p>
+                          <div className="flex items-center gap-2 mt-3">
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                              <Download className="h-3 w-3 mr-1" />
+                              57 downloads
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 rounded-lg border border-white/10 bg-background/30 hover:bg-background/50 transition-colors">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-3">
+                              <Badge className="bg-blue-500/10 text-blue-400 border-blue-400/20">
+                                <span className="mr-1">🚧</span>
+                                beta
+                              </Badge>
+                              <span className="font-mono text-sm font-medium">v1.3.0-beta.2</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">1 week ago</span>
+                          </div>
+                          <h4 className="font-medium text-sm mb-1">New UI Components & Dark Mode</h4>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            Added new dashboard components, dark mode support, and improved accessibility features. Please test and report any issues.
+                          </p>
+                          <div className="flex items-center gap-2 mt-3">
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                              <Download className="h-3 w-3 mr-1" />
+                              23 downloads
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
               
               <TabsContent value="debug" className="space-y-6">

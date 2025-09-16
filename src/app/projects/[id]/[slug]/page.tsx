@@ -6,7 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight, Heart } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight, Heart, Database, Info } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
 import { Project } from "@/types/project"
 import { isFavorite, toggleFavorite } from "@/lib/favorites"
@@ -328,28 +329,208 @@ export default function ProjectViewPage() {
 
         <div className="grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-10">
+            <Tabs defaultValue="about" className="space-y-8">
+              <TabsList className="grid w-full grid-cols-2 max-w-md bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-1.5">
+                <TabsTrigger 
+                  value="about" 
+                  className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg transition-all duration-300 hover:scale-[1.02]"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-700" />
+                  <Info className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:scale-110 group-data-[state=active]:animate-pulse" />
+                  <span className="relative z-10">About</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="versions" 
+                  className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-cyan-400/10 data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400/30 rounded-lg transition-all duration-300 hover:scale-[1.02]"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-700" />
+                  <Database className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:scale-110 group-data-[state=active]:animate-pulse" />
+                  <span className="relative z-10">Versions</span>
+                </TabsTrigger>
+              </TabsList>
 
+              <TabsContent value="about" className="space-y-6">
+                {project.content && (
+                  <Card className="bg-background/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl overflow-hidden">
+                    <CardHeader className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-b border-primary/20 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-purple-500/5 opacity-50"></div>
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
+                      <CardTitle className="flex items-center gap-4 text-xl relative z-10">
+                        <div className="p-4 bg-gradient-to-br from-primary/40 via-primary/25 to-primary/15 rounded-2xl border border-primary/30 shadow-lg backdrop-blur-sm">
+                          <Code className="h-7 w-7 text-primary" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-3xl font-black text-foreground bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent leading-tight">Description</p>
+                          <p className="text-sm text-muted-foreground font-medium opacity-80">Comprehensive project documentation and details</p>
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                      <MarkdownViewer content={project.content} />
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-            {project.content && (
-              <Card className="bg-background/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-b border-primary/20 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-purple-500/5 opacity-50"></div>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
-                  <CardTitle className="flex items-center gap-4 text-xl relative z-10">
-                    <div className="p-4 bg-gradient-to-br from-primary/40 via-primary/25 to-primary/15 rounded-2xl border border-primary/30 shadow-lg backdrop-blur-sm">
-                      <Code className="h-7 w-7 text-primary" />
+              <TabsContent value="versions" className="space-y-6">
+                <Card className="bg-background/70 backdrop-blur-xl border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl overflow-hidden">
+                  <CardHeader className="bg-gradient-to-br from-cyan-500/15 via-cyan-400/10 to-cyan-500/5 border-b border-cyan-400/20 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-cyan-400/5 opacity-50"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-400/20 to-transparent rounded-full blur-2xl"></div>
+                    <CardTitle className="flex items-center gap-4 text-xl relative z-10">
+                      <div className="p-4 bg-gradient-to-br from-cyan-500/40 via-cyan-400/25 to-cyan-500/15 rounded-2xl border border-cyan-400/30 shadow-lg backdrop-blur-sm">
+                        <Database className="h-7 w-7 text-cyan-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-3xl font-black text-foreground bg-gradient-to-r from-foreground via-cyan-400 to-foreground bg-clip-text text-transparent leading-tight">Release History</p>
+                        <p className="text-sm text-muted-foreground font-medium opacity-80">All versions and updates for this project</p>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <div className="space-y-6">
+                      {/* Version entries */}
+                      <div className="space-y-4">
+                        <div className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <Badge className="bg-green-500/10 text-green-400 border-green-400/20 px-3 py-1">
+                                <span className="mr-1">✅</span>
+                                stable
+                              </Badge>
+                              <div>
+                                <h3 className="font-mono text-lg font-bold text-foreground">v1.2.1</h3>
+                                <p className="text-sm text-muted-foreground">Latest Release</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-muted-foreground">2 days ago</p>
+                              <p className="text-xs text-muted-foreground/80">March 14, 2024</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-lg text-foreground">Security Update & Bug Fixes</h4>
+                            <div className="prose prose-sm max-w-none text-muted-foreground">
+                              <p>This release focuses on security improvements and critical bug fixes:</p>
+                              <ul className="list-disc list-inside space-y-1 mt-2">
+                                <li>Fixed critical security vulnerability in authentication system</li>
+                                <li>Improved error handling throughout the application</li>
+                                <li>Enhanced performance optimizations for large datasets</li>
+                                <li>Updated dependencies to latest secure versions</li>
+                              </ul>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Download className="h-4 w-4 text-emerald-500" />
+                              <span className="font-medium text-emerald-600 dark:text-emerald-400">157 downloads</span>
+                            </div>
+                            <Button variant="outline" size="sm" className="ml-auto">
+                              <Download className="h-3 w-3 mr-1.5" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <Badge className="bg-blue-500/10 text-blue-400 border-blue-400/20 px-3 py-1">
+                                <span className="mr-1">🚧</span>
+                                beta
+                              </Badge>
+                              <div>
+                                <h3 className="font-mono text-lg font-bold text-foreground">v1.3.0-beta.2</h3>
+                                <p className="text-sm text-muted-foreground">Pre-release</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-muted-foreground">1 week ago</p>
+                              <p className="text-xs text-muted-foreground/80">March 7, 2024</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-lg text-foreground">New UI Components & Dark Mode</h4>
+                            <div className="prose prose-sm max-w-none text-muted-foreground">
+                              <p>Major UI overhaul with new features and improvements:</p>
+                              <ul className="list-disc list-inside space-y-1 mt-2">
+                                <li>Complete dark mode implementation with theme switching</li>
+                                <li>New dashboard components and layouts</li>
+                                <li>Improved accessibility features and keyboard navigation</li>
+                                <li>Enhanced mobile responsiveness</li>
+                              </ul>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Download className="h-4 w-4 text-emerald-500" />
+                              <span className="font-medium text-emerald-600 dark:text-emerald-400">43 downloads</span>
+                            </div>
+                            <Button variant="outline" size="sm" className="ml-auto">
+                              <Download className="h-3 w-3 mr-1.5" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="p-6 rounded-xl border border-white/10 bg-background/30 hover:bg-background/50 transition-all duration-300 group">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <Badge className="bg-green-500/10 text-green-400 border-green-400/20 px-3 py-1">
+                                <span className="mr-1">✅</span>
+                                stable
+                              </Badge>
+                              <div>
+                                <h3 className="font-mono text-lg font-bold text-foreground">v1.2.0</h3>
+                                <p className="text-sm text-muted-foreground">Major Release</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-muted-foreground">3 weeks ago</p>
+                              <p className="text-xs text-muted-foreground/80">February 22, 2024</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-lg text-foreground">Feature-Rich Update</h4>
+                            <div className="prose prose-sm max-w-none text-muted-foreground">
+                              <p>Introducing powerful new features and improvements:</p>
+                              <ul className="list-disc list-inside space-y-1 mt-2">
+                                <li>Advanced search and filtering capabilities</li>
+                                <li>Real-time collaboration features</li>
+                                <li>Export functionality for multiple formats</li>
+                                <li>Performance improvements and bug fixes</li>
+                              </ul>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Download className="h-4 w-4 text-emerald-500" />
+                              <span className="font-medium text-emerald-600 dark:text-emerald-400">289 downloads</span>
+                            </div>
+                            <Button variant="outline" size="sm" className="ml-auto">
+                              <Download className="h-3 w-3 mr-1.5" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center pt-4">
+                        <p className="text-sm text-muted-foreground">
+                          More versions available • Total downloads: <span className="font-semibold text-foreground">489</span>
+                        </p>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-3xl font-black text-foreground bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent leading-tight">Description</p>
-                      <p className="text-sm text-muted-foreground font-medium opacity-80">Comprehensive project documentation and details</p>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-8">
-                  <MarkdownViewer content={project.content} />
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
 
           </div>
 
