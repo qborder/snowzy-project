@@ -12,6 +12,7 @@ export interface ProjectVersion {
     fileSize?: number
   }>
   isPrerelease: boolean
+  isHidden?: boolean
   downloads: number
   createdAt: string
 }

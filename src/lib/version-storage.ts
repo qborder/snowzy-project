@@ -90,6 +90,40 @@ export async function updateVersionDownloads(projectId: string, versionId: strin
   return updatedVersion
 }
 
+export async function updateVersion(projectId: string, versionId: string, versionData: Partial<Omit<ProjectVersion, 'id' | 'projectId' | 'createdAt'>>): Promise<ProjectVersion | null> {
+  const versions = await getVersionsByProjectId(projectId)
+  const versionIndex = versions.findIndex(v => v.id === versionId)
+  
+  if (versionIndex === -1) return null
+
+  const updatedVersion = {
+    ...versions[versionIndex],
+    ...versionData,
+    id: versionId,
+    projectId,
+    createdAt: versions[versionIndex].createdAt
+  }
+
+  versions[versionIndex] = updatedVersion
+
+  let kvSuccess = false
+
+  if (isVercelEnvironment()) {
+    try {
+      await kv.set(`versions:${projectId}`, versions)
+      kvSuccess = true
+    } catch (error) {
+      console.error('[VersionStorage] Failed to update version in KV:', error)
+    }
+  }
+
+  if (!kvSuccess) {
+    localVersionStore.set(projectId, versions)
+  }
+
+  return updatedVersion
+}
+
 export async function deleteVersion(projectId: string, versionId: string): Promise<boolean> {
   const versions = await getVersionsByProjectId(projectId)
   const filteredVersions = versions.filter(v => v.id !== versionId)

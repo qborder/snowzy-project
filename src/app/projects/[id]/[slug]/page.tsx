@@ -96,7 +96,9 @@ export default function ProjectViewPage() {
       const response = await fetch(`/api/projects/${projectId}/versions`)
       if (response.ok) {
         const versions = await response.json()
-        setProjectVersions(versions)
+        // Filter out hidden versions from public view
+        const visibleVersions = versions.filter((version: ProjectVersion) => !version.isHidden)
+        setProjectVersions(visibleVersions)
       }
     } catch (error) {
       console.error('Failed to fetch versions:', error)

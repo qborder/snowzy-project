@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createVersion, getVersionsByProjectId } from "@/lib/version-storage"
+import { createVersion, getVersionsByProjectId, updateVersion, deleteVersion } from "@/lib/version-storage"
 import { ProjectVersion } from "@/types/project"
 
 export async function GET(
@@ -45,3 +45,4 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to create version' }, { status: 500 })
   }
 }
+

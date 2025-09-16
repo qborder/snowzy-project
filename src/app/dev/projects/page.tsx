@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Plus, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, ExternalLink, Eye, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database, Package } from "lucide-react"
+import { Upload, Sparkles, Plus, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, Edit2, ExternalLink, Eye, EyeOff, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database, Package } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 import { MarkdownEditorEnhanced } from "@/components/markdown-editor-enhanced"
@@ -206,7 +206,9 @@ export default function DevProjectsPage() {
   const [versionTitle, setVersionTitle] = useState("")
   const [versionDescription, setVersionDescription] = useState("")
   const [versionType, setVersionType] = useState<"stable" | "beta" | "alpha" | "preview" | "hotfix">("stable")
-  const [versionAssets, setVersionAssets] = useState<Array<{id: string, name: string, downloadUrl: string, fileSize: number}>>([])
+  const [versionAssets, setVersionAssets] = useState<{id: string, name: string, downloadUrl: string, fileSize: number}[]>([])
+  const [editingVersionId, setEditingVersionId] = useState<string | null>(null)
+  const [isVersionFormLoading, setIsVersionFormLoading] = useState(false)
   const [versionAssetInput, setVersionAssetInput] = useState("")
   const [isPrerelease, setIsPrerelease] = useState(false)
   const [projectVersions, setProjectVersions] = useState<ProjectVersion[]>([])
@@ -290,8 +292,12 @@ export default function DevProjectsPage() {
 
     try {
       setCreatingVersion(true)
-      const response = await fetch(`/api/projects/${editingProjectId}/versions`, {
-        method: 'POST',
+      const url = editingVersionId ? 
+        `/api/projects/${editingProjectId}/versions/${editingVersionId}` :
+        `/api/projects/${editingProjectId}/versions`
+      
+      const response = await fetch(url, {
+        method: editingVersionId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tag: versionTag,
@@ -310,7 +316,17 @@ export default function DevProjectsPage() {
 
       if (response.ok) {
         const { version } = await response.json()
-        setProjectVersions(prev => [version, ...prev])
+        
+        if (editingVersionId) {
+          // Update existing version
+          setProjectVersions(prev => prev.map(v => v.id === editingVersionId ? version : v))
+          setResult(`Version ${version.tag} updated successfully!`)
+          setEditingVersionId(null)
+        } else {
+          // Add new version
+          setProjectVersions(prev => [version, ...prev])
+          setResult(`Version ${version.tag} created successfully!`)
+        }
         
         // Clear form
         setVersionTag("")
@@ -320,15 +336,82 @@ export default function DevProjectsPage() {
         setVersionAssets([])
         setIsPrerelease(false)
         
-        setResult(`Version ${version.tag} created successfully!`)
       } else {
         const error = await response.text()
-        setResult(`Failed to create version: ${error}`)
+        setResult(`Failed to ${editingVersionId ? 'update' : 'create'} version: ${error}`)
       }
     } catch (error) {
-      setResult(`Error creating version: ${error}`)
+      setResult(`Error ${editingVersionId ? 'updating' : 'creating'} version: ${error}`)
     } finally {
       setCreatingVersion(false)
+    }
+  }
+
+  function handleEditVersion(version: ProjectVersion) {
+    setEditingVersionId(version.id)
+    setVersionTag(version.tag)
+    setVersionTitle(version.title)
+    setVersionDescription(version.description || "")
+    setVersionType(version.type)
+    setVersionAssets(version.assets || [])
+    setIsPrerelease(version.isPrerelease || false)
+  }
+
+  function cancelVersionEdit() {
+    setEditingVersionId(null)
+    setVersionTag("")
+    setVersionTitle("")
+    setVersionDescription("")
+    setVersionType("stable")
+    setVersionAssets([])
+    setIsPrerelease(false)
+  }
+
+  async function handleDeleteVersion(versionId: string) {
+    if (!confirm("Are you sure you want to delete this version? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/projects/${editingProjectId}/versions/${versionId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setProjectVersions(prev => prev.filter(v => v.id !== versionId))
+        setResult("Version deleted successfully!")
+        
+        // If we were editing this version, cancel the edit
+        if (editingVersionId === versionId) {
+          cancelVersionEdit()
+        }
+      } else {
+        const error = await response.text()
+        setResult(`Failed to delete version: ${error}`)
+      }
+    } catch (error) {
+      setResult(`Error deleting version: ${error}`)
+    }
+  }
+
+  async function handleToggleVersionVisibility(versionId: string, isHidden: boolean) {
+    try {
+      const response = await fetch(`/api/projects/${editingProjectId}/versions/${versionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isHidden })
+      })
+
+      if (response.ok) {
+        const { version } = await response.json()
+        setProjectVersions(prev => prev.map(v => v.id === versionId ? version : v))
+        setResult(`Version ${isHidden ? 'hidden' : 'shown'} successfully!`)
+      } else {
+        const error = await response.text()
+        setResult(`Failed to ${isHidden ? 'hide' : 'show'} version: ${error}`)
+      }
+    } catch (error) {
+      setResult(`Error ${isHidden ? 'hiding' : 'showing'} version: ${error}`)
     }
   }
 
@@ -2070,15 +2153,28 @@ Instructions for contributors...`}
                             Mark as pre-release
                           </label>
                         </div>
-                        <Button 
-                          type="button"
-                          onClick={handleCreateVersion}
-                          disabled={creatingVersion || !versionTag || !versionTitle || !editingProjectId}
-                          className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-500/90 hover:to-cyan-400/90 text-white shadow-lg hover:shadow-xl hover:shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          {creatingVersion ? "Creating..." : "Create Version"}
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            type="button"
+                            onClick={handleCreateVersion}
+                            disabled={!editingProjectId || creatingVersion}
+                            className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-500/90 hover:to-cyan-400/90 text-white shadow-lg hover:shadow-xl hover:shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/40 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {creatingVersion ? (editingVersionId ? "Updating..." : "Creating...") : (editingVersionId ? "Update Version" : "Create Version")}
+                          </Button>
+                          {editingVersionId && (
+                            <Button 
+                              type="button"
+                              variant="outline"
+                              onClick={cancelVersionEdit}
+                              disabled={creatingVersion}
+                              className="px-4 hover:bg-red-500/10 hover:text-red-400 hover:border-red-400/40 transition-colors"
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                     
@@ -2131,28 +2227,59 @@ Instructions for contributors...`}
                                     {version.description}
                                   </p>
                                 )}
-                                <div className="flex items-center gap-2 mt-3">
-                                  {version.assets && version.assets.length > 0 && (
-                                    <div className="flex items-center gap-1">
-                                      {version.assets.map((asset) => (
-                                        <Button 
-                                          key={asset.id}
-                                          variant="ghost" 
-                                          size="sm" 
-                                          className="h-7 px-2 text-xs hover:bg-cyan-500/10"
-                                          onClick={async () => {
-                                            window.open(`/api/projects/${editingProjectId}/versions/${version.id}/download?assetId=${asset.id}`, '_blank')
-                                          }}
-                                        >
-                                          <Download className="h-3 w-3 mr-1" />
-                                          {asset.name}
-                                        </Button>
-                                      ))}
-                                    </div>
-                                  )}
-                                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                                    {version.downloads} downloads
-                                  </Button>
+                                <div className="flex items-center justify-between mt-3">
+                                  <div className="flex items-center gap-2">
+                                    {version.assets && version.assets.length > 0 && (
+                                      <div className="flex items-center gap-1">
+                                        {version.assets.map((asset) => (
+                                          <Button 
+                                            key={asset.id}
+                                            variant="ghost" 
+                                            size="sm" 
+                                            className="h-7 px-2 text-xs hover:bg-cyan-500/10"
+                                            onClick={async () => {
+                                              window.open(`/api/projects/${editingProjectId}/versions/${version.id}/download?assetId=${asset.id}`, '_blank')
+                                            }}
+                                          >
+                                            <Download className="h-3 w-3 mr-1" />
+                                            {asset.name}
+                                          </Button>
+                                        ))}
+                                      </div>
+                                    )}
+                                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                                      {version.downloads} downloads
+                                    </Button>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-6 w-6 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                                      onClick={() => handleEditVersion(version)}
+                                      title="Edit version"
+                                    >
+                                      <Edit2 className="h-3 w-3" />
+                                    </Button>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-6 w-6 p-0 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                                      onClick={() => handleToggleVersionVisibility(version.id, !version.isHidden)}
+                                      title={version.isHidden ? "Show version" : "Hide version"}
+                                    >
+                                      {version.isHidden ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                                    </Button>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                      onClick={() => handleDeleteVersion(version.id)}
+                                      title="Delete version"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
                             )
