@@ -7,7 +7,7 @@ interface SkeletonProps {
   shimmer?: boolean
 }
 
-function Skeleton({ className, shimmer = true, ...props }: SkeletonProps & any) {
+function Skeleton({ className, shimmer = true, ...props }: SkeletonProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
