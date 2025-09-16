@@ -206,7 +206,7 @@ export default function DevProjectsPage() {
   const [versionTitle, setVersionTitle] = useState("")
   const [versionDescription, setVersionDescription] = useState("")
   const [versionType, setVersionType] = useState<"stable" | "beta" | "alpha" | "preview" | "hotfix">("stable")
-  const [versionAssets, setVersionAssets] = useState<{id: string, name: string, downloadUrl: string, fileSize: number}[]>([])
+  const [versionAssets, setVersionAssets] = useState<{id: string, name: string, downloadUrl: string, fileSize?: number}[]>([])
   const [editingVersionId, setEditingVersionId] = useState<string | null>(null)
   const [isVersionFormLoading, setIsVersionFormLoading] = useState(false)
   const [versionAssetInput, setVersionAssetInput] = useState("")
