@@ -2117,7 +2117,7 @@ Instructions for contributors...`}
                                     <div className="flex items-center gap-2 min-w-0">
                                       <Download className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />
                                       <span className="text-sm truncate">{asset.name}</span>
-                                      {asset.fileSize > 0 && (
+                                      {asset.fileSize && asset.fileSize > 0 && (
                                         <span className="text-xs text-muted-foreground">
                                           ({(asset.fileSize / 1024 / 1024).toFixed(1)} MB)
                                         </span>
