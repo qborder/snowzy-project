@@ -206,7 +206,7 @@ export default function DevProjectsPage() {
   const [versionTitle, setVersionTitle] = useState("")
   const [versionDescription, setVersionDescription] = useState("")
   const [versionType, setVersionType] = useState<"stable" | "beta" | "alpha" | "preview" | "hotfix">("stable")
-  const [versionAssets, setVersionAssets] = useState<Array<{id: string, name: string, url: string}>>([])
+  const [versionAssets, setVersionAssets] = useState<Array<{id: string, name: string, downloadUrl: string, fileSize: number}>>([])
   const [versionAssetInput, setVersionAssetInput] = useState("")
   const [isPrerelease, setIsPrerelease] = useState(false)
   const [projectVersions, setProjectVersions] = useState<ProjectVersion[]>([])
@@ -248,9 +248,10 @@ export default function DevProjectsPage() {
         const data = await res.json()
         if (data.url && data.id) {
           const newAsset = {
-            id: data.id,
-            name: data.displayName || file.name,
-            url: data.url
+            id: data.id, // This is the file storage ID, used for downloads
+            name: data.filename || file.name,
+            downloadUrl: data.url, // API URL for downloading
+            fileSize: data.size || 0
           }
           setVersionAssets(prev => [...prev, newAsset])
           setResult(`Asset "${file.name}" uploaded successfully!`)
@@ -269,7 +270,8 @@ export default function DevProjectsPage() {
       const newAsset = {
         id: crypto.randomUUID(),
         name: versionAssetInput.split('/').pop() || 'Asset',
-        url: versionAssetInput
+        downloadUrl: versionAssetInput,
+        fileSize: 0
       }
       setVersionAssets(prev => [...prev, newAsset])
       setVersionAssetInput("")
@@ -299,8 +301,8 @@ export default function DevProjectsPage() {
           assets: versionAssets.map(asset => ({
             id: asset.id,
             name: asset.name,
-            downloadUrl: asset.url,
-            fileSize: 0 // Could be enhanced to track actual file sizes
+            downloadUrl: asset.downloadUrl,
+            fileSize: asset.fileSize
           })),
           isPrerelease
         })
@@ -2032,6 +2034,11 @@ Instructions for contributors...`}
                                     <div className="flex items-center gap-2 min-w-0">
                                       <Download className="h-3.5 w-3.5 text-cyan-400 flex-shrink-0" />
                                       <span className="text-sm truncate">{asset.name}</span>
+                                      {asset.fileSize > 0 && (
+                                        <span className="text-xs text-muted-foreground">
+                                          ({(asset.fileSize / 1024 / 1024).toFixed(1)} MB)
+                                        </span>
+                                      )}
                                     </div>
                                     <Button
                                       type="button"
@@ -2157,7 +2164,7 @@ Instructions for contributors...`}
                             </div>
                             <h4 className="text-sm font-medium text-foreground/90 mb-1">No versions yet</h4>
                             <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                              {editingProjectId ? "Create your first version using the form above." : "Select a project to view and manage its versions."}
+                              {editingProjectId ? "Create your first version using the form above." : "Save your project first, then edit it to manage versions."}
                             </p>
                           </div>
                         )}
