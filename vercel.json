@@ -2,7 +2,7 @@
   "framework": "nextjs",
   "buildCommand": "pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
+  "installCommand": "pnpm install",
   "outputDirectory": ".next",
   "build": {
     "env": {
