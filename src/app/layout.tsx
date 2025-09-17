@@ -23,11 +23,11 @@ export const metadata: Metadata = {
   keywords: ["Roblox", "Development", "Tutorials", "Projects", "Programming", "Web Development"],
   authors: [{ name: "Snowzy" }],
   creator: "Snowzy",
-  metadataBase: new URL('https://snowzy.dev'),
+  metadataBase: new URL('https://snowzy.vercel.app/'),
   openGraph: {
     title: "Snowzy - Projects & Tutorials",
     description: "Discover cutting-edge tutorials and download project files for Roblox development, web applications, and modern programming.",
-    url: 'https://snowzy.dev',
+    url: 'https://snowzy.vercel.app/',
     siteName: 'Snowzy',
     images: [
       {
