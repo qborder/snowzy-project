@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: "Snowzy - Projects & Tutorials",
     template: "%s | Snowzy"
   },
-  description: "Discover cutting-edge tutorials and download project files for Roblox development, web applications, and modern programming. Expert-crafted resources for developers.",
+  description: "🚀 Premium development tutorials & project downloads | 💎 Roblox scripting, web development & programming resources | 🎯 Expert-crafted content for developers",
   keywords: [
     "Roblox", "Development", "Tutorials", "Projects", "Programming", "Web Development",
     "Game Development", "Scripting", "Luau", "React", "Next.js", "TypeScript", "JavaScript"
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Snowzy - Projects & Tutorials",
-    description: "Discover cutting-edge tutorials and download project files for Roblox development, web applications, and modern programming. Expert-crafted resources for developers.",
+    description: "🚀 Premium Dev Resources | 💎 Roblox + Web Development\n📚 Expert tutorials & project downloads\n🎯 Luau scripting, React, TypeScript & more!",
     url: 'https://snowzy.vercel.app',
     siteName: 'Snowzy',
     images: [
@@ -92,19 +92,25 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
   },
   other: {
-    'theme-color': '#0f0f23',
+    'theme-color': '#5865F2',
     'color-scheme': 'dark light',
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': 'Snowzy',
     'application-name': 'Snowzy',
-    'msapplication-TileColor': '#0f0f23',
+    'msapplication-TileColor': '#5865F2',
     'msapplication-config': '/browserconfig.xml',
     'format-detection': 'telephone=no',
-    'discord:image': '/embed-banner.png',
-    'discord:title': 'Snowzy - Projects & Tutorials',
-    'discord:description': '🚀 Premium development tutorials and project resources',
+    'discord:embed_type': 'rich',
+    'discord:color': '5865F2',
+    'discord:image': 'https://snowzy.vercel.app/embed-banner.png',
+    'discord:title': '🚀 Snowzy - Dev Resources Hub',
+    'discord:description': '💎 Premium tutorials & downloads\n📚 Roblox scripting + Web dev\n🎯 Expert-crafted content',
+    'discord:author': 'Snowzy',
+    'discord:author_url': 'https://snowzy.vercel.app',
+    'discord:provider': 'Snowzy',
+    'discord:provider_url': 'https://snowzy.vercel.app',
   },
 };
 
