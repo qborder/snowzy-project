@@ -23,7 +23,6 @@ const nextConfig: NextConfig = {
     parallelServerBuildTraces: true,
     optimisticClientCache: true,
     esmExternals: true,
-    serverComponentsExternalPackages: ['@vercel/blob', '@vercel/kv'],
   },
   turbopack: {
       rules: {
@@ -110,6 +109,26 @@ const nextConfig: NextConfig = {
         ...config.resolve.alias,
         '@radix-ui/react-icons': '@radix-ui/react-icons/dist/index.js',
       }
+      
+      // Reduce bundle analysis time
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          cacheGroups: {
+            ...config.optimization.splitChunks?.cacheGroups,
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+          },
+        },
+      }
     }
     
     // Enable caching
@@ -118,6 +137,15 @@ const nextConfig: NextConfig = {
       buildDependencies: {
         config: [__filename],
       },
+    }
+    
+    // Optimize resolving
+    config.resolve.symlinks = false
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
     }
     
     return config
