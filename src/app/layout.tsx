@@ -37,13 +37,13 @@ export const metadata: Metadata = {
     canonical: 'https://snowzy.vercel.app',
   },
   openGraph: {
-    title: "Snowzy - Projects & Tutorials",
-    description: "🚀 Premium Dev Resources | 💎 Roblox + Web Development\n📚 Expert tutorials & project downloads\n🎯 Luau scripting, React, TypeScript & more!",
+    title: "🚀 Snowzy - Dev Resources Hub",
+    description: "💎 Premium tutorials & downloads\n📚 Roblox scripting + Web dev\n🎯 Expert-crafted content for developers",
     url: 'https://snowzy.vercel.app',
     siteName: 'Snowzy',
     images: [
       {
-        url: '/embed-banner.png',
+        url: `/embed-banner.png?v=${Date.now()}`,
         width: 1200,
         height: 630,
         alt: 'Snowzy - Premium development tutorials and project resources',
@@ -104,7 +104,7 @@ export const metadata: Metadata = {
     'format-detection': 'telephone=no',
     'discord:embed_type': 'rich',
     'discord:color': '5865F2',
-    'discord:image': 'https://snowzy.vercel.app/embed-banner.png',
+    'discord:image': `https://snowzy.vercel.app/embed-banner.png?v=${Date.now()}`,
     'discord:title': '🚀 Snowzy - Dev Resources Hub',
     'discord:description': '💎 Premium tutorials & downloads\n📚 Roblox scripting + Web dev\n🎯 Expert-crafted content',
     'discord:author': 'Snowzy',
