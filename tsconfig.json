@@ -13,7 +13,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "tsBuildInfoFile": ".next/tsbuildinfo",
     "plugins": [
       {
         "name": "next"

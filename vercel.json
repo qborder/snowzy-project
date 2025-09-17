@@ -2,12 +2,11 @@
   "framework": "nextjs",
   "buildCommand": "pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "pnpm install --frozen-lockfile --prefer-offline --cache-dir=.pnpm",
+  "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
   "outputDirectory": ".next",
   "build": {
     "env": {
-      "NEXT_TELEMETRY_DISABLED": "1",
-      "SKIP_ENV_VALIDATION": "1"
+      "NEXT_TELEMETRY_DISABLED": "1"
     }
   },
   "headers": [

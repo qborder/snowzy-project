@@ -2,27 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    optimizePackageImports: [
-      'lucide-react', 
-      '@radix-ui/react-icons', 
-      'framer-motion', 
-      '@fluentui/react-components', 
-      '@fluentui/react-icons',
-      '@radix-ui/react-checkbox',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-label',
-      '@radix-ui/react-progress',
-      '@radix-ui/react-select',
-      '@radix-ui/react-separator',
-      '@radix-ui/react-slot',
-      '@radix-ui/react-switch',
-      '@radix-ui/react-tabs'
-    ],
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'framer-motion', '@fluentui/react-components', '@fluentui/react-icons'],
     webpackBuildWorker: true,
     parallelServerCompiles: true,
     parallelServerBuildTraces: true,
     optimisticClientCache: true,
-    esmExternals: true,
   },
   turbopack: {
       rules: {
@@ -36,9 +20,8 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
     styledComponents: true,
   },
-  swcMinify: true,
-  compress: true,
-  productionBrowserSourceMaps: false,
+  //swcMinify: true,
+  //compress: true,
   images: {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -57,29 +40,11 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, stale-while-revalidate=86400',
+            value: 'public, max-age=0, must-revalidate',
           },
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
-          },
-        ],
-      },
-      {
-        source: '/api/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=300, stale-while-revalidate=600',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
@@ -95,60 +60,6 @@ const nextConfig: NextConfig = {
     '@radix-ui/react-icons': {
       transform: '@radix-ui/react-icons/{{member}}',
     },
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-    },
-    '@fluentui/react-icons': {
-      transform: '@fluentui/react-icons/lib/{{member}}',
-    },
-  },
-  webpack: (config: any, { dev, isServer }: any) => {
-    // Optimize for faster builds
-    if (!dev && !isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@radix-ui/react-icons': '@radix-ui/react-icons/dist/index.js',
-      }
-      
-      // Reduce bundle analysis time
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'deterministic',
-        chunkIds: 'deterministic',
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
-        splitChunks: {
-          ...config.optimization.splitChunks,
-          cacheGroups: {
-            ...config.optimization.splitChunks?.cacheGroups,
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-            },
-          },
-        },
-      }
-    }
-    
-    // Enable caching
-    config.cache = {
-      type: 'filesystem',
-      buildDependencies: {
-        config: [__filename],
-      },
-    }
-    
-    // Optimize resolving
-    config.resolve.symlinks = false
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      net: false,
-      tls: false,
-    }
-    
-    return config
   },
 };
 
