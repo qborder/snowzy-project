@@ -26,6 +26,7 @@ export interface Project {
   githubUrl?: string
   demoUrl?: string
   youtubeUrl?: string
+  robloxMarketplaceUrl?: string
   image?: string
   icon?: string
   tags: string[]
@@ -54,6 +55,7 @@ export interface ProjectCardProps {
   githubUrl?: string
   demoUrl?: string
   youtubeUrl?: string
+  robloxMarketplaceUrl?: string
   image?: string
   icon?: string
   tags: string[]

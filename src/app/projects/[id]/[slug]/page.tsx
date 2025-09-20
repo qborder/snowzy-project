@@ -5,9 +5,9 @@ import { useParams, notFound } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight, Heart, Database, Info } from "lucide-react"
+import { ArrowLeft, Github, ExternalLink, Download, Youtube, Calendar, Code, Gamepad2, Globe, Tag, Sparkles, Clock, Eye, ArrowDown, TrendingUp, Archive, FileCode, Zap, Package, Monitor, ArrowDownRight, Heart, Database, Info, ShoppingCart, Loader2 } from "lucide-react"
 import { MarkdownViewer } from "@/components/markdown-editor-enhanced"
 import { Project, ProjectVersion } from "@/types/project"
 import { isFavorite, toggleFavorite } from "@/lib/favorites"
@@ -29,18 +29,18 @@ export default function ProjectViewPage() {
         const res = await fetch("/api/projects")
         if (!res.ok) throw new Error("Failed to load projects")
         const projects = await res.json()
-        
+
         const projectId = params.id as string
         const foundProject = projects.find((p: Project) => p.id === projectId)
-        
+
         if (!foundProject) {
           notFound()
         }
         setProject(foundProject)
-        
+
         // Set initial favorite status
         setFavoriteStatus(isFavorite(projectId))
-        
+
         // Fetch file size if download URL exists
         if (foundProject.downloadUrl) {
           try {
@@ -67,7 +67,7 @@ export default function ProjectViewPage() {
             console.error('Failed to fetch file size:', error)
           }
         }
-        
+
         // Increment view count when project detail page is visited
         try {
           await fetch(`/api/projects/${projectId}/views`, {
@@ -79,7 +79,7 @@ export default function ProjectViewPage() {
 
         // Load project versions
         loadProjectVersions(projectId)
-        
+
       } catch (err) {
         console.error("Error loading project:", err)
         notFound()
@@ -123,10 +123,11 @@ export default function ProjectViewPage() {
   function getFileTypeInfo(url: string) {
     const fileName = url.split('/').pop()?.toLowerCase() || ''
     const extension = fileName.split('.').pop() || ''
-    
+
     if (['zip', 'rar', '7z', '7zip'].includes(extension)) {
       return {
         type: 'archive',
+        fileType: 'Archive',
         icon: Archive,
         title: 'Compressed Archive',
         description: 'Complete package with all files',
@@ -138,14 +139,15 @@ export default function ProjectViewPage() {
         buttonGradient: 'from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-600 dark:hover:to-amber-700'
       }
     }
-    
-    if (['rbxl', 'rbxlx', 'rbxm', 'rbxml', 'rbxmlx'].includes(extension)) {
+
+    if (extension === 'rbxm') {
       return {
         type: 'roblox',
+        fileType: 'RBXM',
         icon: Download,
-        title: 'Download',
-        description: 'Project files ready to use',
-        details: 'Complete project package with all assets',
+        title: 'Roblox Model',
+        description: 'Binary Roblox model file',
+        details: 'Roblox Studio model - binary format',
         color: 'blue',
         bgGradient: 'from-blue-500/15 via-blue-400/10 to-indigo-500/10',
         borderColor: 'border-blue-300/30 dark:border-blue-600/30',
@@ -153,10 +155,59 @@ export default function ProjectViewPage() {
         buttonGradient: 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700'
       }
     }
-    
+
+    if (extension === 'rbxmx') {
+      return {
+        type: 'roblox',
+        fileType: 'RBXMX',
+        icon: Download,
+        title: 'Roblox Model',
+        description: 'XML Roblox model file',
+        details: 'Roblox Studio model - XML format',
+        color: 'blue',
+        bgGradient: 'from-blue-500/15 via-blue-400/10 to-indigo-500/10',
+        borderColor: 'border-blue-300/30 dark:border-blue-600/30',
+        textColor: 'text-blue-600 dark:text-blue-400',
+        buttonGradient: 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700'
+      }
+    }
+
+    if (extension === 'rbxl') {
+      return {
+        type: 'roblox',
+        fileType: 'RBXL',
+        icon: Download,
+        title: 'Roblox Place',
+        description: 'Binary Roblox place file',
+        details: 'Complete Roblox game/place - binary format',
+        color: 'blue',
+        bgGradient: 'from-blue-500/15 via-blue-400/10 to-indigo-500/10',
+        borderColor: 'border-blue-300/30 dark:border-blue-600/30',
+        textColor: 'text-blue-600 dark:text-blue-400',
+        buttonGradient: 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700'
+      }
+    }
+
+    if (extension === 'rbxlx') {
+      return {
+        type: 'roblox',
+        fileType: 'RBXLX',
+        icon: Download,
+        title: 'Roblox Place',
+        description: 'XML Roblox place file',
+        details: 'Complete Roblox game/place - XML format',
+        color: 'blue',
+        bgGradient: 'from-blue-500/15 via-blue-400/10 to-indigo-500/10',
+        borderColor: 'border-blue-300/30 dark:border-blue-600/30',
+        textColor: 'text-blue-600 dark:text-blue-400',
+        buttonGradient: 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700'
+      }
+    }
+
     if (['exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm'].includes(extension)) {
       return {
         type: 'executable',
+        fileType: extension.toUpperCase(),
         icon: Zap,
         title: 'Executable File',
         description: 'Ready to install & run',
@@ -168,9 +219,10 @@ export default function ProjectViewPage() {
         buttonGradient: 'from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 dark:from-red-500 dark:to-red-600 dark:hover:from-red-600 dark:hover:to-red-700'
       }
     }
-    
+
     return {
       type: 'file',
+      fileType: extension ? extension.toUpperCase() : 'File',
       icon: FileCode,
       title: 'Project Files',
       description: 'Source code & assets',
@@ -185,20 +237,20 @@ export default function ProjectViewPage() {
 
   async function handleDownload() {
     if (!project?.downloadUrl || !project?.id) return
-    
+
     setIsDownloading(true)
-    
+
     try {
       // Increment download counter
       const response = await fetch(`/api/projects/${project.id}/downloads`, {
         method: 'POST',
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setProject(prev => prev ? { ...prev, downloads: data.downloads } : null)
       }
-      
+
       // Start download
       const link = document.createElement('a')
       link.href = project.downloadUrl
@@ -207,7 +259,7 @@ export default function ProjectViewPage() {
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      
+
     } catch (error) {
       console.error('Download failed:', error)
     } finally {
@@ -257,7 +309,7 @@ export default function ProjectViewPage() {
           <div className="bg-gradient-to-br from-background/95 via-background/98 to-background/95 backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/15 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-56 h-56 bg-gradient-to-bl from-primary/25 to-transparent rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-purple-500/25 to-transparent rounded-full blur-2xl"></div>
-            
+
             <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-4">
                 <div className="relative">
@@ -279,16 +331,16 @@ export default function ProjectViewPage() {
                       variant="outline"
                       size="sm"
                       className={`group/fav relative overflow-hidden transition-all duration-300 hover:scale-105 ${
-                        favoriteStatus 
-                          ? 'bg-gradient-to-r from-red-500/15 to-pink-500/10 border-red-500/30 text-red-500 hover:from-red-500/25 hover:to-pink-500/15 hover:border-red-500/50' 
+                        favoriteStatus
+                          ? 'bg-gradient-to-r from-red-500/15 to-pink-500/10 border-red-500/30 text-red-500 hover:from-red-500/25 hover:to-pink-500/15 hover:border-red-500/50'
                           : 'bg-background/60 border-white/25 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-500'
                       } backdrop-blur-sm shadow-sm hover:shadow-lg`}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/10 to-red-500/0 opacity-0 group-hover/fav:opacity-100 transition-opacity duration-300" />
-                      <Heart 
+                      <Heart
                         className={`h-4 w-4 mr-2 transition-all duration-300 group-hover/fav:scale-110 relative z-10 ${
                           favoriteStatus ? 'fill-current text-red-500' : ''
-                        }`} 
+                        }`}
                       />
                       <span className="font-semibold relative z-10">
                         {favoriteStatus ? 'Favorited' : 'Add to Favorites'}
@@ -315,18 +367,18 @@ export default function ProjectViewPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-6">
-                <h1 
+                <h1
                   className={`text-5xl lg:text-6xl font-black leading-tight tracking-tight mb-2 ${
-                    project.titleGradient 
-                      ? 'bg-clip-text text-transparent' 
-                      : project.titleColor 
-                        ? '' 
+                    project.titleGradient
+                      ? 'bg-clip-text text-transparent'
+                      : project.titleColor
+                        ? ''
                         : 'text-foreground'
                   }`}
                   style={{
-                    backgroundImage: project.titleGradient 
+                    backgroundImage: project.titleGradient
                       ? `linear-gradient(to right, ${project.titleGradient.from}${project.titleGradient.via ? `, ${project.titleGradient.via}` : ''}, ${project.titleGradient.to})`
                       : undefined,
                     color: project.titleColor || undefined
@@ -334,15 +386,15 @@ export default function ProjectViewPage() {
                 >
                   {project.title}
                 </h1>
-                
+
                 <div className="space-y-8">
                   <p className="text-foreground/95 text-xl leading-relaxed max-w-5xl font-medium">
                     {project.description}
                   </p>
                   <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent rounded-full"></div>
                 </div>
-                
-                
+
+
               </div>
             </div>
           </div>
@@ -353,16 +405,16 @@ export default function ProjectViewPage() {
           <div className="lg:col-span-2 space-y-10">
             <Tabs defaultValue="about" className="space-y-8">
               <TabsList className="grid w-full grid-cols-2 max-w-md bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-1.5">
-                <TabsTrigger 
-                  value="about" 
+                <TabsTrigger
+                  value="about"
                   className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg transition-all duration-300 hover:scale-[1.02]"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-700" />
                   <Info className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:scale-110 group-data-[state=active]:animate-pulse" />
                   <span className="relative z-10">About</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="versions" 
+                <TabsTrigger
+                  value="versions"
                   className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-cyan-400/10 data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400/30 rounded-lg transition-all duration-300 hover:scale-[1.02]"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 -translate-x-full group-data-[state=active]:translate-x-full transition-transform duration-700" />
@@ -458,15 +510,15 @@ export default function ProjectViewPage() {
                                   </div>
                                   <div className="text-right">
                                     <p className="text-sm text-muted-foreground">
-                                      {new Date(version.createdAt).toLocaleDateString('en-US', { 
-                                        month: 'short', 
-                                        day: 'numeric', 
-                                        year: 'numeric' 
+                                      {new Date(version.createdAt).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
                                       })}
                                     </p>
                                   </div>
                                 </div>
-                                
+
                                 <div className="space-y-3">
                                   <h4 className="font-semibold text-lg text-foreground">{version.title}</h4>
                                   {version.description && (
@@ -475,7 +527,7 @@ export default function ProjectViewPage() {
                                     </div>
                                   )}
                                 </div>
-                                
+
                                 <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/10">
                                   <div className="flex items-center gap-2 text-sm">
                                     <Download className="h-4 w-4 text-emerald-500" />
@@ -484,9 +536,9 @@ export default function ProjectViewPage() {
                                   <div className="ml-auto flex items-center gap-2">
                                     {version.assets && version.assets.length > 0 && (
                                       version.assets.map((asset) => (
-                                        <Button 
+                                        <Button
                                           key={asset.id}
-                                          variant="outline" 
+                                          variant="outline"
                                           size="sm"
                                           onClick={() => {
                                             window.open(`/api/projects/${project?.id}/versions/${version.id}/download?assetId=${asset.id}`, '_blank')
@@ -502,10 +554,10 @@ export default function ProjectViewPage() {
                               </div>
                             )
                           })}
-                          
+
                           <div className="text-center pt-4">
                             <p className="text-sm text-muted-foreground">
-                              Total versions: <span className="font-semibold text-foreground">{projectVersions.length}</span> • 
+                              Total versions: <span className="font-semibold text-foreground">{projectVersions.length}</span> •
                               Total downloads: <span className="font-semibold text-foreground">
                                 {projectVersions.reduce((sum, v) => sum + v.downloads, 0).toLocaleString()}
                               </span>
@@ -536,12 +588,12 @@ export default function ProjectViewPage() {
               {project.downloadUrl && (() => {
                 const fileInfo = getFileTypeInfo(project.downloadUrl)
                 const IconComponent = fileInfo.icon
-                
+
                 return (
                   <Card className={`bg-gradient-to-br from-background/80 via-background/90 to-background/95 backdrop-blur-xl border ${fileInfo.borderColor} shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl relative`}>
                     <div className={`absolute inset-0 bg-gradient-to-br ${fileInfo.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-2xl"></div>
-                    
+
                     <CardContent className="p-6 relative z-10">
                       <div className="space-y-5">
                         <div className="text-center">
@@ -561,7 +613,7 @@ export default function ProjectViewPage() {
                             {fileInfo.details}
                           </p>
                         </div>
-                        
+
                         <div className="bg-background/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
                           <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
@@ -569,9 +621,7 @@ export default function ProjectViewPage() {
                               <span className="font-medium text-muted-foreground">File Type</span>
                             </div>
                             <span className={`font-bold ${fileInfo.textColor} capitalize`}>
-                              {fileInfo.type === 'archive' ? 'Archive' : 
-                               fileInfo.type === 'roblox' ? 'Project' : 
-                               fileInfo.type === 'executable' ? 'Executable' : 'Source Code'}
+                              {fileInfo.fileType}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-white/10">
@@ -584,33 +634,49 @@ export default function ProjectViewPage() {
                             </span>
                           </div>
                         </div>
-                        
-                        <Button 
-                          onClick={handleDownload}
-                          disabled={isDownloading}
-                          className={`w-full h-14 bg-gradient-to-br ${fileInfo.buttonGradient} text-white font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-0 relative overflow-hidden group/btn text-lg`}
-                          size="lg"
-                        >
-                          <span className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
-                          {isDownloading ? (
-                            <div className="flex items-center gap-3 relative z-10">
-                              <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                              <span>Preparing download...</span>
-                              <div className="ml-2 flex gap-1">
-                                <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                                <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                                <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+
+                        <div className={`${project.robloxMarketplaceUrl ? 'flex gap-3' : 'flex'}`}>
+                          {project.robloxMarketplaceUrl && (
+                            <Button
+                              onClick={() => window.open(project.robloxMarketplaceUrl, '_blank')}
+                              className={`flex-1 h-14 bg-gradient-to-br ${fileInfo.buttonGradient} text-white font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-0 relative overflow-hidden group/btn px-8`}
+                              size="lg"
+                            >
+                              <span className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
+                              <div className="flex items-center justify-center gap-2 relative z-10">
+                                <ShoppingCart className="h-5 w-5 transition-transform duration-200 group-hover/btn:scale-110" />
+                                <span className="text-base">Get from Roblox</span>
                               </div>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-3 relative z-10">
-                              <ArrowDownRight className="h-5 w-5 transition-transform duration-200 group-hover/btn:translate-x-1 group-hover/btn:translate-y-1" />
-                              <span>Download {fileInfo.type === 'archive' ? 'Archive' : fileInfo.type === 'roblox' ? 'Project' : fileInfo.type === 'executable' ? 'Installer' : 'Project'}</span>
-                            </div>
+                            </Button>
                           )}
-                        </Button>
-                        
-                        
+
+                          <Button
+                            onClick={handleDownload}
+                            disabled={isDownloading}
+                            variant={project.robloxMarketplaceUrl ? "outline" : "default"}
+                            className={`${project.robloxMarketplaceUrl ? 'flex-1' : 'w-full'} h-14 ${
+                              project.robloxMarketplaceUrl
+                                ? `bg-background/60 backdrop-blur-sm border-white/30 hover:bg-gradient-to-br hover:${fileInfo.bgGradient} hover:border-${fileInfo.borderColor.split(' ')[1]} transition-all duration-300 hover:scale-[1.02] hover:shadow-xl text-foreground font-bold rounded-xl relative overflow-hidden group/btn px-8`
+                                : `bg-gradient-to-br ${fileInfo.buttonGradient} text-white font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-0 relative overflow-hidden group/btn px-8`
+                            }`}
+                            size="lg"
+                          >
+                            <span className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
+                            {isDownloading ? (
+                              <div className="flex items-center justify-center gap-3 relative z-10">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <span className="text-sm font-medium">Downloading...</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center gap-2 relative z-10">
+                                <Download className="h-5 w-5 transition-transform duration-200 group-hover/btn:scale-110" />
+                                <span className="text-base font-medium">Download {fileInfo.type === 'archive' ? 'Archive' : fileInfo.type === 'roblox' ? 'Project' : fileInfo.type === 'executable' ? 'Installer' : 'Project'}</span>
+                              </div>
+                            )}
+                          </Button>
+                        </div>
+
+
                         {fileInfo.type === 'archive' && (
                           <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
                             <div className="flex items-start gap-3">
@@ -626,7 +692,7 @@ export default function ProjectViewPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         {fileInfo.type === 'executable' && (
                           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
                             <div className="flex items-start gap-3">
@@ -642,7 +708,7 @@ export default function ProjectViewPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         <div className="text-center pt-2">
                           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground font-medium">
                             <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
@@ -659,7 +725,7 @@ export default function ProjectViewPage() {
               {project.tags && project.tags.length > 0 && (
                 <Card className="bg-gradient-to-br from-background/80 via-background/90 to-primary/5 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden rounded-2xl">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
+
                   <CardContent className="p-5 relative z-10">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="relative">
@@ -672,19 +738,19 @@ export default function ProjectViewPage() {
                         <h3 className="text-lg font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Tech Stack</h3>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2">
                       {project.tags.map((tag, index) => (
-                        <Badge 
+                        <Badge
                           key={tag}
-                          variant="outline" 
+                          variant="outline"
                           className="text-xs bg-gradient-to-br from-background/80 to-background/60 border border-white/20 hover:border-primary/40 text-foreground font-medium px-2 py-1 rounded-lg backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 hover:bg-gradient-to-br hover:from-primary/10 hover:to-primary/5"
                         >
                           {tag}
                         </Badge>
                       ))}
                     </div>
-                    
+
                     <div className="mt-3 pt-3 border-t border-white/10">
                       <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
                         <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
@@ -700,7 +766,7 @@ export default function ProjectViewPage() {
                 <Card className="relative bg-gradient-to-br from-background/95 via-background/98 to-orange-500/5 backdrop-blur-2xl border border-white/30 shadow-2xl hover:shadow-3xl transition-all duration-700 rounded-2xl overflow-hidden hover:scale-[1.02] hover:border-orange-500/50">
                   <div className="absolute inset-0 bg-gradient-to-br from-orange-500/8 via-transparent to-red-500/8 opacity-60"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-500/20 to-transparent rounded-full blur-2xl animate-pulse"></div>
-                  
+
                   <CardContent className="p-7 relative z-10">
                     <div className="flex items-center gap-4 mb-6">
                       <div className="relative group/icon">
@@ -714,7 +780,7 @@ export default function ProjectViewPage() {
                         <p className="text-sm text-muted-foreground/80 font-medium">External links and resources</p>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       {project.demoUrl && (
                         <div className="group/demo relative">
@@ -782,7 +848,7 @@ export default function ProjectViewPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="mt-6 pt-4 border-t border-white/20">
                       <div className="flex items-center justify-center gap-2">
                         <div className="flex gap-1">

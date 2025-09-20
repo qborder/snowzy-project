@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  const { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, cardGradient, cardColor, content } = body || {}
+  const { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, robloxMarketplaceUrl, image, icon, tags, cardGradient, cardColor, content } = body || {}
   if (!title || !description || !category || !Array.isArray(tags)) {
     return NextResponse.json({ error: "Missing required fields: title, description, category, tags[]" }, { status: 400 })
   }
@@ -54,6 +54,7 @@ export async function POST(request: Request) {
   if (githubUrl) project.githubUrl = githubUrl
   if (demoUrl) project.demoUrl = demoUrl
   if (youtubeUrl) project.youtubeUrl = youtubeUrl
+  if (robloxMarketplaceUrl) project.robloxMarketplaceUrl = robloxMarketplaceUrl
   if (image) project.image = image
   if (icon) project.icon = icon
   if (cardGradient) project.cardGradient = cardGradient

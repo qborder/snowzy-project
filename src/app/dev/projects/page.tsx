@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { GradientPicker } from "@/components/ui/gradient-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, Sparkles, Plus, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, Edit2, ExternalLink, Eye, EyeOff, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database, Package } from "lucide-react"
+import { Upload, Sparkles, Plus, Code, Gamepad2, Globe, X, ImageIcon, Palette, Edit, Edit2, ExternalLink, Eye, EyeOff, Tag, Download, Youtube, Github, Trash2, ArrowRight, LayoutGrid, Type, Loader2, Bug, RotateCcw, Database, Package, ShoppingCart } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ProjectEditor } from "@/components/project-editor"
 import { MarkdownEditorEnhanced } from "@/components/markdown-editor-enhanced"
@@ -70,7 +70,7 @@ type CustomTemplate = {
   cardColor?: string
 }
 
-const TemplateCard = ({ template, onApply, onDelete, isCustom }: { 
+const TemplateCard = ({ template, onApply, onDelete, isCustom }: {
   template: CustomTemplate,
   onApply: () => void,
   onDelete?: () => void,
@@ -85,10 +85,10 @@ const TemplateCard = ({ template, onApply, onDelete, isCustom }: {
             {template.title}
           </CardTitle>
           {isCustom && onDelete && (
-            <Button 
+            <Button
               type="button"
-              variant="ghost" 
-              size="icon" 
+              variant="ghost"
+              size="icon"
               className="h-7 w-7 -mt-1.5 -mr-1.5 rounded-full opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation()
@@ -106,17 +106,17 @@ const TemplateCard = ({ template, onApply, onDelete, isCustom }: {
       <CardContent className="relative z-10 pt-0">
         <div className="flex flex-wrap gap-1.5 mb-4">
           {template.tags.slice(0, 4).map((tag, i) => (
-            <Badge 
-              key={i} 
-              variant="outline" 
+            <Badge
+              key={i}
+              variant="outline"
               className="text-[10px] px-1.5 py-0.5 h-5 bg-background/60 backdrop-blur-sm border-white/5 text-muted-foreground font-normal"
             >
               {tag}
             </Badge>
           ))}
           {template.tags.length > 4 && (
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className="text-[10px] px-1.5 py-0.5 h-5 bg-background/60 backdrop-blur-sm border-white/5 text-muted-foreground font-normal"
             >
               +{template.tags.length - 4}
@@ -124,10 +124,10 @@ const TemplateCard = ({ template, onApply, onDelete, isCustom }: {
           )}
         </div>
         <div className="flex gap-2">
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm" 
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
             className="flex-1 bg-background/60 backdrop-blur-sm hover:bg-primary/5 hover:text-foreground transition-colors border-white/10 group/btn min-w-[100px]"
             onClick={onApply}
           >
@@ -137,9 +137,9 @@ const TemplateCard = ({ template, onApply, onDelete, isCustom }: {
             </div>
           </Button>
           {isCustom && onDelete && (
-            <Button 
+            <Button
               type="button"
-              variant="ghost" 
+              variant="ghost"
               size="icon"
               className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
               onClick={(e) => {
@@ -165,7 +165,7 @@ export default function DevProjectsPage() {
   })
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
-  
+
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [category, setCategory] = useState("")
@@ -173,6 +173,7 @@ export default function DevProjectsPage() {
   const [githubUrl, setGithubUrl] = useState("")
   const [demoUrl, setDemoUrl] = useState("")
   const [youtubeUrl, setYoutubeUrl] = useState("")
+  const [robloxMarketplaceUrl, setRobloxMarketplaceUrl] = useState("")
   const [image, setImage] = useState("")
   const [icon, setIcon] = useState("")
   const [tags, setTags] = useState<string[]>([])
@@ -240,7 +241,7 @@ export default function DevProjectsPage() {
     fileInput.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
-      
+
       try {
         setUploading(true)
         const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
@@ -292,10 +293,10 @@ export default function DevProjectsPage() {
 
     try {
       setCreatingVersion(true)
-      const url = editingVersionId ? 
+      const url = editingVersionId ?
         `/api/projects/${editingProjectId}/versions/${editingVersionId}` :
         `/api/projects/${editingProjectId}/versions`
-      
+
       const response = await fetch(url, {
         method: editingVersionId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -316,7 +317,7 @@ export default function DevProjectsPage() {
 
       if (response.ok) {
         const { version } = await response.json()
-        
+
         if (editingVersionId) {
           // Update existing version
           setProjectVersions(prev => prev.map(v => v.id === editingVersionId ? version : v))
@@ -327,7 +328,7 @@ export default function DevProjectsPage() {
           setProjectVersions(prev => [version, ...prev])
           setResult(`Version ${version.tag} created successfully!`)
         }
-        
+
         // Clear form
         setVersionTag("")
         setVersionTitle("")
@@ -335,7 +336,7 @@ export default function DevProjectsPage() {
         setVersionType("stable")
         setVersionAssets([])
         setIsPrerelease(false)
-        
+
       } else {
         const error = await response.text()
         setResult(`Failed to ${editingVersionId ? 'update' : 'create'} version: ${error}`)
@@ -380,7 +381,7 @@ export default function DevProjectsPage() {
       if (response.ok) {
         setProjectVersions(prev => prev.filter(v => v.id !== versionId))
         setResult("Version deleted successfully!")
-        
+
         // If we were editing this version, cancel the edit
         if (editingVersionId === versionId) {
           cancelVersionEdit()
@@ -417,13 +418,13 @@ export default function DevProjectsPage() {
 
   // Auto-save functionality - saves EVERYTHING
   useEffect(() => {
-    if (!title && !description && !category && !content && tags.length === 0 && !image && !icon && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl && !editingProject) {
+    if (!title && !description && !category && !content && tags.length === 0 && !image && !icon && !downloadUrl && !githubUrl && !demoUrl && !youtubeUrl && !robloxMarketplaceUrl && !editingProject) {
       return // Don't save completely empty state
     }
-    
+
     const draft = {
       // Form fields
-      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden,
+      title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, robloxMarketplaceUrl, image, icon, tags, content, pinned, hidden,
       // Styling
       cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle,
       // UI State
@@ -435,13 +436,13 @@ export default function DevProjectsPage() {
       // Timestamp
       timestamp: Date.now()
     }
-    
+
     localStorage.setItem('projectDraft', JSON.stringify(draft))
     setAutoSaveStatus("Draft saved")
-    
+
     const timer = setTimeout(() => setAutoSaveStatus(""), 2000)
     return () => clearTimeout(timer)
-  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize, versionTag, versionTitle, versionDescription, versionType, versionAssets, versionAssetInput, isPrerelease])
+  }, [title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, robloxMarketplaceUrl, image, icon, tags, content, pinned, hidden, cardGradient, cardColor, useCustomStyle, titleColor, titleGradientFrom, titleGradientTo, titleGradientVia, useTitleCustomStyle, activeTab, editingProjectId, editingProject, templateName, tagInput, previewReduce, previewSize, versionTag, versionTitle, versionDescription, versionType, versionAssets, versionAssetInput, isPrerelease])
 
   function handleTabChange(value: string) {
     setActiveTab(value)
@@ -464,6 +465,7 @@ export default function DevProjectsPage() {
     setGithubUrl(project.githubUrl || "")
     setDemoUrl(project.demoUrl || "")
     setYoutubeUrl(project.youtubeUrl || "")
+    setRobloxMarketplaceUrl(project.robloxMarketplaceUrl || "")
     setImage(project.image || "")
     setIcon(project.icon || "")
     setTags(project.tags || [])
@@ -491,7 +493,7 @@ export default function DevProjectsPage() {
     if (draft) {
       try {
         const parsed = JSON.parse(draft)
-        
+
         // Form fields
         setTitle(parsed.title || "")
         setDescription(parsed.description || "")
@@ -500,13 +502,14 @@ export default function DevProjectsPage() {
         setGithubUrl(parsed.githubUrl || "")
         setDemoUrl(parsed.demoUrl || "")
         setYoutubeUrl(parsed.youtubeUrl || "")
+        setRobloxMarketplaceUrl(parsed.robloxMarketplaceUrl || "")
         setImage(parsed.image || "")
         setIcon(parsed.icon || "")
         setTags(parsed.tags || [])
         setContent(parsed.content || "")
         setPinned(parsed.pinned || false)
         setHidden(parsed.hidden || false)
-        
+
         // Styling
         setCardGradient(parsed.cardGradient || "")
         setCardColor(parsed.cardColor || "")
@@ -516,7 +519,7 @@ export default function DevProjectsPage() {
         setTitleGradientTo(parsed.titleGradientTo || "")
         setTitleGradientVia(parsed.titleGradientVia || "")
         setUseTitleCustomStyle(parsed.useTitleCustomStyle || false)
-        
+
         // UI State
         if (parsed.activeTab) setActiveTab(parsed.activeTab)
         if (parsed.editingProjectId) setEditingProjectId(parsed.editingProjectId)
@@ -526,8 +529,8 @@ export default function DevProjectsPage() {
         // Preview
         if (typeof parsed.previewReduce === 'boolean') setPreviewReduce(parsed.previewReduce)
         if (parsed.previewSize) setPreviewSize(parsed.previewSize)
-        
-        
+
+
         // Update URL if we're in editing mode
         if (parsed.editingProjectId && parsed.activeTab === 'creator') {
           const url = new URL(window.location.href)
@@ -538,18 +541,18 @@ export default function DevProjectsPage() {
           url.searchParams.set('tab', 'editor')
           router.replace(url.pathname + url.search, { scroll: false })
         }
-        
+
         console.log('Draft restored with full state:', {
           editingMode: !!parsed.editingProjectId,
           activeTab: parsed.activeTab,
           hasContent: !!(parsed.title || parsed.description)
         })
-        
+
       } catch (e) {
         console.warn('Failed to load draft:', e)
       }
     }
-    
+
     // Load custom templates separately (not part of draft system)
     const saved = localStorage.getItem('customTemplates')
     if (saved) {
@@ -599,7 +602,7 @@ export default function DevProjectsPage() {
     try {
       setUploading(true)
       setResult("")
-      const res = await fetch(`/api/upload?filename=icon_${Date.now()}_${encodeURIComponent(file.name)}`, { 
+      const res = await fetch(`/api/upload?filename=icon_${Date.now()}_${encodeURIComponent(file.name)}`, {
         method: 'POST',
         body: file,
         headers: {
@@ -630,9 +633,9 @@ export default function DevProjectsPage() {
     try {
       setUploading(true)
       setResult("")
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
-        method: "POST", 
-        body: file 
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        body: file
       })
       const data = await res.json()
       if (!res.ok || !data?.url) {
@@ -654,9 +657,9 @@ export default function DevProjectsPage() {
     try {
       setUploading(true)
       setResult("")
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
-        method: "POST", 
-        body: file 
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        body: file
       })
       const data = await res.json()
       if (!res.ok || !data?.url) {
@@ -679,9 +682,9 @@ export default function DevProjectsPage() {
     try {
       setUploading(true)
       setResult("")
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
-        method: "POST", 
-        body: file 
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        body: file
       })
       const data = await res.json()
       if (!res.ok || !data?.url) {
@@ -704,9 +707,9 @@ export default function DevProjectsPage() {
     try {
       setUploading(true)
       setResult("")
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, { 
-        method: "POST", 
-        body: file 
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        body: file
       })
       const data = await res.json()
       if (!res.ok || !data?.url) {
@@ -751,7 +754,7 @@ export default function DevProjectsPage() {
       setResult(`Missing required fields: ${missing.join(", ")}`)
       return
     }
-    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, image, icon, tags, content, pinned, hidden }
+    const body: Partial<Project> = { title, description, category, downloadUrl, githubUrl, demoUrl, youtubeUrl, robloxMarketplaceUrl, image, icon, tags, content, pinned, hidden }
     if (useCustomStyle && (cardGradient || cardColor)) {
       body.cardGradient = cardGradient
       body.cardColor = cardColor
@@ -796,7 +799,7 @@ export default function DevProjectsPage() {
           throw new Error(t || "Failed")
         }
         setResult("Project created successfully!")
-        
+
         // Clear form and remove draft
         localStorage.removeItem('projectDraft')
         setTitle("")
@@ -806,6 +809,7 @@ export default function DevProjectsPage() {
         setGithubUrl("")
         setDemoUrl("")
         setYoutubeUrl("")
+        setRobloxMarketplaceUrl("")
         setImage("")
         setIcon("")
         setTags([])
@@ -841,7 +845,7 @@ export default function DevProjectsPage() {
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Create stunning project showcases with advanced customization tools and live preview</p>
         </div>
-      
+
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
         <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto bg-gradient-to-r from-background/80 to-background/60 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-1.5">
           <TabsTrigger value="creator" className="group relative overflow-hidden data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30 rounded-lg transition-all duration-300 hover:scale-[1.02]">
@@ -855,7 +859,7 @@ export default function DevProjectsPage() {
             <span className="relative z-10">Project Editor</span>
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="creator" className="space-y-6">
           {editingProject && (
             <Card className="mb-6">
@@ -868,8 +872,8 @@ export default function DevProjectsPage() {
                       <p className="text-sm text-muted-foreground">Make your changes and click &quot;Update Project&quot; to save</p>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => {
                       setTitle("")
@@ -908,7 +912,7 @@ export default function DevProjectsPage() {
               </CardContent>
             </Card>
           )}
-      
+
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Tabs defaultValue="basic" className="space-y-8">
@@ -954,7 +958,7 @@ export default function DevProjectsPage() {
                 <span className="relative z-10">Debug</span>
               </TabsTrigger>
             </TabsList>
-            
+
             <form onSubmit={onSubmit}>
               <TabsContent value="basic" className="space-y-6">
                 <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
@@ -975,11 +979,11 @@ export default function DevProjectsPage() {
                         <span>Project Title</span>
                         <span className="text-destructive">*</span>
                       </label>
-                      <EnhancedInput 
-                        value={title} 
-                        onChange={e => setTitle(e.target.value)} 
-                        placeholder="My Awesome Project" 
-                        className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-primary/30 focus:border-primary/50" 
+                      <EnhancedInput
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        placeholder="My Awesome Project"
+                        className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -989,11 +993,11 @@ export default function DevProjectsPage() {
                       </label>
                       <div className="relative group/textarea">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/0 rounded-lg opacity-0 group-hover/textarea:opacity-100 transition-opacity -z-10" />
-                        <textarea 
-                          value={description} 
-                          onChange={e => setDescription(e.target.value)} 
-                          placeholder="Describe what makes your project special..." 
-                          className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-primary/50 focus:ring-2 focus:ring-primary/30 transition-all duration-200 backdrop-blur-sm" 
+                        <textarea
+                          value={description}
+                          onChange={e => setDescription(e.target.value)}
+                          placeholder="Describe what makes your project special..."
+                          className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-primary/50 focus:ring-2 focus:ring-primary/30 transition-all duration-200 backdrop-blur-sm"
                         />
                       </div>
                     </div>
@@ -1007,12 +1011,12 @@ export default function DevProjectsPage() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {["Roblox", "Roblox Studio", "Web Development", "Mobile Development", "Game Development"].map(cat => (
-                          <Badge 
+                          <Badge
                             key={cat}
                             variant={category === cat ? "default" : "secondary"}
                             className={`cursor-pointer transition-all duration-200 border ${
-                              category === cat 
-                                ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/15' 
+                              category === cat
+                                ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/15'
                                 : 'bg-background/60 hover:bg-accent/50 border-white/10 hover:border-white/20'
                             }`}
                             onClick={() => setCategory(cat)}
@@ -1024,14 +1028,14 @@ export default function DevProjectsPage() {
                           </Badge>
                         ))}
                       </div>
-                      <EnhancedInput 
-                        value={category} 
-                        onChange={e => setCategory(e.target.value.slice(0, 40))} 
-                        placeholder="Or enter custom category" 
+                      <EnhancedInput
+                        value={category}
+                        onChange={e => setCategory(e.target.value.slice(0, 40))}
+                        placeholder="Or enter custom category"
                         className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors"
                       />
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-muted-foreground">Project Settings</label>
@@ -1061,7 +1065,7 @@ export default function DevProjectsPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
                   <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-400/5 border-b border-blue-400/10 p-5">
                     <CardTitle className="flex items-center gap-4">
@@ -1083,23 +1087,23 @@ export default function DevProjectsPage() {
                         </label>
                         <span className="text-xs text-muted-foreground">{tags.length} tags</span>
                       </div>
-                      
+
                       <div className="relative group/input">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-blue-400/3 rounded-lg opacity-0 group-hover/input:opacity-100 transition-opacity -z-10" />
                         <div className="flex flex-wrap gap-2 p-2.5 min-h-[44px] rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 transition-colors">
                           {tags.map(tag => (
-                            <Badge 
-                              key={tag} 
-                              variant="secondary" 
+                            <Badge
+                              key={tag}
+                              variant="secondary"
                               className="group/tag flex items-center gap-1 bg-background/80 hover:bg-background border border-white/10 hover:border-white/20 transition-colors"
                             >
                               <span className="text-foreground/90">{tag}</span>
-                              <X 
-                                className="h-3 w-3 text-muted-foreground hover:text-foreground transition-colors" 
+                              <X
+                                className="h-3 w-3 text-muted-foreground hover:text-foreground transition-colors"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   removeTag(tag);
-                                }} 
+                                }}
                               />
                             </Badge>
                           ))}
@@ -1113,7 +1117,7 @@ export default function DevProjectsPage() {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-muted-foreground">
                           {tags.length === 0 ? (
@@ -1124,10 +1128,10 @@ export default function DevProjectsPage() {
                             <span>Tags help others discover your project</span>
                           )}
                         </p>
-                        <Button 
-                          type="button" 
-                          size="sm" 
-                          variant="ghost" 
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
                           className="h-7 px-2.5 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors"
                           onClick={() => addTag(tagInput.trim())}
                           disabled={!tagInput.trim()}
@@ -1136,7 +1140,7 @@ export default function DevProjectsPage() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <p className="text-xs font-medium text-muted-foreground">Popular tags:</p>
                       <div className="flex flex-wrap gap-1.5">
@@ -1144,10 +1148,10 @@ export default function DevProjectsPage() {
                           .filter(tag => !tags.includes(tag))
                           .slice(0, 8)
                           .map(tag => (
-                            <Badge 
-                              key={tag} 
-                              variant="outline" 
-                              className="cursor-pointer text-xs px-2 py-0.5 h-6 bg-background/60 hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-400/30 transition-colors" 
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="cursor-pointer text-xs px-2 py-0.5 h-6 bg-background/60 hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-400/30 transition-colors"
                               onClick={() => addTag(tag)}
                             >
                               + {tag}
@@ -1159,8 +1163,8 @@ export default function DevProjectsPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
-              
+
+
               <TabsContent value="links" className="space-y-6">
                 <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
                   <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-400/5 border-b border-green-400/10 p-5">
@@ -1187,28 +1191,28 @@ export default function DevProjectsPage() {
                               <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.027 2.747-1.027.546 1.377.202 2.394.1 2.646.64.7 1.028 1.593 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.19 22 16.428 22 12.017 22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                             </svg>
                           </div>
-                          <EnhancedInput 
-                            value={githubUrl} 
-                            onChange={e => setGithubUrl(e.target.value)} 
-                            placeholder="https://github.com/username/repo" 
+                          <EnhancedInput
+                            value={githubUrl}
+                            onChange={e => setGithubUrl(e.target.value)}
+                            placeholder="https://github.com/username/repo"
                             className="pl-9 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
                           />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-1.5">
                         <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                           <ExternalLink className="h-3.5 w-3.5 text-green-400/80" />
                           <span>Live Demo</span>
                         </label>
-                        <EnhancedInput 
-                          value={demoUrl} 
-                          onChange={e => setDemoUrl(e.target.value)} 
-                          placeholder="https://your-project.com" 
+                        <EnhancedInput
+                          value={demoUrl}
+                          onChange={e => setDemoUrl(e.target.value)}
+                          placeholder="https://your-project.com"
                           className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
                         />
                       </div>
-                      
+
                       <div className="space-y-1.5">
                         <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                           <Download className="h-3.5 w-3.5 text-green-400/80" />
@@ -1216,20 +1220,20 @@ export default function DevProjectsPage() {
                         </label>
                         <div className="flex items-center gap-2">
                           <div className="flex-1">
-                            <EnhancedInput 
-                              value={downloadUrl} 
-                              onChange={e => setDownloadUrl(e.target.value)} 
-                              placeholder="https://releases.com/download" 
+                            <EnhancedInput
+                              value={downloadUrl}
+                              onChange={e => setDownloadUrl(e.target.value)}
+                              placeholder="https://releases.com/download"
                               className="w-full h-10 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
                             />
                           </div>
                           <input ref={downloadFileInputRef} type="file" accept="*/*" onChange={handleDownloadFileSelect} className="hidden" />
-                          <Button 
-                            type="button" 
-                            variant="outline" 
+                          <Button
+                            type="button"
+                            variant="outline"
                             size="sm"
-                            className="h-10 px-3.5 whitespace-nowrap bg-background/60 hover:bg-green-500/10 border-green-400/20 text-green-400 hover:text-green-300 hover:border-green-400/40 transition-colors flex-shrink-0" 
-                            onClick={() => downloadFileInputRef.current?.click()} 
+                            className="h-10 px-3.5 whitespace-nowrap bg-background/60 hover:bg-green-500/10 border-green-400/20 text-green-400 hover:text-green-300 hover:border-green-400/40 transition-colors flex-shrink-0"
+                            onClick={() => downloadFileInputRef.current?.click()}
                             disabled={uploading}
                           >
                             {uploading ? (
@@ -1241,7 +1245,7 @@ export default function DevProjectsPage() {
                           </Button>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-1.5">
                         <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                           <svg className="h-3.5 w-3.5 text-green-400/80" fill="currentColor" viewBox="0 0 24 24">
@@ -1249,18 +1253,31 @@ export default function DevProjectsPage() {
                           </svg>
                           <span>YouTube Demo</span>
                         </label>
-                        <EnhancedInput 
-                          value={youtubeUrl} 
-                          onChange={e => setYoutubeUrl(e.target.value)} 
-                          placeholder="https://www.youtube.com/watch?v=..." 
+                        <EnhancedInput
+                          value={youtubeUrl}
+                          onChange={e => setYoutubeUrl(e.target.value)}
+                          placeholder="https://www.youtube.com/watch?v=..."
                           className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-green-400/30 focus:border-green-400/50 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                          <ShoppingCart className="h-3.5 w-3.5 text-blue-400/80" />
+                          <span>Roblox Marketplace</span>
+                        </label>
+                        <EnhancedInput
+                          value={robloxMarketplaceUrl}
+                          onChange={e => setRobloxMarketplaceUrl(e.target.value)}
+                          placeholder="https://www.roblox.com/catalog/..."
+                          className="bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400/50 transition-colors"
                         />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="media" className="space-y-6">
                 <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
                   <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-400/5 border-b border-purple-400/10 p-5">
@@ -1284,8 +1301,8 @@ export default function DevProjectsPage() {
                     />
                     <div
                       className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group/upload ${
-                        dragActive 
-                          ? "border-primary/60 bg-primary/5" 
+                        dragActive
+                          ? "border-primary/60 bg-primary/5"
                           : "border-white/10 hover:border-primary/40 hover:bg-primary/5"
                       }`}
                       onDrop={handleDrop}
@@ -1294,14 +1311,14 @@ export default function DevProjectsPage() {
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-xl opacity-0 group-hover/upload:opacity-100 transition-opacity duration-300 -z-10" />
-                      
+
                       {image ? (
                         <div className="relative group/image-preview">
                           <div className="relative overflow-hidden rounded-lg bg-background/20">
-                            <img 
-                              src={image} 
-                              alt="Preview" 
-                              className="w-full max-h-64 object-contain mx-auto rounded-lg transition-all duration-300 group-hover/image-preview:scale-[1.02]" 
+                            <img
+                              src={image}
+                              alt="Preview"
+                              className="w-full max-h-64 object-contain mx-auto rounded-lg transition-all duration-300 group-hover/image-preview:scale-[1.02]"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover/image-preview:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                               <div className="text-center space-y-3 transform translate-y-4 group-hover/image-preview:translate-y-0 transition-all duration-300">
@@ -1338,16 +1355,16 @@ export default function DevProjectsPage() {
                     <div className="relative">
                       <label className="text-sm font-medium mb-2 block">Or paste image URL</label>
                       <div className="flex gap-2">
-                        <EnhancedInput 
-                          value={image} 
-                          onChange={e => setImage(e.target.value)} 
+                        <EnhancedInput
+                          value={image}
+                          onChange={e => setImage(e.target.value)}
                           placeholder="https://images.com/project.jpg"
-                          className="flex-1" 
+                          className="flex-1"
                         />
                         {image && (
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
+                          <Button
+                            type="button"
+                            variant="ghost"
                             size="icon"
                             onClick={() => setImage("")}
                             className="hover:bg-red-500/20"
@@ -1382,8 +1399,8 @@ export default function DevProjectsPage() {
                     />
                     <div
                       className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer group/upload ${
-                        dragActive 
-                          ? "border-orange-400/60 bg-orange-500/5" 
+                        dragActive
+                          ? "border-orange-400/60 bg-orange-500/5"
                           : "border-white/10 hover:border-orange-400/40 hover:bg-orange-500/5"
                       }`}
                       onDrop={handleIconDrop}
@@ -1392,14 +1409,14 @@ export default function DevProjectsPage() {
                       onClick={() => iconFileInputRef.current?.click()}
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent rounded-xl opacity-0 group-hover/upload:opacity-100 transition-opacity duration-300 -z-10" />
-                      
+
                       {icon ? (
                         <div className="relative group/icon-preview">
                           <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-xl bg-background/20">
-                            <img 
-                              src={icon} 
-                              alt="Icon Preview" 
-                              className="w-full h-full object-cover transition-all duration-300 group-hover/icon-preview:scale-105" 
+                            <img
+                              src={icon}
+                              alt="Icon Preview"
+                              className="w-full h-full object-cover transition-all duration-300 group-hover/icon-preview:scale-105"
                             />
                             <div className="absolute inset-0 bg-black/70 opacity-0 group-hover/icon-preview:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                               <div className="text-center space-y-2 transform translate-y-3 group-hover/icon-preview:translate-y-0 transition-all duration-300">
@@ -1433,16 +1450,16 @@ export default function DevProjectsPage() {
                     <div className="relative">
                       <label className="text-sm font-medium mb-2 block">Or paste icon URL</label>
                       <div className="flex gap-2">
-                        <EnhancedInput 
-                          value={icon} 
-                          onChange={e => setIcon(e.target.value)} 
+                        <EnhancedInput
+                          value={icon}
+                          onChange={e => setIcon(e.target.value)}
                           placeholder="https://images.com/icon.png"
-                          className="flex-1" 
+                          className="flex-1"
                         />
                         {icon && (
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
+                          <Button
+                            type="button"
+                            variant="ghost"
                             size="icon"
                             onClick={() => setIcon("")}
                             className="hover:bg-red-500/20"
@@ -1455,7 +1472,7 @@ export default function DevProjectsPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="content" className="space-y-6">
                 <MarkdownEditorEnhanced
                   value={content}
@@ -1485,7 +1502,7 @@ Instructions for contributors...`}
                   height={500}
                 />
               </TabsContent>
-              
+
               <TabsContent value="style" className="space-y-6">
                 <Card className="border-white/10 bg-gradient-to-br from-background/80 to-background/50 backdrop-blur-sm">
                   <CardHeader className="border-b border-white/10">
@@ -1510,13 +1527,13 @@ Instructions for contributors...`}
                         </label>
                         <p className="text-xs text-muted-foreground mt-1">Enable to customize the card appearance</p>
                       </div>
-                      <Switch 
+                      <Switch
                         checked={useCustomStyle}
                         onCheckedChange={setUseCustomStyle}
                         className="data-[state=checked]:bg-indigo-600 data-[state=unchecked]:bg-white/10"
                       />
                     </div>
-                    
+
                     {useCustomStyle && (
                       <>
                         <div className="space-y-4 p-4 bg-background/30 rounded-lg border border-white/10">
@@ -1587,12 +1604,12 @@ Instructions for contributors...`}
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
                                 <label className="text-xs font-medium text-muted-foreground">Custom Gradient</label>
-                                <GradientPicker 
+                                <GradientPicker
                                   value={cardGradient}
                                   onChange={setCardGradient}
                                 />
                               </div>
-                              <EnhancedInput 
+                              <EnhancedInput
                                 value={cardGradient}
                                 onChange={e => setCardGradient(e.target.value)}
                                 placeholder="bg-gradient-to-r from-indigo-500 to-purple-600"
@@ -1601,7 +1618,7 @@ Instructions for contributors...`}
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-4 p-4 bg-background/30 rounded-lg border border-white/10">
                           <div>
                             <h4 className="text-sm font-medium">Solid Color</h4>
@@ -1648,7 +1665,7 @@ Instructions for contributors...`}
                                 </div>
                               ))}
                             </div>
-                            <EnhancedInput 
+                            <EnhancedInput
                               value={cardColor}
                               onChange={e => {
                                 setCardColor(e.target.value)
@@ -1658,9 +1675,9 @@ Instructions for contributors...`}
                             />
                           </div>
                         </div>
-                        
+
                         <div className="pt-2">
-                          <Button 
+                          <Button
                             type="button"
                             variant="outline"
                             onClick={() => {
@@ -1705,13 +1722,13 @@ Instructions for contributors...`}
                         </label>
                         <p className="text-xs text-muted-foreground mt-1">Enable to customize the title appearance</p>
                       </div>
-                      <Switch 
+                      <Switch
                         checked={useTitleCustomStyle}
                         onCheckedChange={setUseTitleCustomStyle}
                         className="data-[state=checked]:bg-amber-600 data-[state=unchecked]:bg-white/10"
                       />
                     </div>
-                    
+
                     {useTitleCustomStyle && (
                       <>
                         <div>
@@ -1738,15 +1755,15 @@ Instructions for contributors...`}
                                     setTitleGradientVia("")
                                   }}
                                   className={`h-10 rounded-lg border-2 transition-all ${
-                                    titleColor === color && !titleGradientFrom 
-                                      ? 'border-primary scale-110' 
+                                    titleColor === color && !titleGradientFrom
+                                      ? 'border-primary scale-110'
                                       : 'border-transparent hover:border-white/20 hover:scale-105'
                                   }`}
                                   style={{ backgroundColor: color }}
                                 />
                               ))}
                             </div>
-                            <EnhancedInput 
+                            <EnhancedInput
                               value={titleColor}
                               onChange={e => {
                                 setTitleColor(e.target.value)
@@ -1758,13 +1775,13 @@ Instructions for contributors...`}
                             />
                           </div>
                         </div>
-                        
+
                         <div>
                           <label className="text-sm font-medium mb-2 block">Title Gradient</label>
                           <div className="space-y-3">
                             <div>
                               <label className="text-xs font-medium text-muted-foreground mb-1 block">From Color</label>
-                              <EnhancedInput 
+                              <EnhancedInput
                                 value={titleGradientFrom}
                                 onChange={e => {
                                   setTitleGradientFrom(e.target.value)
@@ -1775,7 +1792,7 @@ Instructions for contributors...`}
                             </div>
                             <div>
                               <label className="text-xs font-medium text-muted-foreground mb-1 block">To Color</label>
-                              <EnhancedInput 
+                              <EnhancedInput
                                 value={titleGradientTo}
                                 onChange={e => {
                                   setTitleGradientTo(e.target.value)
@@ -1786,7 +1803,7 @@ Instructions for contributors...`}
                             </div>
                             <div>
                               <label className="text-xs font-medium text-muted-foreground mb-1 block">Via Color (Optional)</label>
-                              <EnhancedInput 
+                              <EnhancedInput
                                 value={titleGradientVia}
                                 onChange={e => setTitleGradientVia(e.target.value)}
                                 placeholder="#6366f1"
@@ -1826,9 +1843,9 @@ Instructions for contributors...`}
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="pt-2">
-                          <Button 
+                          <Button
                             type="button"
                             variant="outline"
                             onClick={() => {
@@ -1849,7 +1866,7 @@ Instructions for contributors...`}
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="templates" className="space-y-8">
                 <div className="grid gap-6">
                   <Card className="bg-gradient-to-br from-orange-500/5 to-orange-400/3 border-orange-500/10 group">
@@ -1867,7 +1884,7 @@ Instructions for contributors...`}
                     <CardContent>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <div className="flex-1 relative">
-                          <EnhancedInput 
+                          <EnhancedInput
                             value={templateName}
                             onChange={e => setTemplateName(e.target.value)}
                             placeholder="Enter a name for your template..."
@@ -1877,14 +1894,14 @@ Instructions for contributors...`}
                             <span className="text-xs text-muted-foreground">{templateName.length}/40</span>
                           </div>
                         </div>
-                        <Button 
-                          type="button" 
+                        <Button
+                          type="button"
                           onClick={() => {
                             if (templateName.trim() && title && description && category) {
-                              const newTemplate: CustomTemplate = { 
-                                title, 
-                                description, 
-                                category, 
+                              const newTemplate: CustomTemplate = {
+                                title,
+                                description,
+                                category,
                                 tags: [...tags],
                                 ...(useCustomStyle && cardGradient && { cardGradient }),
                                 ...(useCustomStyle && cardColor && { cardColor })
@@ -1927,9 +1944,9 @@ Instructions for contributors...`}
                         {Object.keys({...DEFAULT_TEMPLATES, ...customTemplates}).length} templates
                       </span>
                       <div className="h-8 w-px bg-white/10 mx-1"></div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-white/5"
                         onClick={() => document.getElementById('default-templates')?.scrollIntoView({ behavior: 'smooth' })}
                       >
@@ -1942,7 +1959,7 @@ Instructions for contributors...`}
                   {Object.keys(customTemplates).length > 0 ? (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {Object.entries(customTemplates).map(([key, template]) => (
-                        <TemplateCard 
+                        <TemplateCard
                           key={key}
                           template={template}
                           onApply={() => applyTemplate(template)}
@@ -1976,7 +1993,7 @@ Instructions for contributors...`}
                   </h3>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {Object.entries(DEFAULT_TEMPLATES).map(([key, template]) => (
-                      <TemplateCard 
+                      <TemplateCard
                         key={key}
                         template={template}
                         onApply={() => applyTemplate(template)}
@@ -1986,7 +2003,7 @@ Instructions for contributors...`}
                   </div>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="versions" className="space-y-6">
                 <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
                   <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-cyan-400/5 border-b border-cyan-400/10 p-5">
@@ -2007,42 +2024,42 @@ Instructions for contributors...`}
                           <span>Version Tag</span>
                           <span className="text-destructive">*</span>
                         </label>
-                        <EnhancedInput 
+                        <EnhancedInput
                           value={versionTag}
                           onChange={(e) => setVersionTag(e.target.value)}
-                          placeholder="v1.0.0" 
-                          className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50" 
+                          placeholder="v1.0.0"
+                          className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50"
                         />
                       </div>
-                      
+
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
                           <span>Release Title</span>
                           <span className="text-destructive">*</span>
                         </label>
-                        <EnhancedInput 
+                        <EnhancedInput
                           value={versionTitle}
                           onChange={(e) => setVersionTitle(e.target.value)}
-                          placeholder="Major Update - New Features & Bug Fixes" 
-                          className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50" 
+                          placeholder="Major Update - New Features & Bug Fixes"
+                          className="text-lg border-white/10 bg-background/50 hover:bg-background/70 transition-colors focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50"
                         />
                       </div>
-                      
+
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium text-muted-foreground">
                           Release Notes
                         </label>
                         <div className="relative group/textarea">
                           <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-cyan-400/0 rounded-lg opacity-0 group-hover/textarea:opacity-100 transition-opacity -z-10" />
-                          <textarea 
+                          <textarea
                             value={versionDescription}
                             onChange={(e) => setVersionDescription(e.target.value)}
                             placeholder="What's new in this version?&#10;- Added new feature X&#10;- Fixed bug Y&#10;- Improved performance"
-                            className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/30 transition-all duration-200 backdrop-blur-sm" 
+                            className="w-full rounded-lg border border-white/10 bg-background/50 hover:bg-background/70 p-4 min-h-[120px] resize-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/30 transition-all duration-200 backdrop-blur-sm"
                           />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <label className="text-sm font-medium text-muted-foreground">Version Type</label>
                         <div className="flex flex-wrap gap-2">
@@ -2053,7 +2070,7 @@ Instructions for contributors...`}
                             { type: "preview", color: "purple", icon: "👀" },
                             { type: "hotfix", color: "red", icon: "🔥" }
                           ].map(({ type, color, icon }) => (
-                            <Badge 
+                            <Badge
                               key={type}
                               variant="outline"
                               onClick={() => setVersionType(type as "stable" | "beta" | "alpha" | "preview" | "hotfix")}
@@ -2073,41 +2090,41 @@ Instructions for contributors...`}
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <label className="text-sm font-medium text-muted-foreground">Download Assets</label>
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
-                            <EnhancedInput 
+                            <EnhancedInput
                               value={versionAssetInput}
                               onChange={(e) => setVersionAssetInput(e.target.value)}
-                              placeholder="https://releases.com/asset.zip or upload file" 
+                              placeholder="https://releases.com/asset.zip or upload file"
                               className="flex-1 bg-background/50 hover:bg-background/70 border-white/10 focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-400/50 transition-colors"
                               onKeyPress={(e) => e.key === 'Enter' && addVersionAssetUrl()}
                             />
-                            <Button 
-                              type="button" 
-                              variant="outline" 
+                            <Button
+                              type="button"
+                              variant="outline"
                               size="sm"
                               onClick={addVersionAssetUrl}
                               disabled={!versionAssetInput.trim()}
-                              className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors disabled:opacity-50" 
+                              className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors disabled:opacity-50"
                             >
                               Add URL
                             </Button>
-                            <Button 
-                              type="button" 
-                              variant="outline" 
+                            <Button
+                              type="button"
+                              variant="outline"
                               size="sm"
                               onClick={handleVersionAssetUpload}
                               disabled={uploading}
-                              className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors" 
+                              className="bg-background/60 hover:bg-cyan-500/10 border-cyan-400/20 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors"
                             >
                               <Upload className="h-4 w-4 mr-1.5" />
                               {uploading ? "Uploading..." : "Upload"}
                             </Button>
                           </div>
-                          
+
                           {versionAssets.length > 0 && (
                             <div className="space-y-2">
                               <p className="text-xs text-muted-foreground">Assets ({versionAssets.length}):</p>
@@ -2139,12 +2156,12 @@ Instructions for contributors...`}
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between pt-4 border-t border-white/10">
                         <div className="flex items-center gap-2">
-                          <input 
-                            type="checkbox" 
-                            id="prerelease" 
+                          <input
+                            type="checkbox"
+                            id="prerelease"
                             checked={isPrerelease}
                             onChange={(e) => setIsPrerelease(e.target.checked)}
                             className="rounded border-gray-300 text-cyan-400 focus:ring-cyan-400/30"
@@ -2154,7 +2171,7 @@ Instructions for contributors...`}
                           </label>
                         </div>
                         <div className="flex gap-2">
-                          <Button 
+                          <Button
                             type="button"
                             onClick={handleCreateVersion}
                             disabled={!editingProjectId || creatingVersion}
@@ -2164,7 +2181,7 @@ Instructions for contributors...`}
                             {creatingVersion ? (editingVersionId ? "Updating..." : "Creating...") : (editingVersionId ? "Update Version" : "Create Version")}
                           </Button>
                           {editingVersionId && (
-                            <Button 
+                            <Button
                               type="button"
                               variant="outline"
                               onClick={cancelVersionEdit}
@@ -2177,13 +2194,13 @@ Instructions for contributors...`}
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4 pt-6 border-t border-white/10">
                       <h3 className="text-lg font-semibold text-foreground/90 flex items-center gap-2">
                         <span className="w-1 h-5 rounded-full bg-cyan-400"></span>
                         Version History
                       </h3>
-                      
+
                       <div className="space-y-3">
                         {projectVersions.length > 0 ? (
                           projectVersions.map((version) => {
@@ -2232,10 +2249,10 @@ Instructions for contributors...`}
                                     {version.assets && version.assets.length > 0 && (
                                       <div className="flex items-center gap-1">
                                         {version.assets.map((asset) => (
-                                          <Button 
+                                          <Button
                                             key={asset.id}
-                                            variant="ghost" 
-                                            size="sm" 
+                                            variant="ghost"
+                                            size="sm"
                                             className="h-7 px-2 text-xs hover:bg-cyan-500/10"
                                             onClick={async () => {
                                               window.open(`/api/projects/${editingProjectId}/versions/${version.id}/download?assetId=${asset.id}`, '_blank')
@@ -2252,27 +2269,27 @@ Instructions for contributors...`}
                                     </Button>
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
                                       className="h-6 w-6 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                                       onClick={() => handleEditVersion(version)}
                                       title="Edit version"
                                     >
                                       <Edit2 className="h-3 w-3" />
                                     </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
                                       className="h-6 w-6 p-0 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
                                       onClick={() => handleToggleVersionVisibility(version.id, !version.isHidden)}
                                       title={version.isHidden ? "Show version" : "Hide version"}
                                     >
                                       {version.isHidden ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                                     </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
                                       className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                                       onClick={() => handleDeleteVersion(version.id)}
                                       title="Delete version"
@@ -2300,7 +2317,7 @@ Instructions for contributors...`}
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="debug" className="space-y-6">
                 <Card className="bg-background/80 backdrop-blur-sm border-white/10 shadow-xl overflow-hidden group">
                   <CardHeader className="bg-gradient-to-r from-red-500/10 to-red-400/5 border-b border-red-400/10 p-5">
@@ -2316,9 +2333,9 @@ Instructions for contributors...`}
                   </CardHeader>
                   <CardContent className="space-y-6 p-6">
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
                         onClick={async () => {
                           try {
@@ -2341,9 +2358,9 @@ Instructions for contributors...`}
                         <span className="relative z-10">Reset Downloads</span>
                       </Button>
 
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
                         onClick={async () => {
                           try {
@@ -2366,9 +2383,9 @@ Instructions for contributors...`}
                         <span className="relative z-10">Reset Views</span>
                       </Button>
 
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
                         onClick={() => {
                           localStorage.removeItem('projectDraft')
@@ -2382,9 +2399,9 @@ Instructions for contributors...`}
                         <span className="relative z-10">Clear Storage</span>
                       </Button>
 
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         className="group relative overflow-hidden bg-background/60 hover:bg-red-500/10 border-red-400/20 text-red-400 hover:text-red-300 hover:border-red-400/40 transition-all duration-300 hover:scale-105"
                         onClick={async () => {
                           try {
@@ -2424,7 +2441,7 @@ Instructions for contributors...`}
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <div className="flex items-center justify-between pt-6 border-t">
                 <div className="flex items-center gap-3">
                   {result && (
@@ -2519,7 +2536,7 @@ Instructions for contributors...`}
               </form>
             </Tabs>
           </div>
-          
+
           <div className="lg:col-span-1">
             <Card className="sticky top-8 bg-background/60 backdrop-blur-sm border-white/10 shadow-xl">
               <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-white/10">
@@ -2578,6 +2595,7 @@ Instructions for contributors...`}
                   githubUrl={githubUrl || undefined}
                   demoUrl={demoUrl || undefined}
                   youtubeUrl={youtubeUrl || undefined}
+                  robloxMarketplaceUrl={robloxMarketplaceUrl || undefined}
                   image={image || undefined}
                   icon={icon || undefined}
                   tags={tags.length ? tags : ["Sample", "Tags"]}
@@ -2598,11 +2616,11 @@ Instructions for contributors...`}
           </div>
         </div>
         </TabsContent>
-        
+
         <TabsContent value="editor" className="space-y-6">
           <ProjectEditor onEditProject={startEditingProject} />
         </TabsContent>
-        
+
       </Tabs>
       </div>
     </div>
